@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+data/
+.pytest_cache/
+# Python virtualenv
+.venv/
+venv/
+env/
+__pycache__/
+
+# Pytest cache
+.pytest_cache/
+
+# Debug / local files
+debug_*.html

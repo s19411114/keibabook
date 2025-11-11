@@ -1,0 +1,11 @@
+# 設定ファイル
+race_id: 202503060201
+race_key: "20250306_fukushima1R"
+shutuba_url: "https://s.keibabook.co.jp/cyuou/syutuba/202503060201"
+seiseki_url: "https://s.keibabook.co.jp/cyuou/seiseki/202503060201"
+# 出力先
+output_dir: "C:/GeminiCLI/TEST/keibabook/data"
+# Playwright オプション
+use_playwright: true
+playwright_headless: false
+playwright_timeout: 30000  # ms
