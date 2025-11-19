@@ -1,4 +1,11 @@
 # 設定ファイル
+# 競馬種別: 'jra' (中央競馬) または 'nar' (地方競馬)
+race_type: "jra"
+# 地方競馬の場合の会場: 'minami_kanto' (南関4会場) または 'other' (その他会場)
+# 南関4会場: 大井、川崎、船橋、浦和
+# その他会場: 門別、盛岡、名古屋、園田など
+venue_type: "minami_kanto"  # 'minami_kanto' or 'other'
+venue: "大井"  # 会場名（大井、川崎、船橋、浦和、門別、盛岡、名古屋、園田など）
 race_id: 202503060201
 race_key: "20250306_fukushima1R"
 shutuba_url: "https://s.keibabook.co.jp/cyuou/syutuba/202503060201"

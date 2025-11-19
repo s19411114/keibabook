@@ -14,3 +14,6 @@ __pycache__/
 
 # Debug / local files
 debug_*.html
+
+# Streamlit
+.streamlit/
