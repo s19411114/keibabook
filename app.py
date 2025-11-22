@@ -6,14 +6,23 @@ import streamlit as st
 import asyncio
 import os
 import json
+import datetime
+import importlib
 from pathlib import Path
 from src.utils.config import load_settings
 from src.scrapers.keibabook import KeibaBookScraper
+# モジュールのリロードを強制 (AttributeError対策)
+import src.scrapers.jra_schedule
+importlib.reload(src.scrapers.jra_schedule)
+from src.scrapers.jra_schedule import JRAScheduleFetcher
+
+from src.scrapers.jra_odds import JRAOddsFetcher
 from src.utils.db_manager import CSVDBManager
 from src.utils.recommender import HorseRecommender
 from src.utils.horse_ranker import HorseRanker
 from src.utils.upset_detector import UpsetDetector
 from src.utils.logger import get_logger
+from src.utils.venue_manager import VenueManager
 
 logger = get_logger(__name__)
 
@@ -21,8 +30,127 @@ logger = get_logger(__name__)
 st.set_page_config(
     page_title="競馬ブックスクレイパー",
     page_icon="🐎",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
+
+# --- カスタムCSS (Premium UI - High Contrast) ---
+st.markdown("""
+<style>
+    /* 全体のフォントと背景 */
+    .stApp {
+        background-color: #0e1117;
+        color: #ffffff; /* テキストを真っ白に */
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* ヘッダー */
+    h1, h2, h3, h4, h5, h6 {
+        color: #ffffff !important; /* 強制的に白 */
+        font-weight: 700;
+    }
+    
+    /* 通常テキスト */
+    p, label, .stMarkdown, .stText, li {
+        color: #e0e0e0 !important;
+    }
+    
+    /* カード風コンテナ */
+    .css-1r6slb0, .css-12w0qpk {
+        background-color: #1e2130;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        border: 1px solid #333;
+    }
+    
+    /* ボタン */
+    .stButton>button {
+        background-color: #4CAF50;
+        color: white !important;
+        border-radius: 5px;
+        border: none;
+        padding: 10px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        background-color: #45a049;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* 入力フィールド */
+    .stTextInput>div>div>input, .stNumberInput>div>div>input {
+        background-color: #262730;
+        color: #ffffff !important;
+        border-radius: 5px;
+        border: 1px solid #444;
+    }
+    
+    /* セレクトボックス - ドロップダウンメニューの視認性を確保 */
+    .stSelectbox [data-baseweb="select"] > div {
+        background-color: #262730 !important;
+        color: #ffffff !important;
+    }
+    
+    /* ドロップダウンメニューのオプション */
+    [data-baseweb="popover"] {
+        background-color: #1e2130 !important;
+    }
+    
+    [role="option"] {
+        background-color: #262730 !important;
+        color: #ffffff !important;
+    }
+    
+    [role="option"]:hover {
+        background-color: #4CAF50 !important;
+        color: #ffffff !important;
+    }
+    
+    /* ラジオボタン */
+    .stRadio>div {
+        color: #ffffff !important;
+    }
+    
+    /* Expander */
+    .streamlit-expanderHeader {
+        color: #ffffff !important;
+        background-color: #1e2130;
+    }
+    
+    /* メトリック */
+    [data-testid="stMetricValue"] {
+        color: #ffffff !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #aaaaaa !important;
+    }
+    
+    /* サイドバー */
+    section[data-testid="stSidebar"] {
+        background-color: #111;
+    }
+    
+    /* ツールチップアイコン (?マーク) の視認性向上 */
+    [data-testid="stTooltipIcon"] {
+        color: #ffffff !important;
+    }
+    [data-testid="stTooltipIcon"] > svg {
+        stroke: #ffffff !important;
+        fill: #ffffff !important;
+    }
+    
+    /* リンクの色 */
+    a {
+        color: #4CAF50 !important;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # セッション状態の初期化
 if 'scraping_in_progress' not in st.session_state:
@@ -31,124 +159,219 @@ if 'scraped_data' not in st.session_state:
     st.session_state.scraped_data = None
 if 'db_manager' not in st.session_state:
     st.session_state.db_manager = CSVDBManager()
+if 'jra_schedule' not in st.session_state:
+    st.session_state.jra_schedule = []
+if 'last_fetched_date' not in st.session_state:
+    st.session_state.last_fetched_date = None
 
-# タイトル
-st.title("🐎 競馬ブックスクレイパー")
+# 会場コード定義 (推定)
+VENUE_CODES = {
+    # JRA
+    "札幌": "01", "函館": "02", "福島": "03", "新潟": "04", "東京": "05", 
+    "中山": "06", "中京": "07", "京都": "08", "阪神": "09", "小倉": "10",
+    # NAR (標準的なコード)
+    "帯広": "03", "門別": "36", "盛岡": "10", "水沢": "11", 
+    "浦和": "18", "船橋": "19", "大井": "20", "川崎": "21", 
+    "金沢": "22", "笠松": "23", "名古屋": "24", 
+    "園田": "27", "姫路": "28", "高知": "31", "佐賀": "32"
+}
+
+# タイトルエリア
+col_title, col_status = st.columns([3, 1])
+with col_title:
+    st.title("🐎 競馬ブックスクレイパー Pro")
+with col_status:
+    if st.session_state.scraping_in_progress:
+        st.warning("🔄 処理中...")
+    else:
+        st.success("✅ 待機中")
+
 st.markdown("---")
 
-# サイドバー: 設定
-with st.sidebar:
-    st.header("⚙️ 設定")
+# 設定ファイルの読み込み
+try:
+    settings = load_settings()
+except Exception as e:
+    st.error(f"設定ファイル読み込みエラー: {e}")
+    settings = {}
+
+# --- スマートレース選択 (メインエリア上部) ---
+st.subheader("📅 レース選択")
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    # 日付選択 (現在時刻に応じてデフォルトを変更)
+    now = datetime.datetime.now()
+    today = datetime.date.today()
     
-    # 設定ファイルの読み込み
-    try:
-        settings = load_settings()
-        st.success("設定ファイル読み込み成功")
-    except Exception as e:
-        st.error(f"設定ファイル読み込みエラー: {e}")
-        settings = {}
+    # 17時以降なら翌日をデフォルトに
+    if now.hour >= 17:
+        default_date = today + datetime.timedelta(days=1)
+    else:
+        default_date = today
+        
+    selected_date = st.date_input("開催日", default_date)
+    date_str = selected_date.strftime("%Y%m%d")
     
-    # レース情報表示
-    if 'race_id' in settings:
-        st.subheader("現在のレース")
-        st.text(f"レースID: {settings.get('race_id', 'N/A')}")
-        st.text(f"レースキー: {settings.get('race_key', 'N/A')}")
-        st.text(f"URL: {settings.get('shutuba_url', 'N/A')[:50]}...")
-    
-    st.markdown("---")
-    
-    # データベース統計
-    st.subheader("📊 データベース統計")
-    race_ids = st.session_state.db_manager.get_race_ids()
-    st.metric("保存済みレース数", len(race_ids))
-    
-    # 重複チェック設定
-    use_duplicate_check = st.checkbox("重複チェックを有効化", value=True)
-    
-    st.markdown("---")
-    
-    # 中央競馬/地方競馬選択
-    race_type_options = {
-        "中央競馬 (JRA)": "jra",
-        "地方競馬 (NAR)": "nar"
-    }
+    # 日付が変わったらスケジュール再取得
+    if st.session_state.last_fetched_date != selected_date:
+        async def update_schedule():
+            # タイムアウト対策: spinnerを表示しつつ、失敗してもエラーにしない
+            try:
+                with st.spinner(f"{selected_date}のスケジュールを確認中..."):
+                    schedule = await JRAScheduleFetcher.fetch_schedule_for_date(selected_date)
+                    st.session_state.jra_schedule = schedule
+                    st.session_state.last_fetched_date = selected_date
+            except Exception as e:
+                logger.error(f"スケジュール更新エラー: {e}")
+                st.session_state.jra_schedule = [] # 失敗時は空にして手動選択へ
+        
+        asyncio.run(update_schedule())
+
+with col2:
+    # 競馬種別と会場選択
+    race_type_options = ["中央競馬 (JRA)", "地方競馬 (NAR)"]
     race_type_display = st.radio(
-        "競馬種別",
-        list(race_type_options.keys()),
-        index=0 if settings.get('race_type', 'jra') == 'jra' else 1
+        "競馬種別", 
+        race_type_options, 
+        index=0 if settings.get('race_type', 'jra') == 'jra' else 1,
+        horizontal=True
     )
-    race_type = race_type_options[race_type_display]
+    race_type = "jra" if race_type_display == "中央競馬 (JRA)" else "nar"
     
-    # 地方競馬の場合、会場選択
-    if race_type == 'nar':
-        from src.utils.venue_manager import VenueManager
-        
-        venue_type = st.radio(
-            "会場タイプ",
-            ["南関4会場", "その他会場"],
-            index=0 if settings.get('venue_type', 'minami_kanto') == 'minami_kanto' else 1
-        )
-        
-        if venue_type == "南関4会場":
-            venue_options = VenueManager.get_minami_kanto_venues()
-            default_venue = settings.get('venue', '大井')
-        else:
-            venue_options = VenueManager.get_other_venues()
-            default_venue = settings.get('venue', '門別')
-        
-        selected_venue = st.selectbox(
-            "会場を選択",
-            venue_options,
-            index=venue_options.index(default_venue) if default_venue in venue_options else 0
+    if race_type == "nar":
+        venue_list = VenueManager.get_all_venues()
+        default_venue = settings.get('venue', '大井')
+        selected_venue_name = st.selectbox(
+            "会場", 
+            venue_list, 
+            index=venue_list.index(default_venue) if default_venue in venue_list else 0
         )
     else:
-        selected_venue = None
+        # JRA会場 (スケジュールベース)
+        priority_order = ["福島", "京都", "東京", "中山", "阪神", "中京", "新潟", "小倉", "札幌", "函館"]
+        
+        # 取得したスケジュールから会場リストを作成
+        today_venues = list(set([s['venue'] for s in st.session_state.jra_schedule])) if st.session_state.jra_schedule else []
+        
+        if today_venues:
+            # 優先順にソート
+            active_venues = sorted([v for v in today_venues if v in priority_order], key=lambda x: priority_order.index(x))
+            active_venues += [v for v in today_venues if v not in priority_order]
+            
+            selected_venue_name = st.selectbox("会場 (開催あり)", active_venues)
+        else:
+            # 開催がない場合 (または取得失敗)
+            # 警告は出さず、手動選択であることを示す
+            selected_venue_name = st.selectbox("会場 (手動選択)", priority_order)
+
+with col3:
+    # レース番号選択 (現在時刻から推定)
+    default_race_num = 1
+    
+    # 選択日が今日の場合のみ時刻推定を行う
+    if selected_date == today:
+        if 9 <= now.hour <= 16:
+            start_minutes = 9 * 60 + 50 # 9:50開始基準
+            current_minutes = now.hour * 60 + now.minute
+            diff_minutes = current_minutes - start_minutes
+            if diff_minutes > 0:
+                estimated_race = int(diff_minutes / 30) + 1
+                default_race_num = max(1, min(12, estimated_race))
+        elif 17 <= now.hour:
+            # 今日だけど17時以降 -> 最終レース終わってるので手動選択待ち (または翌日誘導済み)
+            default_race_num = 12 
+    else:
+        # 明日以降なら1Rから
+        default_race_num = 1
+    
+    selected_race_num = st.number_input("レース番号", min_value=1, max_value=12, value=default_race_num)
+
+with col4:
+    # ID自動生成
+    venue_code = VENUE_CODES.get(selected_venue_name, "00")
+    generated_race_id = f"{date_str}{venue_code}{selected_race_num:02d}"
+    
+    # URL生成
+    if race_type == "nar":
+        generated_url = f"https://s.keibabook.co.jp/chihou/syutuba/{generated_race_id}"
+    else:
+        generated_url = f"https://s.keibabook.co.jp/cyuou/syutuba/{generated_race_id}"
+    
+    # URLリンク表示 (ボタン風)
+    st.markdown(f"""
+    <div style="margin-top: 28px;">
+        <a href="{generated_url}" target="_blank" style="
+            background-color: #262730; 
+            color: #4CAF50 !important; 
+            padding: 10px 15px; 
+            border-radius: 5px; 
+            border: 1px solid #4CAF50;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        ">
+            🔗 出馬表ページを開く
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+
+# レースキー生成 (内部用)
+generated_race_key = f"{date_str}_{VenueManager.get_venue_code(selected_venue_name) or 'unknown'}{selected_race_num}R"
+
+st.markdown("---")
+
+# --- サイドバー: 開発者設定 (隠蔽) ---
+with st.sidebar:
+    with st.expander("🛠️ 開発者設定 (Developer Settings)"):
+        st.header("⚙️ 詳細設定")
+        
+        # ID/URLの手動オーバーライド
+        st.subheader("🔧 パラメータ手動設定")
+        manual_race_id = st.text_input("レースID (上書き用)", value=generated_race_id)
+        manual_race_key = st.text_input("レースキー (上書き用)", value=generated_race_key)
+        manual_url = st.text_input("URL (上書き用)", value=generated_url)
+        
+        # データベース統計
+        st.subheader("📊 データベース統計")
+        race_ids = st.session_state.db_manager.get_race_ids()
+        st.metric("保存済みレース数", len(race_ids))
+        
+        # 重複チェック設定
+        use_duplicate_check = st.checkbox("重複チェックを有効化", value=True)
+        headless_mode = st.checkbox("ヘッドレスモード", value=settings.get('playwright_headless', False))
 
 # メインコンテンツ
 tab1, tab2, tab3, tab4 = st.tabs(["📥 スクレイピング", "📊 データ確認", "🎯 レコメンド", "📝 ログ"])
 
 with tab1:
-    st.header("レースデータ取得")
+    st.header("データ取得実行")
     
-    # レース情報入力
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        race_id = st.text_input(
-            "レースID",
-            value=settings.get('race_id', ''),
-            help="例: 202503060201"
-        )
-        race_key = st.text_input(
-            "レースキー",
-            value=settings.get('race_key', ''),
-            help="例: 20250306_fukushima1R"
-        )
-    
-    with col2:
-        shutuba_url = st.text_input(
-            "出馬表URL",
-            value=settings.get('shutuba_url', ''),
-            help="競馬ブックの出馬表ページURL"
-        )
-        headless_mode = st.checkbox("ヘッドレスモード", value=settings.get('playwright_headless', False))
+    # 最終確認用の表示
+    st.info(f"**対象**: {selected_date} {selected_venue_name} {selected_race_num}R")
     
     # スクレイピング実行ボタン
     if st.button("🚀 スクレイピング開始", type="primary", disabled=st.session_state.scraping_in_progress):
-        if not race_id or not shutuba_url:
-            st.error("レースIDと出馬表URLを入力してください")
+        # 手動設定があればそちらを優先
+        target_race_id = manual_race_id if manual_race_id != generated_race_id else generated_race_id
+        target_race_key = manual_race_key if manual_race_key != generated_race_key else generated_race_key
+        target_url = manual_url if manual_url != generated_url else generated_url
+        
+        if not target_race_id or not target_url:
+            st.error("レースIDとURLが無効です")
         else:
             st.session_state.scraping_in_progress = True
             
             # 設定を更新
             current_settings = {
-                'race_type': race_type,  # 競馬種別
-                'venue': selected_venue if race_type == 'nar' else None,  # 会場（地方競馬の場合）
-                'venue_type': 'minami_kanto' if (race_type == 'nar' and venue_type == '南関4会場') else 'other' if race_type == 'nar' else None,
-                'race_id': race_id,
-                'race_key': race_key or race_id,
-                'shutuba_url': shutuba_url,
-                'seiseki_url': settings.get('seiseki_url', ''),  # 結果ページURL
+                'race_type': race_type,
+                'venue': selected_venue_name if race_type == 'nar' else None,
+                'venue_type': 'minami_kanto' if (race_type == 'nar' and VenueManager.is_minami_kanto(selected_venue_name)) else 'other' if race_type == 'nar' else None,
+                'race_id': target_race_id,
+                'race_key': target_race_key,
+                'shutuba_url': target_url,
+                'seiseki_url': settings.get('seiseki_url', ''),
                 'playwright_headless': headless_mode,
                 'playwright_timeout': settings.get('playwright_timeout', 30000),
                 'output_dir': settings.get('output_dir', 'data')
@@ -170,11 +393,26 @@ with tab1:
                     # スクレイパー作成
                     scraper = KeibaBookScraper(current_settings, db_manager=db_manager)
                     
-                    status_text.text("ページ取得中...")
+                    status_text.text("ページ取得中 (KeibaBook)...")
                     progress_bar.progress(30)
                     
-                    # スクレイピング実行
+                    # スクレイピング実行 (KeibaBook)
                     scraped_data = await scraper.scrape()
+                    
+                    # JRAオッズ取得 (JRAの場合のみ)
+                    if race_type == 'jra':
+                        status_text.text("リアルタイムオッズ取得中 (JRA)...")
+                        progress_bar.progress(60)
+                        
+                        jra_odds = await JRAOddsFetcher.fetch_realtime_odds(selected_venue_name, selected_race_num)
+                        
+                        # オッズデータをマージ
+                        if jra_odds:
+                            for horse in scraped_data.get('horses', []):
+                                horse_num = horse.get('horse_num')
+                                if horse_num in jra_odds:
+                                    horse['current_odds'] = jra_odds[horse_num]
+                                    logger.info(f"JRAオッズ適用: 馬番{horse_num} -> {jra_odds[horse_num]}")
                     
                     status_text.text("データ保存中...")
                     progress_bar.progress(80)
@@ -183,20 +421,20 @@ with tab1:
                     if db_manager:
                         db_manager.save_race_data(
                             scraped_data,
-                            race_id,
-                            race_key or race_id
+                            target_race_id,
+                            target_race_key
                         )
                     
                     # JSONファイルにも保存
                     output_dir = Path(current_settings.get('output_dir', 'data'))
                     output_dir.mkdir(parents=True, exist_ok=True)
-                    json_file = output_dir / f"{race_key or race_id}.json"
+                    json_file = output_dir / f"{target_race_key}.json"
                     with open(json_file, 'w', encoding='utf-8') as f:
                         json.dump(scraped_data, f, ensure_ascii=False, indent=2)
                     
                     # AI用JSONもエクスポート
                     if db_manager:
-                        db_manager.export_for_ai(race_id, str(output_dir / "json"))
+                        db_manager.export_for_ai(target_race_id, str(output_dir / "json"))
                     
                     progress_bar.progress(100)
                     status_text.text("完了！")
@@ -238,6 +476,11 @@ with tab2:
                 with open(json_file, 'r', encoding='utf-8') as f:
                     race_data = json.load(f)
                 
+                # JSONコピー機能
+                st.subheader("📋 JSONデータ (コピー用)")
+                json_str = json.dumps(race_data, ensure_ascii=False, indent=2)
+                st.code(json_str, language='json')
+                
                 # レース情報表示
                 st.subheader("レース情報")
                 col1, col2, col3 = st.columns(3)
@@ -257,6 +500,8 @@ with tab2:
                             col1, col2 = st.columns(2)
                             with col1:
                                 st.text(f"騎手: {horse.get('jockey', 'N/A')}")
+                                if 'current_odds' in horse:
+                                    st.metric("現在オッズ (JRA)", f"{horse['current_odds']}倍")
                                 if 'training_data' in horse and horse['training_data']:
                                     st.text("調教データ: あり")
                                 if 'pedigree_data' in horse and horse['pedigree_data']:
@@ -410,9 +655,9 @@ with tab3:
                                 st.metric("近走調子", analysis['recent_form'])
                             
                             if analysis['flags']:
-                                st.warning("⚠️ 要注意フラグ:")
-                                for flag in analysis['flags']:
-                                    st.text(f"  • {flag}")
+                                 st.warning("⚠️ 要注意フラグ:")
+                                 for flag in analysis['flags']:
+                                     st.text(f"  • {flag}")
                 else:
                     st.info("馬データがありません")
             else:
@@ -452,4 +697,3 @@ with tab4:
 # フッター
 st.markdown("---")
 st.caption("競馬ブックスクレイパー v1.0 | 利用規約とrobots.txtを確認してください")
-
