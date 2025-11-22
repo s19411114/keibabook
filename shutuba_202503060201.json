@@ -1,0 +1,15 @@
+{
+  "race_id": "202503060201",
+  "race_name": "s.keibabook.co.jps.keibabook.co.jp",
+  "horses": [
+    {
+      "horse_num": "馬名母馬名種牡馬名馬主名騎手名厩舎名検索",
+      "jockey": null,
+      "weight": null,
+      "odds": null,
+      "extras": {
+        "row_text": "馬名 母馬名 種牡馬名 馬主名 騎手名 厩舎名 検索"
+      }
+    }
+  ]
+}

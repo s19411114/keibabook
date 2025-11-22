@@ -1,0 +1,22 @@
+{
+  "url": "https://s.keibabook.co.jp/db/uma/0951125",
+  "fetched_at": "2025-11-14T02:06:56.052481+09:00",
+  "levels": {
+    "1": {
+      "sire": null,
+      "dam": "馬名",
+      "damsire": null
+    },
+    "2": {
+      "paternal_grandsire": "母馬名",
+      "paternal_granddam": "種牡馬名",
+      "maternal_grandsire": "馬主名",
+      "maternal_granddam": "騎手名"
+    },
+    "3": [
+      "厩舎名",
+      "検索"
+    ]
+  },
+  "raw_snippet": "馬名 母馬名 種牡馬名 馬主名 騎手名 厩舎名 検索"
+}

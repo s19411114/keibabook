@@ -1,0 +1,3031 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja" id="html"><head>
+	<!-- Google Tag Manager 20230221 -->
+<!--
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-TW5ZR9G');</script>
+-->
+	<!-- End Google Tag Manager -->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="//style.keibabook.co.jp/images/common/apple-touch-icon.png">
+<link rel="shortcut icon" href="//style.keibabook.co.jp/images/common/favicon.ico">
+<title>		 競馬ブック－専門紙が送る充実の競馬情報サイト 			</title>
+<meta name="keywords" content="競馬,予想,結果,レース,オッズ,競馬ブック,JRA,競馬場,馬主,騎手">
+<meta name="description" content="		 新聞・週刊誌・四季報を発行する競馬専門紙『競馬ブック』。トレセン＆競馬場直送のお役立ち情報や、圧倒的規模を誇るデータベースをご利用いただけます。競馬ブックであなたの予想を実りあるものに。 			">
+<link rel="canonical" href="https://p.keibabook.co.jp">
+<!--[if lt IE 9]>
+<script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<script src="//www.keibabook.co.jp/testsite/smart/js/css3-mediaqueries.js"></script>
+<![endif]-->
+
+<!-- styleshhet start -->
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/smart/css/reset.css?20180211" media="all">
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/smart/css/clear.css" media="all">
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/smart/css/global.css?20240109" media="all">
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/smart/css/main.css?20191108" media="all">
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/smart/css/common.css?20251004" media="all">
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/kessai/css/form.css?202402091247" media="all">
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/smart/css/utility.css?20230906" media="all">
+<!-- styleshhet end -->
+
+<!-- script start -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="//style.keibabook.co.jp/smart/js/jquery.tablesorter.min.js"></script>
+
+<link href="//style.keibabook.co.jp/smart/css/select2.min.css?20180106" rel="stylesheet">
+<script src="//style.keibabook.co.jp/smart/js/select2.min.js?20180107"></script>
+<!--
+<script type="text/javascript" src="//style.keibabook.co.jp/smart/js/googleanalytics.js?20200321"></script>
+-->
+<meta name="google-site-verification" content="lTHR0XeaAG_9ruLPESh_PgugV92SP-2Ah7hyQ28Q8lQ">
+</head>
+
+
+
+<body>
+	<!-- Google Tag Manager 20230221(noscript) -->
+<!--
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TW5ZR9G"
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+-->
+	<!-- End Google Tag Manager (noscript) -->
+
+	<!-- l-modal -->
+	
+	<!-- メニューを表示 -->
+	<nav class="js-drawermenu l-menumenu" style="display: none;">
+		<!-- drawermenu -->
+	<div class=" scrolly" style="">
+
+
+		<!-- -->
+		<div class="" style="display: block; background: #333;">
+			<p style="color: #fff;">－競馬ブック－</p>
+		</div><!-- /.midasi -->
+
+
+		<!-- -->
+		<dl class="accordion_open menu mb-xs js-sonota">
+
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul class="js-drawermenu_youso">
+						<li class="js-member_drawermenu" style="display: list-item;"><a href="/mypage/index">マイページ</a></li>
+						<li class="js-free_drawermenu" style="display: list-item;"><a href="/login/login">ログイン</a></li>
+						<li class="js-member_drawermenu" style="display: list-item;"><a href="/login/login">ログアウト</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+		<!-- -->
+		<div class="midasi-sub m0" style="display: none;">
+			<p>全メニュー</p>
+		</div><!-- /.midasi -->
+
+
+
+
+		<!-- -->
+		<dl class="home accordion_open menu mb-xs js-selectsale">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>中央競馬</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/cyuou/top">中央競馬Top</a></li>
+						<li class=""><a href="/cyuou/nittei/top">開催日程</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+
+					<!-- -->
+					<dl class="accordion">
+
+						<dt class="">
+							<!-- -->
+							<div class="title under sub">
+								<p>トラックマン直前情報</p>
+							</div><!-- /.midasi_sub -->
+						</dt>
+						<dd style="display: none;">
+
+							<!-- -->
+							<div class="sidemenu sub mb-xs">
+								<ul>
+									<li class=""><a href="/cyuou/tmmenu">トラックマン直前情報Top</a></li>
+									<li class=""><a href="/cyuou/cyokuzen">ＴＭ直前情報</a></li>
+									<li class=""><a href="/cyuou/todaymainkiru">メインを斬る</a></li>
+									<li class=""><a href="/cyuou/todaykisyu">上位騎手騎乗馬ジャッジ！</a></li>
+									<li class=""><a href="/cyuou/oikiripikaichi">追い切りピカイチ</a></li>
+									<li class=""><a href="/cyuou/kyusyamawari">厩舎回り特選</a></li>
+									<li class=""><a href="/cyuou/oikiritokusen">日曜追い特選</a></li>
+								</ul>
+							</div><!-- sidemenu // -->
+
+						</dd>
+
+					</dl><!-- /.accordion -->
+
+				</div><!-- sidemenu // -->
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+
+					<!-- -->
+					<dl class="accordion">
+
+						<dt class="">
+							<!-- -->
+							<div class="title under sub">
+								<p>コンピュータの推奨</p>
+							</div><!-- /.midasi_sub -->
+						</dt>
+						<dd style="display: none;">
+
+							<!-- -->
+							<div class="sidemenu sub mb-xs">
+								<ul>
+									<li class=""><a href="/cyuou/todaymember">コンピュータの推奨Top</a></li>
+									<li class=""><a href="/cyuou/cpubest">コンピュータ予想ベスト5</a></li>
+									<li class=""><a href="/cyuou/vsakusen">Ｖ作戦</a></li>
+								</ul>
+							</div><!-- sidemenu // -->
+
+						</dd>
+
+					</dl><!-- /.accordion -->
+
+				</div><!-- sidemenu // -->
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+
+					<!-- -->
+					<dl class="accordion">
+
+						<dt class="">
+							<!-- -->
+							<div class="title under sub">
+								<p>今日を分析する</p>
+							</div><!-- /.midasi_sub -->
+						</dt>
+						<dd style="display: none;">
+
+							<!-- -->
+							<div class="sidemenu sub mb-xs">
+								<ul>
+									<li class=""><a href="/cyuou/todaybunseki">今日を分析するTop</a></li>
+									<li class=""><a href="/cyuou/todaykeikou">本日の傾向</a></li>
+									<li class=""><a href="/cyuou/todaycomputer">コンピュータ勝敗表</a></li>
+									<li class=""><a href="/cyuou/todaymanken">キターーッ万券！！</a></li>
+								</ul>
+							</div><!-- sidemenu // -->
+
+						</dd>
+
+					</dl><!-- /.accordion -->
+
+				</div><!-- sidemenu // -->
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/cyuou/syusouba">今週の出走馬検索</a></li>
+						<li class=""><a href="/cyuou/win5/top">WIN5</a></li>
+						<li class=""><a href="/cyuou/bestcyokyo">ベスト調教</a></li>
+						<li class=""><a href="/cyuou/sokuhou">払戻金</a></li>
+						<li class=""><a href="/cyuou/jisouyotei">次走予定</a></li>
+						<li class=""><a href="/column/kinkyo">最近取材近況レポ</a></li>
+						<li class=""><a href="/cyuou/tourokuba">新規登録馬</a></li>
+						<li class=""><a href="/cyuou/masyoba">抹消馬</a></li>
+						<li class=""><a href="/cyuou/seisai">先週の制裁</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- 地方競馬 -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>地方競馬</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/chihou/top">地方競馬Top</a></li>
+						<li class=""><a href="/chihou/nittei/top">開催日程</a></li>
+						<li class=""><a href="/chihou/cyokuzen">ＴＭ直前情報</a></li>
+						<li class=""><a href="https://keiba-lv-st.jp/?target=_blank" target="_blank">インターネット中継</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- ネット新聞 -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>ネット新聞</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- データ検索 -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>データ検索</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/db/search/horse">馬</a></li>
+						<li class=""><a href="/db/search/kettou">血統</a></li>
+						<li class=""><a href="/db/search/race">レース</a></li>
+						<li class=""><a href="/db/search/jockey">騎手</a></li>
+						<li class=""><a href="/db/search/trainer">調教師</a></li>
+						<li class=""><a href="/db/search/banushi">馬主</a></li>
+						<li class=""><a href="/db/search/seisan">生産牧場</a></li>
+						<li class=""><a href="/db/leading/jockey">リーディング</a></li>
+						<li class=""><a href="/db/kiskouka">騎手考課表</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- 海外競馬 -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>海外競馬</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/kaigai/nittei">海外競馬Top</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- My馬 -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>My馬</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/myuma/list">My馬Top</a></li>
+						<li class=""><a href="/myuma/syuso">My馬出走情報</a></li>
+						<li class=""><a href="/myuma/mail">My馬メール項目設定</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- 動画 -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>動画</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/keibabookmovie/tmtalk">TMトーク</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- スタッフ -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>スタッフ</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/tm/ritto">トラックマン紹介（栗東）</a></li>
+						<li class=""><a href="/tm/miho">トラックマン紹介（美浦）</a></li>
+						<li class=""><a href="/tm/nankan">トラックマン紹介（南関東）</a></li>
+						<li class=""><a href="/tm/douei">トラックマン紹介（ホッカイドウ）</a></li>
+						<li class=""><a href="/tm/banei">トラックマン紹介（ばんえい）</a></li>
+						<li class=""><a href="/tm/hyogo">トラックマン紹介（園田・姫路）</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- ニュース -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>ニュース</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/news/all">ニュース（全て）</a></li>
+						<li class=""><a href="/news/cyuou">ニュース（中央）</a></li>
+						<li class=""><a href="/news/chihou">ニュース（地方）</a></li>
+						<li class=""><a href="/news/kaigai">ニュース（海外）</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- コラム -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>コラム</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/column/neraiuma/">今週の狙い馬(美浦)</a></li>
+						<li class=""><a href="/column/neraiuma/0">今週の狙い馬(栗東)</a></li>
+						<li class=""><a href="/column/kinkyo">最近取材近況レポ</a></li>
+						<li class=""><a href="/column/jusyokaiko">重賞回顧</a></li>
+						<li class=""><a href="https://column.keibabook.co.jp/category/trrepo/?target=_blank" title="週刊トレセン通信" target="_blank">週刊トレセン通信</a></li>
+						<li class=""><a href="/column/hidaka">日高通信365</a></li>
+						<li class=""><a href="/column/sinba">新馬・未勝利 勝ち馬総評</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- アミューズメント -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>アミューズメント</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/game/pogmaster_tbl_kekka">POG</a></li>
+					</ul>
+					<ul>
+						<li class=""><a href="/mypage/bingo_input">ＧⅠ馬番ビンゴゲーム</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- サポート -->
+		<dl class="home accordion">
+
+			<dt>
+				<!-- -->
+				<div class="title under">
+					<p>サポート</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd>
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/support/oshirase/all/all">お知らせ</a></li>
+						<li class=""><a href="/support">よくある質問</a></li>
+						<li class=""><a href="/support/enquiry">お問い合わせ</a></li>
+						<li class=""><a href="/support/rireki">更新履歴</a></li>
+						<li class=""><a href="/support/sitemap">サイトマップ</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- -->
+		<dl class="accordion menu mb-xs js-sonota">
+
+			<dt class="active">
+				<!-- -->
+				<div class="title under">
+					<p>その他</p>
+				</div><!-- /.midasi_sub -->
+			</dt>
+			<dd style="display: block;">
+
+				<!-- -->
+				<div class="sidemenu mb-sm">
+					<ul>
+						<li class=""><a href="/entry/teikyo/s">提供内容（スマホサイト）</a></li>
+						<li class=""><a href="/support/privacy">プライバシーポリシー</a></li>
+						<li class="" style="font-size: 0.85rem;"><a href="/support/application_privacy/android">アプリケーションプライバシポリシー</a></li>
+						<li class=""><a href="/support/gaiyou">会社概要</a></li>
+						<li class=""><a href="/support/tokutei">特定商取引に基づく表示</a></li>
+						<li class=""><a href="/support/rireki">会社概要</a></li>
+					</ul>
+				</div><!-- sidemenu // -->
+
+			</dd>
+
+		</dl><!-- /.accordion -->
+
+
+
+		<!-- -->
+		<div class="section" style="margin: 1rem 0;">
+
+			<div class="logo">
+				<a href="/">
+				<img src="https://style.keibabook.co.jp/smart/images/common/title_w.png">
+				</a>
+			</div>
+
+		</div><!-- /section -->
+
+	</div><!-- .drawermenu // -->
+
+<script>
+
+
+	//var scrollHeight = $(".js-about").scrollTop();
+	var scrollHeight = 0;
+	//var plcTop = $('.js-about').position().top;
+	//	var scrollHeight = 200;
+
+	$(".scrolly").animate({scrollTop: scrollHeight});
+
+//$(window).scrollTop($('#section2').position().top);
+/*-------------------------------------
+アコーディオンメニュー
+---------------------------------------*/
+$(function(){
+
+	$(".accordion > dt").on("click", function() {
+		$(this).next().slideToggle(100);
+		$(this).toggleClass("active");//追加部分
+	});
+
+	$(".accordion_open > dt").on("click", function() {
+		$(this).next().slideToggle(100);
+		$(this).toggleClass("active");//追加部分
+	});
+
+});
+</script>
+	</nav>
+
+
+	<!-- /#wrap start -->
+	<div id="wrap">
+
+		<!-------------------------------------------------------------------->
+		<!-- smart new start -->
+		<!-------------------------------------------------------------------->
+		<!-- /#header start -->
+		<div id="header">
+
+			<!-- /.header_content start -->
+			<div class="header_content">
+
+				<!-- /.header_wrap start -->
+				<div class="header_wrap">
+
+					<div class="header_box">
+
+						<div class="btn-menu l-display_sp" style="width: 3rem;">
+					        <label class="drawermenu-open js-drawermenu-open"><span></span></label>
+					        <label class="drawermenu-unshown drawermenu-close js-drawermenu-close"></label>
+						    <br><span style="font-size: 50%;">メニュー</span>
+						</div>
+					</div><!-- /.header_box menu -->
+
+					<div class="menubutton js-menubutton">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+
+					<div class="header_box logo">
+						<h1>
+														<a href="//s.keibabook.co.jp/" class="js-smartpremiumigai_show" style="display: none;">s.keibabook.co.jp</a>
+							<a href="//s.keibabook.co.jp/" class="js-smartpremium_show" style="display: none; background-image: url(//style.keibabook.co.jp/smart/images/common/bnr_smartpremium_kuro.png);">s.keibabook.co.jp</a>
+														<dl style="" id="js-application" class="application"></dl>
+						</h1>
+					</div><!-- /.header_box logo -->
+
+
+					<div class="header_box" style="display: none;" id="js-application-show">
+						<a href="/support/application_privacy/android" style="width: 55px;"><p style="font-size: 0.8rem; white-space: nowrap; font-weight: 600;">ﾌﾟﾗｲﾊﾞｼｰ<br>ﾎﾟﾘｼｰ</p></a>
+					</div><!-- /.header_box -->
+
+					<div class="header_box ">
+						<p class="search header_searchbox_OpenBtn"></p>
+						<p class="search header_searchbox_CloseBtn" style="display: none;">×</p>
+						<span style="font-size: 50%;">&nbsp;検索</span>
+					</div><!-- /.header_box -->
+
+					<!-- ログインチェック -->
+					
+					<!-- ログイン状態を表示 -->
+					<div id="logincheck">
+					</div><!-- /. -->
+
+					<!-- logincheckを取得 -->
+					<script type="text/javascript">
+					$( document ).ready( function() {
+						var cache = (new Date).getTime();
+						ajaxload_logincheck( 'logincheck', 'logincheck' );
+					} );
+					</script>
+
+					<!-- 20181115 -->
+					<div class="header_box none" style="display: table-cell;">
+						<a href="/login/login" class="logout"></a>
+						<span style="font-size: 50%;">&nbsp;</span>
+					</div><!-- /.header_box -->
+
+					<!-- 20181115 -->
+					<div class="header_box none" style="display: table-cell;">
+						<a href="/mypage/index" class="mypage"></a>
+						<span style="font-size: 50%;">&nbsp;マイページ</span>
+					</div><!-- /.header_box -->
+
+				</div><!-- /.header_wrap end -->
+
+
+				<!-- 20181115 -->
+				<script>
+				$(function(){
+					//setTimeout関数でfadeOut()の実行を遅延させる
+					setTimeout(function() {
+						//$('.js-fade_messsage').fadeOut();
+					}, 3000);
+				});
+				</script>
+
+				<!-- -->
+				<div class="header_searchbox" style="display: none;">
+
+					<form method="post" action="/db/search/horse" class="selectform header_search">
+
+					<!-- -->
+					<div class="element">
+						<table class="default ">
+						<tbody>
+						<tr>
+							<td class="left">
+								<select name="&lt;!-- 指定して下さい --&gt;" class="selectbox" style="width: 8em; display: none;" tabindex="-1">
+								<option value="bamei">馬名</option>
+								<option value="brood">母馬名</option>
+								<option value="sire">種牡馬名</option>
+								<option value="banushi">馬主名</option>
+								<option value="jockey">騎手名</option>
+								<option value="trainer">厩舎名</option>
+								</select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 8em;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-&lt;!-- 指定して下さい --&gt;-wj-container"><span class="select2-selection__rendered" id="select2-&lt;!-- 指定して下さい --&gt;-wj-container" title="馬名">馬名</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+								<input type="text" id="keyword" name="bamei" style="width: 40%;" maxlength="256" class="ime_on" value="" placeholder="検索したい文字">
+								<button class="bookbutton header_search_submit">検索</button>
+							</td>
+						</tr>
+						</tbody>
+						</table>
+					</div><!-- /.element -->
+
+					</form><!-- / -->
+
+				</div><!-- /.header_searchbox -->
+
+				<!-- -->
+				<div class="header_menubox" style="display: none;">
+					<!-- -->
+					メニュー
+				</div><!-- /.header_menubox -->
+
+			</div><!-- /.header_content end -->
+
+		</div><!-- /#header end -->
+
+		<!-- /#menu start -->
+		<div id="menu">
+			
+      <!-- globalmenu start -->
+	<div class="globalmenu " id="globalmenu">
+		<!--<div class="hidari"> < </div>-->
+		<!-- globalmenu_center start	 -->
+		<div class="globalmenu_center" id="globalmenu_center" style="display: block;">
+			<ul class="">
+				<li class=" active "><a href="/" title="HOME">HOME</a></li>
+				<li class=""><a href="/cyuou/top" title="中央競馬">中央競馬</a></li>
+				<li class=""><a href="/chihou/top" title="地方競馬">地方競馬</a></li>
+				<li class=""><a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞</a></li>
+				<li class=""><a href="/db/search/horse" title="データ検索">データ検索</a></li>
+				<li class=""><a href="/kaigai/nittei" title="海外競馬">海外競馬</a></li>
+				<li class=""><a href="/myuma/list" title="My馬">My馬</a></li>
+				<li class=""><a href="/keibabookmovie/tmtalk" title="動画">動画</a></li>
+				<li class=""><a href="/tm/top" title="TM">スタッフ</a></li>
+				<li class=""><a href="/news/all" title="ニュース">ニュース</a></li>
+				<li class=""><a href="/column/neraiuma/1" title="コラム">コラム</a></li>
+				<li class=""><a href="/game/pogmaster_tbl_kekka" title="アミューズメント">アミューズメント</a></li>
+				<li class=""><a href="/support/oshirase/all/all" title="サポート">サポート</a></li>
+				<li class="" style="display: none;"><a href="/support/sitemap" title="サイトマップ">サイトマップ</a></li>
+			</ul>
+		</div><!-- globalmenu_center end	 -->
+		<!--<div class="migi"> > </div>-->
+	</div><!-- globalmenu end -->
+
+
+	
+
+	<div class="globalmenu_sub">
+
+	
+		<div class="menutable">
+			<table class="open">
+			<tbody>
+			<tr>
+				<td class="" style="border-bottom: 1px solid #666;">
+					<a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+				</td>
+					<td class="" style="border-bottom: 1px solid #666;">
+					<a href="//netshinbun.keibabook.co.jp//syukansi?target=_blank" title="週刊競馬ブックDigital" target="_blank">週刊競馬ブック<wbr>Digital<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+				</td>
+				<td class="js-member_show" style="border-bottom: 1px solid #666; display: none;">
+					<a href="/mypage/annai/subscription?target=_blank" title="週刊競馬ブックDigital定期購読">週刊競馬ブック<wbr>Digital定期購読<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+				</td>
+				<td class="js-free_show" style="border-bottom: 1px solid #666; display: none;">
+					<a href="/entry/top" title="会員登録">会員登録</a>
+				</td>
+			</tr>
+			</tbody>
+			</table>
+		</div><!-- menutable end-->
+
+	
+	</div><!-- globalmenu_sub end -->
+
+
+
+
+
+
+	<div class="globalmenu_sub">
+
+	
+	</div><!-- globalmenu_sub end -->
+		</div><!-- /#menu end-->
+
+		<!-- pankuzu -->
+		
+		<!-- menu_sub -->
+		
+	<script>
+	//ブラウザかアプリか判断して表示
+	$(function () {
+		var ua = navigator.userAgent;
+
+		if ( ua.indexOf('KEIBABOOK-SMART-2525') > 0 ) {
+
+			if (ua.indexOf('iPhone') > 0 || ua.indexOf('iPad') > 0 || ua.indexOf('Mac OS') > 0) {
+
+				// iPhoneアプリ用
+				$( '#js-application' ).html('iPhone');
+				//$( '#js-application_privacy' ).html('');
+				$( '#js-application-show' ).css('display', 'none');
+
+			} else if (ua.indexOf('Android') > 0) {
+
+				// Androidアプリ用
+				$( '#js-application' ).html('Android');
+				$( '#js-application_privacy' ).html('<a href="/support/application_privacy/android">ｱﾌﾟﾘｹｰｼｮﾝ<br>ﾌﾟﾗｲﾊﾞｼｰﾎﾟﾘｼｰ</a>');
+				$( '#js-application-show' ).css('display', 'table-cell');
+
+			}
+
+		} else {
+			// ブラウザ用
+			//$( '#js-application' ).html('ブラウザ');
+			//$( '#js-application_privacy' ).html('');
+		}
+	})
+	</script>
+
+	<!-------------------------------------------------------------------->
+	<!-- smart new end											 -->
+	<!-------------------------------------------------------------------->
+
+
+
+
+
+	<!---------------------------------------------------------------->
+	<!-- idcが継続しているあいだ有効start							 -->
+	<!---------------------------------------------------------------->
+	<!--
+	<div id="HeaderCont">
+		<ul class="hedmenulist clearfix">
+			<li class="headlogo2"><a href="//smart.keibabook.co.jp/menu/index.html"><img src="//smart.keibabook.co.jp/images/common/title_syukan.png"></a></li>
+			<li class="headmenu"><a href="http://sp.keibabook.co.jp/login.asp?target=_blank" target="_blank"><div class="c2"><span>新聞を<br>お持ちの方</span></div></a></li><li class="headmenu"><a href="http://sp.keibabook.co.jp/login_syukan.asp?target=_blank" target="_blank"><div class="c3"><span>週刊誌を<br>お持ちの方</span></div></a></li>
+		</ul>
+		<div id="MenuOut">
+			<p class="arrowl"><span></span></p><p class="arrowr"><span></span></p>
+			<div id="MenuIn" class="clearfix">
+			<table class="headtable">
+				<tbody>
+				<tr>
+					<td><a href="//smart.keibabook.co.jp/indexmenu/bangumi.html?uid=NULLGWDOCOMO&amp;20170325"><div><span class="lf">今週の開催</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/pay/kakosei/index_c.html?uid=NULLGWDOCOMO"><div><span class="lf">レース結果</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/pay/local/index.html?uid=NULLGWDOCOMO"><div><span class="lf">地方競馬</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/indexmenu/syukan.html?uid=NULLGWDOCOMO"><div><span>メニュー</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/pay/umainfo/myokiniiri.html?uid=NULLGWDOCOMO"><div><span>Ｍｙ馬<br>お気に入り馬</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/indexmenu/movie.html?uid=NULLGWDOCOMO"><div><span>動画サービス</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/menu/search.html?uid=NULLGWDOCOMO"><div><span>各種データ検索</span></div></a></td>
+					<td><a href="/column/neraiuma"><div><span>コラム</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/kbfree/gk/in.html?uid=NULLGWDOCOMO"><div><span>トピックス</span></div></a></td>
+					<td><a href="//smart.keibabook.co.jp/free/list.html?uid=NULLGWDOCOMO"><div><span>無料コンテンツ</span></div></a></td>
+					<td><a href="//www.keibabook.co.jp/?mode=pc&amp;target=_blank" target="_blank"><div><span class="lf">PCサイトへ</span></div></a></td>
+				</tr>
+				</tbody>
+			</table>
+			</div>
+		</div>
+	</div>
+	-->
+	<!---------------------------------------------------------------->
+	<!-- idcが継続しているあいだ有効end -->
+	<!---------------------------------------------------------------->
+
+
+
+
+
+
+
+
+		<!-- /#container start -->
+		<div id="container">
+
+			<!-- /#flex_container_top start -->
+			<div id="flex_container_top" class="clearfix">
+
+				<!-- /.main start -->
+				<div class="main">
+					
+<!-- 重要なお知らせ -->
+
+        <div class="sectionfull">
+        <div id="jyuyou">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- 重要なお知らせを取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'jyuyou', 'jyuyou' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+
+
+<div class="mainimage" role="toolbar">
+	
+	<!-- スライダー本体 -->
+	<ul class="thumb-item slick-initialized slick-slider slick-dotted"><button type="button" data-role="none" class="slick-prev slick-arrow" aria-label="Previous" role="button" style="display: block;">Previous</button>
+
+		
+		
+		<div aria-live="polite" class="slick-list draggable"><div class="slick-track" role="listbox" style="opacity: 1; width: 6996px; transform: translate3d(-636px, 0px, 0px);"><li class="slick-slide slick-cloned" data-slick-index="-1" aria-hidden="true" tabindex="-1" style="width: 636px;">
+				<ul class="ul-table" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff;">- 週刊競馬ブックDigital -</p>
+					</li>
+				</ul>
+				<a href="//netshinbun.keibabook.co.jp/syukansi?target=_blank" target="_blank" tabindex="-1">
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_digital.jpg?20240331">
+				</a>
+			</li><li style="width: 636px;" class="slick-slide slick-current slick-active" data-slick-index="0" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide00">
+			<ul class="mainimage koukoku" style="width: 100%; margin: 0; display: block; background: #333;">
+				<li style="width: 100%; vertical-align: middle; background: #333;">
+					<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff; text-align: left;">-「週刊競馬ブック」特別登録ページのコンビニプリントサービス -</p>
+				</li>
+			</ul>
+			<a href="https://s.keibabook.co.jp/support/oshirase/detail/2904" tabindex="0">
+				<img src="//cdn.keibabook.co.jp/images/common/mainimage_print_20251114.jpg?0">
+			</a>
+		</li><li class="slick-slide" data-slick-index="1" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide01" style="width: 636px;">
+
+			<ul class="ul-table" style="margin: 0;">
+				<li style="width: 100%; vertical-align: middle;">
+					<a href="/cyuou/syutuba/202504000611" tabindex="-1">
+					<div class="cyumoku" style="padding: 0 0.5rem; background: #fff;">
+						<p class="ta-l fz-ml fw600">マイルＣＳ<span class="icon_grade g1" style="top: 0;font-size: 0.9rem;">Ｇ１</span></p>
+						<p class="ta-l fz-ml">11/23(日)京都11R 芝1600m</p>
+					</div>
+					</a>
+				</li>
+
+				<li style="white-space: nowrap; vertical-align: middle;">
+					<a href="/cyuou/tokusyu/202504000611" style="background: #111; border: 1px solid #999; color: #fff; padding: 0.25rem;" tabindex="-1">
+						Ｇ１特集 ▶
+					</a>
+				</li>
+			</ul>
+
+			<a href="/cyuou/syutuba/202504000611" tabindex="-1">
+				<img src="//cdn.keibabook.co.jp/images/tokusyu/tokusyu_202504000611.jpg">
+			</a>
+
+		</li><li class="slick-slide" data-slick-index="2" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide02" style="width: 636px;">
+
+			<ul class="ul-table" style="margin: 0;">
+				<li style="width: 100%; vertical-align: middle;">
+					<a href="/cyuou/syutuba/202505040611" tabindex="-1">
+					<div class="cyumoku" style="padding: 0 0.5rem; background: #fff;">
+						<p class="ta-l fz-ml fw600">東京スポーツ杯２歳Ｓ<span class="icon_grade g2" style="top: 0;font-size: 0.9rem;">Ｇ２</span></p>
+						<p class="ta-l fz-ml">11/24(月)東京11R 芝1800m</p>
+					</div>
+					</a>
+				</li>
+
+				<li style="white-space: nowrap; vertical-align: middle;">
+					<a href="/cyuou/tokusyu/202505040611" style="background: #111; border: 1px solid #999; color: #fff; padding: 0.25rem;" tabindex="-1">
+						特集 ▶
+					</a>
+				</li>
+			</ul>
+
+			<a href="/cyuou/syutuba/202505040611" tabindex="-1">
+				<img src="//cdn.keibabook.co.jp/images/tokusyu/tokusyu_202505040611.jpg">
+			</a>
+
+		</li><li class="slick-slide" data-slick-index="3" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide03" style="width: 636px;">
+
+			<ul class="ul-table" style="margin: 0;">
+				<li style="width: 100%; vertical-align: middle;">
+					<a href="/cyuou/syutuba/202503060511" tabindex="-1">
+					<div class="cyumoku" style="padding: 0 0.5rem; background: #fff;">
+						<p class="ta-l fz-ml fw600">福島記念<span class="icon_grade g3" style="top: 0;font-size: 0.9rem;">Ｇ３</span></p>
+						<p class="ta-l fz-ml">11/22(土)福島11R 芝2000m</p>
+					</div>
+					</a>
+				</li>
+
+				<li style="white-space: nowrap; vertical-align: middle;">
+					<a href="/cyuou/tokusyu/202503060511" style="background: #111; border: 1px solid #999; color: #fff; padding: 0.25rem;" tabindex="-1">
+						特集 ▶
+					</a>
+				</li>
+			</ul>
+
+			<a href="/cyuou/syutuba/202503060511" tabindex="-1">
+				<img src="//cdn.keibabook.co.jp/images/tokusyu/tokusyu_202503060511.jpg">
+			</a>
+
+		</li><li class="slick-slide" data-slick-index="4" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide04" style="width: 636px;">
+
+			<ul class="ul-table" style="margin: 0;">
+				<li style="width: 100%; vertical-align: middle;">
+					<a href="/cyuou/syutuba/202505040812" tabindex="-1">
+					<div class="cyumoku" style="padding: 0 0.5rem; background: #fff;">
+						<p class="ta-l fz-ml fw600">ジャパンＣ<span class="icon_grade g1" style="top: 0;font-size: 0.9rem;">Ｇ１</span></p>
+						<p class="ta-l fz-ml">11/30(日)東京12R 2400m</p>
+					</div>
+					</a>
+				</li>
+
+				<li style="white-space: nowrap; vertical-align: middle;">
+					<a href="/cyuou/tokusyu/202505040812" style="background: #111; border: 1px solid #999; color: #fff; padding: 0.25rem;" tabindex="-1">
+						Ｇ１特集 ▶
+					</a>
+				</li>
+			</ul>
+
+			<a href="/cyuou/syutuba/202505040812" tabindex="-1">
+				<img src="//cdn.keibabook.co.jp/images/tokusyu/tokusyu_202505040812.jpg">
+			</a>
+
+		</li><li class="slick-slide" data-slick-index="5" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide05" style="width: 636px;">
+				<ul class="ul-table" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff;">- 競馬ブックPrint -</p>
+					</li>
+				</ul>
+				<a href="//www.keibabook.co.jp/a3/" target="_blank" tabindex="-1">
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_keibabookprint.jpg">
+				</a>
+			</li><li class="slick-slide" data-slick-index="6" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide06" style="width: 636px;">
+				<ul class="ul-table" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff;">- 競馬ブックネット新聞 -</p>
+					</li>
+				</ul>
+				<a href="//netshinbun.keibabook.co.jp/?target=_blank" target="_blank" tabindex="-1">
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_netshinbun.jpg?20240403">
+				</a>
+			</li><li class="slick-slide" data-slick-index="7" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide07" style="width: 636px;">
+				<ul class="ul-table" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff;">- 競馬ブックネットSHOP -</p>
+					</li>
+				</ul>
+				<a href="//shop.keibabook.co.jp/" target="_blank" tabindex="-1">
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_netshop.jpg">
+				</a>
+			</li><li class="slick-slide" data-slick-index="8" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide08" style="width: 636px;">
+				<ul class="ul-table" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff;">- 週刊競馬ブックDigital -</p>
+					</li>
+				</ul>
+				<a href="//netshinbun.keibabook.co.jp/syukansi?target=_blank" target="_blank" tabindex="-1">
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_digital.jpg?20240331">
+				</a>
+			</li><li style="width: 636px;" class="slick-slide slick-cloned" data-slick-index="9" aria-hidden="true" tabindex="-1">
+			<ul class="mainimage koukoku" style="width: 100%; margin: 0; display: block; background: #333;">
+				<li style="width: 100%; vertical-align: middle; background: #333;">
+					<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff; text-align: left;">-「週刊競馬ブック」特別登録ページのコンビニプリントサービス -</p>
+				</li>
+			</ul>
+			<a href="https://s.keibabook.co.jp/support/oshirase/detail/2904" tabindex="-1">
+				<img src="//cdn.keibabook.co.jp/images/common/mainimage_print_20251114.jpg?0">
+			</a>
+		</li></div></div>
+
+				
+				
+				
+				
+		
+		
+		
+			<!-- 競馬ブックPrint -->
+			
+			
+			<!-- 競馬ブックPrint「宝塚記念100円キャンペーン」 -->
+<!--
+			<li>
+				<ul class="mainimage koukoku" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.0rem; font-family: meiryo; padding: 0.6rem; color: #fff; text-align: left;">- 競馬ブックPrint「宝塚記念100円キャンペーン」 -</p>
+					</li>
+				</ul>
+				<a href="//www.keibabook.co.jp/a3/" target="_blank">
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_takarazukinen_campaign.jpg">
+				</a>
+			</li>
+-->
+
+			<!-- -->
+			
+
+			<!-- -->
+			
+
+			<!--通常 -->
+			
+			<!--暑熱対策 -->
+<!--
+			<li>
+				<ul class="ul-table" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff;">- 週刊競馬ブックDigital -</p>
+					</li>
+				</ul>
+				<a href="//netshinbun.keibabook.co.jp/syukansi?target=_blank" target="_blank">
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_digital202508.jpg?20250726">
+				</a>
+			</li>
+-->			
+
+
+
+<!--			
+			<li>
+				<ul class="mainimage koukoku" style="width: 100%; margin: 0; display: block; background: #333;">
+					<li style="width: 100%; vertical-align: middle; background: #333;">
+						<p style="font-size: 1.2rem; font-family: meiryo; padding: 0.6rem; color: #fff; text-align: left;">- ハッシュタグキャンペーン -</p>
+					</li>
+				</ul>
+				<a href="//cdn.keibabook.co.jp/pdf/campaign_20250719.pdf" >
+					<img src="//cdn.keibabook.co.jp/images/common/mainimage_campaign_20250719.jpg?0">
+				</a>
+			</li>
+-->
+
+
+	<button type="button" data-role="none" class="slick-next slick-arrow" aria-label="Next" role="button" style="display: block;">Next</button><ul class="slick-dots" style="display: block;" role="tablist"><li class="slick-active" aria-hidden="false" role="presentation" aria-selected="true" aria-controls="navigation00" id="slick-slide00"><button type="button" data-role="none" role="button" tabindex="0">1</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation01" id="slick-slide01"><button type="button" data-role="none" role="button" tabindex="0">2</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation02" id="slick-slide02"><button type="button" data-role="none" role="button" tabindex="0">3</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation03" id="slick-slide03"><button type="button" data-role="none" role="button" tabindex="0">4</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation04" id="slick-slide04"><button type="button" data-role="none" role="button" tabindex="0">5</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation05" id="slick-slide05"><button type="button" data-role="none" role="button" tabindex="0">6</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation06" id="slick-slide06"><button type="button" data-role="none" role="button" tabindex="0">7</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation07" id="slick-slide07"><button type="button" data-role="none" role="button" tabindex="0">8</button></li><li aria-hidden="true" role="presentation" aria-selected="false" aria-controls="navigation08" id="slick-slide08"><button type="button" data-role="none" role="button" tabindex="0">9</button></li></ul></ul>
+	
+	<!-- サムネイル -->
+	<ul class="thumb-item-nav slick-initialized slick-slider" style="display: none;">
+				<div aria-live="polite" class="slick-list draggable"><div class="slick-track" role="listbox" style="opacity: 1; width: 0px; transform: translate3d(0px, 0px, 0px);"><li class="slick-slide slick-current slick-active" data-slick-index="0" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide10" style="width: 0px;">マイルＣＳ</li><li class="slick-slide slick-active" data-slick-index="1" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide11" style="width: 0px;">東京スポーツ杯２歳Ｓ</li><li class="slick-slide slick-active" data-slick-index="2" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide12" style="width: 0px;">福島記念</li><li class="slick-slide slick-active" data-slick-index="3" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide13" style="width: 0px;">ジャパンＣ</li></div></div>
+				
+				
+				
+			</ul>
+
+</div><!-- /.mainimage -->
+
+
+
+
+<!-- Topページのみ使用する -->
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/www/js/slick/slick.css" media="screen">
+<link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/www/js/slick/slick-theme.css" media="screen">
+<script src="//style.keibabook.co.jp/www/js/slick/slick.min.js"></script>
+<script>
+/*-------------------------------------
+スライド
+---------------------------------------*/
+$('.slider').slick({
+	// 自動再生で切り替えをする時間
+	autoplaySpeed: 5000,
+	autoplay: true,
+	arrows: false,
+});
+
+/*-------------------------------------
+スライド（サムネイル付き）
+---------------------------------------*/
+
+$('.thumb-item').slick({
+	// 自動再生で切り替えをする時間
+
+	autoplaySpeed: 5000,
+	infinite: true,
+	autoplay: true,
+	slidesToShow: 1,
+	slidesToScroll: 1,
+	arrows: true,
+	dots: true,
+});
+
+$('.thumb-item-nav').slick({
+	infinite: true,
+	slidesToShow: 5,
+	slidesToScroll: 1,
+	asNavFor: '.thumb-item', //スライダー本体のクラス名
+	focusOnSelect: true,
+});
+
+</script>
+
+<style>
+/* スライダーがチラつかないようにする */
+.thumb-item{
+	display: none;
+}
+.thumb-item.slick-initialized{
+	display: block; /*slick-initializedが付与されたら表示*/
+}
+.thumb-item .slick-next {
+	top: 60%;
+	right: 0;
+	z-index: 1;
+	border-radius: 0%;
+}
+.thumb-item .slick-prev {
+	top: 60%;
+	left: 0;
+	z-index: 1;
+	border-radius: 0%;
+}
+.thumb-item .slick-next::before {
+	content: '▶';
+	content: '＞';
+	background: #111;
+	color: #fff;
+	font-weight: 600;
+	display: block;
+	padding: 0.3rem 0 0.1rem 0.15rem;
+	opacity: 100%;
+	opacity:0.7;
+
+}
+.thumb-item .slick-prev::before {
+	border-width: 0 0 3px 3px;
+	content: '▶';
+	content: '＞';
+	background: #111;
+	color: #fff;
+	font-weight: 600;
+	display: block;
+	padding: 0.3rem 0 0.1rem 0.15rem;
+	opacity: 100%;
+	opacity:0.7;
+	transform:rotateY(180deg);
+}
+
+.thumb-item-nav  {
+	background: #fff;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+}
+
+.thumb-item-nav li.slick-slide {
+	background: #fff;
+	border-right: 1px solid #ccc;
+	padding: 0.15rem 0;
+}
+.slick-dots
+{
+	bottom: -20px;
+}
+
+.slick-dots li button:before
+{
+	font-family: "ＭＳ Ｐゴシック", Osaka, "ヒラギノ角ゴ Pro W3", sans-serif;
+	font-size: 12px;
+	content: '●';
+}
+
+</style>
+
+
+<div class="box-oshirase" style="margin-bottom: 1px; display: none;">
+
+	<div class="flex_tekityu">
+	
+		<div class="title">
+		的中情報
+		</div>
+	
+		<div class="tekityu">
+			<div class="slider_moji_tate slick-initialized slick-slider" style="">
+
+
+			<!-- ここだけ修正する start -->
+			
+			<!--
+			<p>厩舎回り特選：8/2（土）札幌8R ララエキリーブル4番人気3着</p>
+			<p>追い切りピカイチ：8/2（土）札幌8R ララエキリーブル4番人気3着</p>
+			 -->
+			<div aria-live="polite" class="slick-list draggable"><div class="slick-track" role="listbox" style="opacity: 1; width: 0px; transform: translate3d(0px, 0px, 0px);"><p class="slick-slide slick-cloned" data-slick-index="-1" aria-hidden="true" tabindex="-1" style="width: 0px;">厩舎回り特選：11/15（土）福島8R ブリヤディアマンテ 7番人気1着 単勝1,950円</p><p class="slick-slide slick-current slick-active" data-slick-index="0" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide20" style="width: 0px;">厩舎回り特選：11/16（日）東京4R アジアントレジャー 7番人気1着 単勝2,260円</p><p class="slick-slide" data-slick-index="1" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide21" style="width: 0px;">追い切りピカイチ：11/15（土）福島12R マリノトニトゥルス 5番人気1着 単勝980円</p><p class="slick-slide" data-slick-index="2" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide22" style="width: 0px;">追い切りピカイチ： 11/15（土）京都11Ｒ アドマイヤクワッズ 1番人気1着</p><p class="slick-slide" data-slick-index="3" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide23" style="width: 0px;">厩舎回り特選：11/15（土）福島8R ブリヤディアマンテ 7番人気1着 単勝1,950円</p><p class="slick-slide slick-cloned" data-slick-index="4" aria-hidden="true" tabindex="-1" style="width: 0px;">厩舎回り特選：11/16（日）東京4R アジアントレジャー 7番人気1着 単勝2,260円</p></div></div>
+			
+			
+			
+			<!-- ここだけ修正する end -->
+
+
+			</div>
+		</div>
+		
+	</div>
+	
+</div>
+
+
+
+
+
+
+<style>
+.flex_tekityu {
+	display: flex;
+}
+
+/* スマホ用 */
+@media only screen and (max-width: 767px){
+	.flex_tekityu > .title {
+		width: 9.5%;
+		max-width: 3rem;
+		background: #c00;
+		text-align: center;
+		color: #fff;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	
+	.flex_tekityu > .tekityu {
+		width: 90%;
+	}
+}
+/* タブレット・パソコン用 */
+@media only screen and (min-width: 768px), print {
+	.flex_tekityu > .title {
+		width: 12.5%;
+		max-width: 6rem;
+		background: #c00;
+		text-align: center;
+		color: #fff;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 1rem;
+	}
+	
+	.flex_tekityu > .tekityu {
+		width: 87%;
+	}
+}
+
+
+.slider_moji_tate {
+}
+
+.slider_moji_tate .slick-track {
+
+}
+
+/* スマホ用 */
+@media only screen and (max-width: 767px){
+	.slider_moji_tate p {
+		font-size: 1rem;
+		padding-left: 0.2rem;
+		height: 3rem;
+	}
+	
+	.slider_moji_tate  > .slick-list {
+		height: 3rem;
+	}
+}
+/* タブレット・パソコン用 */
+@media only screen and (min-width: 768px), print {
+	.slider_moji_tate p {
+		font-size: 1rem;
+		padding: 0.5rem;
+	}
+	
+	.slider_moji_tate  > .slick-list {
+	}
+}
+
+
+.slider_moji_tate .slick-slide {
+}
+
+
+</style>
+
+<script>
+
+$(window).resize(sampleEvent);
+
+function sampleEvent(e) {
+
+	//alert('resize');
+
+
+}
+
+$('.slider_moji_tate').slick({
+	autoplay: true,
+	autoplaySpeed: 4000,
+	speed: 800,
+	dots: false,
+	arrows: false,
+})
+
+</script><!-- 競馬ブックPrint -->
+
+    		<div class="sectionfull">
+    		<div id="js-print">
+    		</div><!-- /. -->
+    		</div><!-- /.sectionfull -->
+
+    		<!-- 競馬ブックプリント販売のお知らせを取得 -->
+    		<div class="sectionfull">
+    		<script type="text/javascript">
+    		$( document ).ready( function() {
+    			var cache = (new Date).getTime();
+    			ajaxload( 'js-print', 'print' );
+    		} );
+    		</script>
+    		</div><!-- /.sectionfull -->
+        
+<!-- とりあえず「当たり屋さん」 -->
+
+        <div class="sectionfull">
+        <div id="js-atariyasan">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- atariyasanを取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'js-atariyasan', 'atariyasan' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+
+
+<div class="sectionfull">
+
+	<!-- ログインしていない会員にだけ表示 start -->
+	<div class="" style="display: block; ">
+
+		<div class="box-oshirase js-free_show_block" style="margin-bottom: 1px; display: block; ">
+			<ul>
+				<li class="icon infomation" style="background: #c00; vertical-align: middle;">▶</li>
+				<li><a href="https://youtu.be/yxsDg8o7d8A" class="" target="_blank">&nbsp;LINEで簡単！競馬ブック【無料会員登録】</a></li>
+			</ul>
+		</div>
+
+	</div><!-- /.section -->
+	<!-- ログインしていない会員にだけ表示 end -->
+
+</div>
+
+<p style="margin-bottom: 0.5rem;"></p><p>
+
+<style>
+/* 動画が2本の場合 */
+.menuindex.ni ul.column li {
+	width: 48.0%;
+}
+
+/* 動画が1本の場合 */
+.menuindex.ichi ul.column li {
+	width: 100%;
+}
+
+.menuindex ul.column li {
+	background: transparent;
+	border: none;
+}
+
+.youtube {
+	position: relative;
+}
+
+.youtube a:after {
+	content: url(//style.keibabook.co.jp/images/common/icon_douga.png);
+	position: absolute;
+	top: 50%;
+	left: 40%;
+	left: 48%;
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+</style>
+
+<!-- TMトーク公開時（金曜日の夕方～日曜日の夕方） 動画が1本 表示→block 非表示→none  -->
+</p><div class="menuindex ichi" style="display: none;">
+
+	<ul class="column ">
+		
+		<li>
+			<!-- 1本目東 -->
+			<div class="banner_imageonly youtube" style="border: 1px solid #ddd; display: block;">
+				<a href="/keibabookmovie/tmtalk" target=""><img src="//img.youtube.com/vi/MCPG6lE5Hc8/mqdefault.jpg"></a>
+			</div>
+			<!-- /banner_imageonly -->
+		</li>
+
+	</ul>
+</div>
+
+
+<!-- TMトーク公開時（金曜日の夕方～日曜日の夕方） 動画が2本 表示→block 非表示→none -->
+<div class="menuindex ni" style="display: block;">
+
+	<ul class="column ">
+		
+		<li>
+			<!-- 1本目 -->
+			<div class="banner_imageonly youtube" style="border: 1px solid #ddd; display: block;">
+				<a href="/keibabookmovie/tmtalk" target=""><img src="//img.youtube.com/vi/CKwLdQYV2o4/mqdefault.jpg"></a>
+			</div>
+			<!-- /banner_imageonly -->
+		</li>
+		
+		<li>
+			<!-- 2本目 -->
+			<div class="banner_imageonly youtube" style="border: 1px solid #ddd; display: block;">
+				<a href="/keibabookmovie/tmtalk" target=""><img src="//img.youtube.com/vi/RWFt93oF57c/mqdefault.jpg"></a>
+			</div>
+			<!-- /banner_imageonly -->
+		</li>
+
+		<li>
+			<!-- 障害 -->
+			<div class="banner_imageonly youtube" style="border: 1px solid #ddd; display: block;">
+				<a href="/keibabookmovie/tmtalk" target=""><img src="//img.youtube.com/vi/vArMopnyQMM/mqdefault.jpg"></a>
+			</div>
+			<!-- /banner_imageonly -->
+		</li>
+
+
+
+	</ul>
+</div>
+
+
+<!--myuma-->
+
+
+<!-- 本日の競馬 -->
+	<div class="midasi_sub">
+    <p>今日の中央競馬(出馬表に移動します)</p>
+</div>
+<div class="section" style="display: block;">
+
+    <div class="yokoscroll nomi">
+
+        <div class="flex_mamonaku">
+
+            
+                        <div class="mamonaku chuou">
+                <!-- 競馬場 -->
+                <div class="keibajyo">
+                    <p class="flex_keibajyo">
+                        <span class="keibajyo">京都</span>
+                        <span class="tenki">晴</span>
+                    </p>
+                </div>
+                <!-- 馬場 -->
+                <div class="baba">
+                    <p class="flex_keibajyo">
+                        <span class="baba siba">芝：良</span>
+                        <span class="baba dirt">ダ：良</span>
+                    </p>
+                </div>
+                <!-- 前 -->
+                <div class="race mae">
+                                        <a href="/cyuou/seiseki/202504000506">
+                        <p class="flex_race">
+                            <span class="raceno">6R</span>
+                            <span class="haso kakutei">確定</span>
+                        </p>
+                        <p class="flex_race">
+                            <span class="racemei">2歳新馬</span>
+                        </p>
+                    </a>
+                    <p class="flex_race">
+                                                <span class="icon_race"></span>
+                        
+                                                <span class="icon_race"></span>
+                        
+                                                <span class="icon_race"></span>
+                                            </p>
+                                    </div>
+                                <div class="race tugi">
+                    <a href="/cyuou/syutuba/202504000507">
+                        <p class="flex_race">
+                            <span class="raceno">7R</span>
+                            <span class="haso">13:25</span>
+                        </p>
+                        <p class="flex_race">
+                            <span class="racemei">3歳以上1勝クラス</span>
+                        </p>
+                    </a>
+                    <p class="flex_race">
+                                                <a href="/cyuou/paddok/202504000507"><span class="icon_race paddock">パ</span></a>
+                        
+                                                <span class="icon_race"></span>
+                        
+                                                <a href="/cyuou/cyokuzen/202504000507"><span class="icon_race cyokuzen">T</span></a>
+                                            </p>
+                </div>
+                            </div>
+
+                                    <div class="mamonaku chuou">
+                <!-- 競馬場 -->
+                <div class="keibajyo">
+                    <p class="flex_keibajyo">
+                        <span class="keibajyo">福島</span>
+                        <span class="tenki">晴</span>
+                    </p>
+                </div>
+                <!-- 馬場 -->
+                <div class="baba">
+                    <p class="flex_keibajyo">
+                        <span class="baba siba">芝：良</span>
+                        <span class="baba dirt">ダ：良</span>
+                    </p>
+                </div>
+                <!-- 前 -->
+                <div class="race mae">
+                                        <a href="/cyuou/syutuba/202503060507">
+                        <p class="flex_race">
+                            <span class="raceno">7R</span>
+                            <span class="haso">13:10</span>
+                        </p>
+                        <p class="flex_race">
+                            <span class="racemei">2歳未勝利</span>
+                        </p>
+                    </a>
+                    <p class="flex_race">
+                                                <span class="icon_race"></span>
+                        
+                                                <span class="icon_race"></span>
+                        
+                                                <a href="/cyuou/cyokuzen/202503060507"><span class="icon_race cyokuzen">T</span></a>
+                                            </p>
+                                    </div>
+                                <div class="race tugi">
+                    <a href="/cyuou/syutuba/202503060508">
+                        <p class="flex_race">
+                            <span class="raceno">8R</span>
+                            <span class="haso">13:40</span>
+                        </p>
+                        <p class="flex_race">
+                            <span class="racemei">3歳以上1勝クラス</span>
+                        </p>
+                    </a>
+                    <p class="flex_race">
+                                                <span class="icon_race"></span>
+                        
+                                                <span class="icon_race"></span>
+                        
+                                                <a href="/cyuou/cyokuzen/202503060508"><span class="icon_race cyokuzen">T</span></a>
+                                            </p>
+                </div>
+                            </div>
+
+                    </div>
+    </div>
+</div>
+
+
+<div class="midasi_sub">
+	<p>今週の中央開催</p>
+</div><!-- /.midasi_sub -->
+<div class="section">
+        <div class="nittei">
+                        <dl>
+                <dt class="tukihi">
+                    11/22
+                </dt>
+
+                <dd>
+                    <ul>
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/20251122">
+                                    <p class="keibajyo"></p>
+                                                                    </a>
+                                                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025112200">
+                                    <p class="keibajyo">京都</p>
+                                                                        <p class="jusyo">シトリンＳ</p>
+                                                                    </a>
+                                                                                                
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025112206">
+                                    <p class="keibajyo">福島</p>
+                                                                        <p class="jusyo">福島記念</p>
+                                                                    </a>
+                                                                                                <p class="negahikeibajyo_grade"><span class="icon_grade g3">Ｇ３</span></p>
+                                                            </div>
+                        </li>
+                    </ul>
+                </dd>
+            </dl>
+                        <dl>
+                <dt class="tukihi">
+                    11/23
+                </dt>
+
+                <dd>
+                    <ul>
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025112304">
+                                    <p class="keibajyo">東京</p>
+                                                                        <p class="jusyo">霜月Ｓ</p>
+                                                                    </a>
+                                                                                                
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025112300">
+                                    <p class="keibajyo">京都</p>
+                                                                        <p class="jusyo">マイルＣＳ</p>
+                                                                    </a>
+                                                                                                <p class="negahikeibajyo_grade"><span class="icon_grade g1">Ｇ１</span></p>
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/20251123">
+                                    <p class="keibajyo"></p>
+                                                                    </a>
+                                                                                            </div>
+                        </li>
+                    </ul>
+                </dd>
+            </dl>
+                        <dl>
+                <dt class="tukihi">
+                    11/24
+                </dt>
+
+                <dd>
+                    <ul>
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025112404">
+                                    <p class="keibajyo">東京</p>
+                                                                        <p class="jusyo">東スポ２歳Ｓ</p>
+                                                                    </a>
+                                                                                                <p class="negahikeibajyo_grade"><span class="icon_grade g2">Ｇ２</span></p>
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/20251124">
+                                    <p class="keibajyo"></p>
+                                                                    </a>
+                                                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025112406">
+                                    <p class="keibajyo">福島</p>
+                                                                        <p class="jusyo">奥羽Ｓ</p>
+                                                                    </a>
+                                                                                                
+                                                            </div>
+                        </li>
+                    </ul>
+                </dd>
+            </dl>
+                    </div>
+    </div>
+
+
+<div class="midasi_sub">
+	<p>前週の中央開催</p>
+</div><!-- /.midasi_sub -->
+<div class="section">
+        <div class="nittei">
+                        <dl>
+                <dt class="tukihi">
+                    11/15
+                </dt>
+
+                <dd>
+                    <ul>
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025111504">
+                                    <p class="keibajyo">東京</p>
+                                                                        <p class="jusyo">武蔵野Ｓ</p>
+                                                                    </a>
+                                                                                                <p class="negahikeibajyo_grade"><span class="icon_grade g3">Ｇ３</span></p>
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025111500">
+                                    <p class="keibajyo">京都</p>
+                                                                        <p class="jusyo">デイリー杯２Ｓ</p>
+                                                                    </a>
+                                                                                                <p class="negahikeibajyo_grade"><span class="icon_grade g2">Ｇ２</span></p>
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025111506">
+                                    <p class="keibajyo">福島</p>
+                                                                        <p class="jusyo">フルーツライン</p>
+                                                                    </a>
+                                                                                                
+                                                            </div>
+                        </li>
+                    </ul>
+                </dd>
+            </dl>
+                        <dl>
+                <dt class="tukihi">
+                    11/16
+                </dt>
+
+                <dd>
+                    <ul>
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025111604">
+                                    <p class="keibajyo">東京</p>
+                                                                        <p class="jusyo">オーロＣ</p>
+                                                                    </a>
+                                                                                                
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025111600">
+                                    <p class="keibajyo">京都</p>
+                                                                        <p class="jusyo">エ女王杯</p>
+                                                                    </a>
+                                                                                                <p class="negahikeibajyo_grade"><span class="icon_grade g1">Ｇ１</span></p>
+                                                            </div>
+                        </li>
+
+                        <li class="negahikeibajyo">
+                            <div>
+                                                                <a href="/cyuou/nittei/2025111606">
+                                    <p class="keibajyo">福島</p>
+                                                                        <p class="jusyo">福島民友Ｃ</p>
+                                                                    </a>
+                                                                                                
+                                                            </div>
+                        </li>
+                    </ul>
+                </dd>
+            </dl>
+                    </div>
+    </div>
+
+
+<div class="midasi_sub">
+	<p>開催情報（地方）</p>
+</div><!-- /.midasi_sub -->
+<div class="section">
+        <div class="nittei">
+                        <dl>
+                <dt class="tukihi">
+                    11/21
+                </dt>
+                <dd>
+                    <ul>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112111">
+                                    <p class="keibajyo">川崎</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112134">
+                                    <p class="keibajyo">名古屋</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                            </ul>
+                </dd>
+            </dl>
+                        <dl>
+                <dt class="tukihi">
+                    11/22
+                </dt>
+                <dd>
+                    <ul>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112223">
+                                    <p class="keibajyo">佐賀</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112258">
+                                    <p class="keibajyo">帯広</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                            </ul>
+                </dd>
+            </dl>
+                        <dl>
+                <dt class="tukihi">
+                    11/23
+                </dt>
+                <dd>
+                    <ul>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112326">
+                                    <p class="keibajyo">高知</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112323">
+                                    <p class="keibajyo">佐賀</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112320">
+                                    <p class="keibajyo">金沢</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112358">
+                                    <p class="keibajyo left basyo4">帯広</p>
+                                                                        <p class="jusyo">ドリームエ</p>
+                                                                    </a>
+                                                                <p class="negahikeibajyo_grade"><span class="icon_grade normal small">重賞</span></p>
+                                                            </div>
+                        </li>
+                                            </ul>
+                </dd>
+            </dl>
+                        <dl>
+                <dt class="tukihi">
+                    11/24
+                </dt>
+                <dd>
+                    <ul>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112429">
+                                    <p class="keibajyo left basyo5">水沢</p>
+                                                                        <p class="jusyo">寒菊賞</p>
+                                                                    </a>
+                                                                <p class="negahikeibajyo_grade"><span class="icon_grade normal small">重賞</span></p>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112426">
+                                    <p class="keibajyo">高知</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112423">
+                                    <p class="keibajyo">佐賀</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112420">
+                                    <p class="keibajyo left basyo5">金沢</p>
+                                                                        <p class="jusyo">金沢ヤング</p>
+                                                                    </a>
+                                                                <p class="negahikeibajyo_grade"><span class="icon_grade normal small">重賞</span></p>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112458">
+                                    <p class="keibajyo">帯広</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                            </ul>
+                </dd>
+            </dl>
+                        <dl>
+                <dt class="tukihi">
+                    11/25
+                </dt>
+                <dd>
+                    <ul>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112513">
+                                    <p class="keibajyo">浦和</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112529">
+                                    <p class="keibajyo">水沢</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112520">
+                                    <p class="keibajyo">金沢</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112534">
+                                    <p class="keibajyo">名古屋</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                                <li class="negahikeibajyo">
+                            <div>
+                                <a href="/chihou/nittei/2025112537">
+                                    <p class="keibajyo">園田</p>
+                                                                    </a>
+                                                            </div>
+                        </li>
+                                            </ul>
+                </dd>
+            </dl>
+                    </div><!-- /.nittei -->
+    </div><!-- /.section -->
+
+
+
+        <div class="sectionfull">
+        <div id="jyuyou_message">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- jyuyou_messageを取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'jyuyou_message', 'jyuyou_message' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+
+
+<style>
+.menuindex ul.column li {
+	width: 48.0%;
+}
+
+.menuindex ul.column li {
+	background: transparent;
+	border: none;
+}
+</style>
+
+<div class="menuindex">
+
+	<ul class="column ">
+		
+		<li>
+			<p><a href="//netshinbun.keibabook.co.jp/?target=_blank" target="_blank"><img src="//cdn.keibabook.co.jp/images/common/bnr_keibabook_netshinbun.jpg" alt="競馬ブックネット新聞" style=""></a></p>
+		</li>
+		
+		<li>
+			<p><a href="//netshinbun.keibabook.co.jp/syukansi?target=_blank" target="_blank"><img src="//cdn.keibabook.co.jp/images/common/bnr_syukankeibabook_digital.jpg" alt="週刊競馬ブックDigital" style=""></a></p>
+		</li>
+		
+		<li>
+			<p><a href="//s.keibabook.co.jp/mypage/annai/subscription" target="_blank"><img src="//cdn.keibabook.co.jp/images/common/bnr_teikikoudoku_syukankeibabook_digital.jpg" alt="週刊競馬ブックDigitalの定期購読申込" style=""></a></p>
+		</li>
+		
+		<li>
+			<p><a href="//shop.keibabook.co.jp/products/list?category_id=14" target="_blank"><img src="//cdn.keibabook.co.jp/images/common/bnr_teikikoudoku_syukankeibabook.jpg" alt="おトクな定期購読！週刊競馬ブック" style=""></a></p>
+		</li>
+		
+		<li>
+			<p><a href="https://www.youtube.com/playlist?list=PLsQvyIouSQNAh1-uE-5j3DjUITJogAJzk" target="_blank"><img src="//cdn.keibabook.co.jp/images/common/bookendpr3s.png" alt="電子書籍 ネット新聞 説明"></a></p>
+		</li>
+		
+		<li>
+			<p><a href="//shop.keibabook.co.jp/" target="_blank"><img src="//cdn.keibabook.co.jp/www/images/index/bnr_netshop2.jpg" alt="競馬ブックネットSHOP"></a></p>
+		</li>
+
+	</ul>
+</div>
+	
+
+
+
+
+        <div class="sectionfull">
+        <div id="newsall">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- ニュース（全てが選択された状態）を取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'newsall', 'newsall' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+
+<!-- コラム一覧 -->
+<div class="midasi_sub">
+	<p class="soutai">コラム一覧<span class="migi"></span></p>
+</div>
+
+<div class="section">
+
+	<div class="news_section_list">
+		<!-- 1件ずつ -->
+		<div class="news_section">
+			<a href="/column/neraiuma/1">
+				<dl>
+					<dt class="icon">
+						<p>
+						<span class="category">更新日：日曜夜</span>
+						</p>
+					</dt>
+				</dl>
+				<dl>
+					<dt class="title">今週の狙い馬(美浦)</dt>
+				</dl>
+			</a>
+		</div><!-- /.news_section -->
+		<!-- 1件ずつ -->
+		<div class="news_section">
+			<a href="/column/neraiuma/0">
+				<dl>
+					<dt class="icon">
+						<p>
+						<span class="category">更新日：日曜夜</span>
+						</p>
+					</dt>
+				</dl>
+				<dl>
+					<dt class="title">今週の狙い馬(栗東)</dt>
+				</dl>
+			</a>
+		</div><!-- /.news_section -->
+		<!-- 1件ずつ -->
+		<div class="news_section">
+			<a href="/column/jusyokaiko">
+				<dl>
+					<dt class="icon">
+						<p>
+						<span class="category">更新日：日曜夜</span>
+						</p>
+					</dt>
+				</dl>
+				<dl>
+					<dt class="title">重賞回顧</dt>
+				</dl>
+			</a>
+		</div><!-- /.news_section -->
+		<!-- 1件ずつ -->
+		<div class="news_section">
+			<a href="/column/hidaka">
+				<dl>
+					<dt class="icon">
+						<p>
+						<span class="category">更新日：木曜</span>
+						</p>
+					</dt>
+				</dl>
+				<dl>
+					<dt class="title">日高通信365</dt>
+				</dl>
+			</a>
+		</div><!-- /.news_section -->
+		<!-- 1件ずつ -->
+		<div class="news_section">
+			<a href="/column/sinba">
+				<dl>
+					<dt class="icon">
+						<p>
+						<span class="category">更新日：開催が変わった翌週の木曜</span>
+						</p>
+					</dt>
+				</dl>
+				<dl>
+					<dt class="title">新馬・未勝利勝ち馬総評</dt>
+				</dl>
+			</a>
+		</div><!-- /.news_section -->
+		<!-- 1件ずつ -->
+		<div class="news_section">
+			<a href="//column.keibabook.co.jp/category/trrepo/" target="_blank">
+				<dl>
+					<dt class="icon">
+						<p>
+						<span class="subsystem">更新日：水曜</span>
+						</p>
+					</dt>
+				</dl>
+				<dl>
+					<dt class="title">週刊トレセン通信</dt>
+				</dl>
+			</a>
+		</div><!-- /.news_section -->
+		<!-- 1件ずつ -->
+		<div class="news_section">
+			<a href="//column.keibabook.co.jp/category/nankan/" target="_blank">
+				<dl>
+					<dt class="icon">
+						<p>
+						<span class="subsystem">不定期更新</span>
+						</p>
+					</dt>
+				</dl>
+				<dl>
+					<dt class="title">中川明美の南関あらうんど</dt>
+				</dl>
+			</a>
+		</div><!-- /.news_section -->
+
+		<div class="section none">
+			<div class="annotation" style="width: 100%;">
+				<p class="textleft">
+					※変則開催時は更新日が変更になります
+				</p>
+			</div>
+		</div>
+
+	</div><!-- /.news_section_list -->
+</div><!-- /.section -->
+
+
+<!--  その他 -->
+<div class="midasi_sub">
+	<p class="soutai">その他<span class="migi"></span></p>
+</div>
+
+<div class="menutable" style="background: #fff;">
+
+	<table class="open">
+	<tbody>
+	<tr>
+		<td>
+			<a href="//shop.keibabook.co.jp/?target=_blank" target="_blank" title="ネットSHOP">ネットSHOP</a>
+		</td>
+		<td>
+			<a href="//www.keibabook.co.jp/homepage/pay5/tekityu/yosorank_web.html?target=_blank" target="_blank" title="予想者ランキング">予想者ランキング</a>
+		</td>
+		<td>
+			<a href="/tm/top" title="トラックマン紹介">トラックマン紹介</a>
+		</td>
+	</tr>
+	</tbody>
+	</table><!-- /. -->
+
+</div><!-- /.menutable  -->
+
+
+<style>
+.menuindex ul.column li {
+	width: 48.0%;
+}
+</style>
+
+	<div class="midasi_sub">
+		<p>SNS</p>
+	</div>
+
+	<div class="menuindex">
+
+		<ul class="column ">
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://twitter.com/keiba_book" target="_blank">
+					<dl class="dl-banner">
+						<dt class="image" style="width: 3px;">
+
+						</dt>
+						<dt class="honbun">
+							<p class="title">競馬ブック公式 X<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></p>
+							<p class="honbun">旧ツイッター</p>
+						</dt>
+					</dl>
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://www.youtube.com/@smartbooktube" target="_blank">
+					<dl class="dl-banner">
+						<dt class="image" style="width: 3px;">
+						
+						</dt>
+						<dt class="honbun">
+							<p class="title">競馬ブック公式チャンネル<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></p>
+							<p class="honbun">Youtube</p>
+						</dt>
+					</dl>
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="" style="display: none;">
+				<!--  -->
+				<div class="banner">
+				<a href="https://twitter.com/keibabookshop" target="_blank">
+					<dl class="dl-banner">
+						<dt class="image" style="width: 3px;">
+	
+						</dt>
+						<dt class="honbun">
+							<p class="title">ネットSHOP X<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></p>
+							<p class="honbun">旧ツイッター</p>
+						</dt>
+					</dl>
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://www.instagram.com/keibabooknetshop/?hl=ja" target="_blank">
+					<dl class="dl-banner">
+						<dt class="image" style="width: 3px;">
+	
+						</dt>
+						<dt class="honbun">
+							<p class="title">ネットSHOP 公式インスタグラム<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></p>
+							<p class="honbun"></p>
+						</dt>
+					</dl>
+				</a>
+				</div><!-- /banner -->
+			</li>
+			
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://note.com/keibabook_note" target="_blank">
+					<dl class="dl-banner">
+						<dt class="image" style="width: 3px;">
+							
+						</dt>
+						<dt class="honbun">
+							<p class="title" style="font-size: 1rem;">競馬ブック公式note<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></p>
+							<p class="honbun">※ブックログは終了しました</p>
+						</dt>
+					</dl>
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+		</ul>
+	</div>
+	
+
+
+<div class="section">
+
+
+        <div class="sectionfull">
+        <div id="bookoshirase">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- ブックからのお知らせを取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'bookoshirase', 'bookoshirase' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+</div><!-- /.section -->
+
+
+<style>
+.menuindex ul.column li {
+	width: 48.0%;
+}
+</style>
+
+	<div class="midasi_sub">
+		<p>関連サイト</p>
+	</div>
+
+	<div class="menuindex">
+
+		<ul class="column ">
+
+			<li class="">
+				<!--  -->
+				<div class="banner" style="">
+				<a href="https://www.jra.go.jp/" target="_blank">
+					<img src="https://www.jra.go.jp/use/img/link_04_l.jpg" alt="JRA" style="height: 54px;">
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://www.keiba.go.jp/" target="_blank">
+					<dl class="dl-banner">
+						<dt class="image" style="width: auto;">
+							<img alt="" src="//style.keibabook.co.jp/images/common/keibagojp02.jpg" style="width: 144px; height: 37px;">
+						</dt>
+						<dt class="honbun">
+							<p class="title">地方競馬情報</p>
+						</dt>
+					</dl>
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://www.jrha.or.jp/stallion/" target="_blank">
+					<dl class="dl-banner">
+						<dt class="image" style="width: auto;">
+							<img alt="" src="https://s3-ap-northeast-1.amazonaws.com/cdn.jrha.or.jp/images/index/bnr_main_stallion.jpg?20200201" style="width: 94px; height: 37px;">
+						</dt>
+						<dt class="honbun">
+							<p class="title">Stallions in Japan</p>
+						</dt>
+					</dl>
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://kenkyunews.jp/" target="_blank">
+					<img src="//style.keibabook.co.jp/images/common/bnr_kenkyunews.png" alt="研究ニュース">
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="https://www.kachiuma.co.jp/" target="_blank">
+					<img src="https://s3-ap-northeast-1.amazonaws.com/cdn.keibabook.co.jp/images/common/bnr_kachiuma.png" alt="勝馬" style="height: 76px;">
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+			<li class="">
+				<!--  -->
+				<div class="banner">
+				<a href="//yaegashi.data-yosou.jp/?target=_blank" target="_blank">
+					<img alt="" src="https://s3-ap-northeast-1.amazonaws.com/cdn.keibabook.co.jp/images/common/yaegashi-data-yosou.jpg">
+				</a>
+				</div><!-- /banner -->
+			</li>
+
+
+
+		</ul>
+	</div>
+	
+
+
+
+
+<!-- messageを取得 -->
+<script type="text/javascript">
+$( document ).ready( function() {
+	var cache = (new Date).getTime();
+	ajaxload_member_message_detail();
+} );
+</script>
+
+<script>
+
+$( function() {
+
+	//----------------------
+	// モーダルウインドウを閉じる
+	//----------------------
+	$('.js-modal-close').on('click',function() {
+		$('.js-modal').hide();
+		return false;
+	});
+
+});
+
+/**
+* モーダルウインドウのオープン
+*
+* @param  string _param
+*/
+function modal_open(_param) {
+	var _ret = ''
+
+	$(_param).show();
+
+}	//
+
+</script>
+
+
+									</div><!-- /.main end -->
+
+				<!-- /.side start -->
+				<div class="side">
+					<!-- Home用のサイドバナー -->
+
+        <div class="sectionfull">
+        <div id="sidebanner_s_home">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- ブックからのお知らせを取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'sidebanner_s_home', 'sidebanner_s_home' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+				</div><!-- /.side end  -->
+
+			</div><!-- /#flex_container_top end -->
+
+			<!-- flex_container start -->
+			<div id="flex_container" class="clearfix">
+
+				<div id="fullcontent"><!-- fullcontent start -->
+					
+
+
+				</div><!--  #fullcontent end -->
+
+			</div><!-- #flex_container end -->
+
+		</div><!-- container end  -->
+
+	</div><!-- /#wrap end -->
+
+	<!-- footer start -->
+	<div id="footer">
+
+		<div id="footer_content">
+			<p class="footer_message">
+			成績、配当等は主催者発行のものと照合してください。<br>
+		当サイトからの無断転載、複写、蓄積または転送することは禁止します。
+			</p>
+			<div class="footer-links">
+			<ul>
+				<li><a href="/entry/teikyo/s">提供内容（スマホサイト）</a></li>
+				<li><a href="/support/sitemap">サイトマップ</a></li>
+				<li><a href="/support/privacy">プライバシーポリシー</a></li>
+				<li class="js-free_drawermenu"><a href="/support/application_privacy/android">アプリケーションプライバシポリシー</a></li>
+				<li><a href="/support/gaiyou">会社概要</a></li>
+				<li><a href="/support/tokutei">特定商取引に基づく表示</a></li>
+						
+			<li><a href="/support/enquiry">お問い合わせ</a></li>
+						</ul>
+			</div><!-- /.footer-links -->
+
+			<p class="copyright">
+			Copyright (C) keibabook Co.,Ltd.. All Rights Reserved.
+			</p>
+
+		</div><!-- /#footer_content -->
+
+	</div><!-- footer end -->
+
+
+
+	<!-- js-modal-message -->
+	<div id="js-modal-message" class="modal js-modal">
+
+		<div class="modal__bg js-modal-close"></div>
+
+		<div class="modal__content" style="width: 90%; max-width: 640px;">
+
+			<!--  -->
+			<div class="supportbox rakusatsu">
+
+				<div class="box-title">
+					<p class="js-message_title">
+						<!-- REPLACE_MESSAGE_TITLE	-->
+					</p>
+				</div><!-- /.box-title -->
+
+				<div class="box-honbun js-message_honbun" style="height: auto; overflow: auto;">
+				</div><!-- /.box-honbun -->
+
+				<p class="footer_right js-message_negahi">
+
+				</p>
+			</div>
+
+			<!--  -->
+			<div class="element margin_jrha" style="text-align: center; margin: 0 0 0.5rem;">
+
+				<button class="button simple js-modal-close" value="" style="width: 5rem;">閉じる</button>
+
+			</div>
+
+		</div><!--modal__inner-->
+
+	</div><!-- js-modal-message-->
+
+
+
+	<script src="//style.keibabook.co.jp/smart/js/booklibrary.js?20240106"></script>
+
+
+<style>
+
+/*-------------------------------------
+ スクロール
+---------------------------------------*/
+
+	.overlay {
+		content: "";
+		display: block;
+		width: 0;
+		height: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 3;
+		opacity: 0;
+		transition: opacity .5s;
+	}
+
+	.overlay.open {
+		width: 100%;
+		height: 100%;
+		opacity: 1;
+	}
+
+
+
+	/* ドロワーメニュー */
+	.drawermenu {
+		display: none;
+		/*	width: 270px;	*/
+		height: 100%;
+		margin-right: -50px;
+		background-color: rgb(16, 69, 153, 0.8);
+		background: #fff;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 4;
+		transform: translate(-270px);
+		transform: translateX(-100%);
+		transition: all .5s;
+	}
+
+	.drawermenu.open {
+		transform: translateZ(0);
+	}
+
+	.drawermenu > ul {
+		border-bottom: 0px solid #dadada;
+	}
+
+	.drawermenu > ul > li {
+		border-top: 1px solid #dadada;
+		border-right: 1px solid #dadada;
+		border-left: 1px solid #dadada;
+		text-align: left;
+		padding: 0.8rem;
+		white-space: nowrap;
+	}
+
+	.drawermenu > ul > li:last-child {
+		border-bottom: 1px solid #dadada;
+	}
+
+	.drawermenu > ul > li.menu {
+		line-height: 2;
+		background: #1F4E3A;
+		color: #fff;
+	}
+
+	.drawermenu > ul > li.title {
+		line-height: 1;
+		background: #f1f4f6;
+		color: #111;
+	}
+
+	.drawermenu > ul > li.active {
+		background: #c7e1f1;
+	}
+
+	.drawermenu > ul > li a {
+		display: block;
+		position: relative;
+		/* color: #111; */
+	}
+
+	.drawermenu > ul > li a:after {
+		display: block;
+		content: ">";
+		position: absolute;
+		top: 50%;
+		right: 10px;
+		margin: -12px 0 0 0;
+	}
+
+	.drawermenu ul > li.active a {
+		display: block;
+		position: relative;
+		/* color: #111; */
+	}
+
+	.drawermenu > ul > li a:hover,
+	.drawermenu > ul > li.active a:hover {
+		text-decoration: none;
+	}
+
+	.drawermenu__title {
+		line-height: 2;
+		background: -moz-linear-gradient(#1F4E3A, #005D36);
+		background: -webkit-linear-gradient(#1F4E3A, #005D36);
+		background: -ms-linear-gradient(#1F4E3A, #005D36);
+		color: #fff;
+	}
+
+	.drawermenu__title__under {
+		line-height: 2;
+		background: -moz-linear-gradient(#1F4E3A, #005D36);
+		background: -webkit-linear-gradient(#1F4E3A, #005D36);
+		background: -ms-linear-gradient(#1F4E3A, #005D36);
+		border-bottom: 2px solid #111;
+		color: #fff;
+	}
+
+	.drawermenu__active p {
+		background: #c7e1f1;
+	}
+
+
+
+
+		/* メニューボタン */
+		.menubutton {
+			display: inline-block;
+			width: 36px;
+			height: 28px;
+			vertical-align: middle;
+			cursor: pointer;
+			position: fixed;
+			top: 50px;
+			left: 60px;
+			transform: translateX(0);
+			transition: transform 0.3s;
+			z-index: -1;
+		}
+
+		.menubutton.active {
+			transform: translateX(215px);
+			z-index: 3;
+		}
+
+		.menubutton span {
+			display: inline-block;
+			box-sizing: border-box;
+			position: absolute;
+			left: 0;
+			width: 100%;
+			height: 0px;
+			background-color: #000;
+		}
+		.menubutton.active span {
+			display: inline-block;
+			box-sizing: border-box;
+			position: absolute;
+			left: 0;
+			width: 100%;
+			height: 4px;
+			background-color: #fff;
+		}
+
+		.menubutton span:nth-of-type(1) {
+			top: 0;
+		}
+
+		.menubutton.active span:nth-of-type(1) {
+			transform: translateY(12px) rotate(-45deg);
+		}
+
+		.menubutton span:nth-of-type(2) {
+			top: 12px;
+		}
+
+		.menubutton.active span:nth-of-type(2) {
+			opacity: 0;
+		}
+
+		.menubutton span:nth-of-type(3) {
+			bottom: 0;
+		}
+
+		.menubutton.active span:nth-of-type(3) {
+			transform: translateY(-12px) rotate(45deg);
+		}
+
+	   /*メニューを開く用ボタン*/
+	   .drawermenu-open{
+	       display: inline-block;
+	       width: 2rem;
+	       height: 2rem;
+	       vertical-align: middle;
+	   }
+	   .drawermenu-open:hover{
+	       cursor: pointer;
+	   }
+	   .drawermenu-open span,
+	   .drawermenu-open span:before,
+	   .drawermenu-open span:after {
+	       position: absolute;
+	       height: 3px;/*線の太さ*/
+	       width: 2rem;/*長さ*/
+	       border-radius: 3px;
+	       background: #111;
+	       display: block;
+	       content: '';
+	       cursor: pointer;
+	   }
+	   .drawermenu-open span:before {
+		   bottom: -10px;
+	   }
+	   .drawermenu-open span:after {
+		   bottom: -20px;
+	   }
+
+	   /*メニューを閉じるカバーエリア*/
+	   .drawermenu-close {
+	       display: none;/*はじめは隠しておく*/
+	       position: fixed;
+	       z-index: 2;/*最前面のすぐ下に表示*/
+	       top: 0;/*全体に広がるように*/
+	       left: 0;
+	       width: 100%;
+	       height: 100%;
+	       background: black;
+	       opacity: 0;
+	       transition: .3s ease-in-out;
+	   }
+
+	   .l-menumenu {
+		   overflow: auto;
+	       position: fixed;
+	       top: 0;
+	       left: 0;
+	       width: 270px;/*右側に隙間を作る（閉じるカバーを表示）*/
+	       max-width: 270px;/*最大幅（調整してください）*/
+	       height: 100%;
+	       background: #fff;/*背景色*/
+	       -webkit-transform: translateX(-105%);
+	       transform: translateX(-105%);/*左に隠しておく*/
+	   }
+
+	   .menu_show{
+	       z-index: 3;/*最前面に表示*/
+		   transition: 0.3s ease-in-out;/*滑らかに表示*/
+	       -webkit-transform: translateX(0%);
+	       transform: translateX(0%);/*左に隠しておく*/
+	   }
+
+</style>
+
+<script>
+
+
+	$('.menu-trigger').on('click',function(){
+			$('.menubutton').addClass('active');
+			$('.drawermenu').addClass('open');
+			$('.overlay').addClass('open');
+			$('.menu-trigger').css('display','none');
+	});
+
+	$('.menubutton').on('click',function(){
+			$(this).removeClass('active');
+			$('.drawermenu').removeClass('open');
+			$('.overlay').removeClass('open');
+			$('.menu-trigger').css('display','block');
+	});
+/*
+	$('.overlay').on('touchstart ',function(){
+		if($(this).hasClass('open')){
+			$(this).removeClass('open');
+			$('.menu-trigger').removeClass('active');
+			$('.menubutton').removeClass('active');
+			$('.drawermenu').removeClass('open');
+			$('.menu-trigger').css('display','block');
+		}
+	});
+
+	$('.overlay').on('click ',function(){
+		if($(this).hasClass('open')){
+			$(this).removeClass('open');
+			$('.menu-trigger').removeClass('active');
+			$('.menubutton').removeClass('active');
+			$('.drawermenu').removeClass('open');
+			$('.menu-trigger').css('display','block');
+		}
+	});
+*/
+	$(function(){
+
+
+		$('.js-drawermenu-open').on('click', function() {
+
+
+			$('.js-drawermenu').css('display', 'block');
+
+			$('.js-drawermenu').addClass('menu_show');
+
+			$('.js-drawermenu-close').css('opacity', '0.5');
+			$('.js-drawermenu-close').css('display', 'block');
+
+			$('.js-menubutton').addClass('active');
+
+			//
+			
+				//alert('会員');
+				$('.js-free_drawermenu').css('display', 'none');
+
+			
+		});
+
+	    //menu|メニュー表示時のスクロール止め
+	    var scrollpos;
+	    $('.js-drawermenu-open').on('click', function(){
+	        scrollpos = $(window).scrollTop();
+	        $('body').addClass('fixed').css({'top': -scrollpos});
+	        $('.js-drawermenu-open').addClass('open');
+	    });
+
+		//
+	    $('.js-drawermenu-close, .js-menubutton').on('click', function() {
+	        $('body').removeClass('fixed').css({'top': 0});
+	        window.scrollTo( 0 , scrollpos );
+	        $('.js-drawermenu-open').removeClass('open');
+			$('.js-drawermenu').removeClass('menu_show');
+
+			$('.js-drawermenu-close').css('opacity', '0');
+			$('.js-drawermenu-close').css('display', 'none');
+
+			$('.js-menubutton').removeClass('active');
+	    });
+	});
+
+</script>
+
+
+
+<!-- 20250318 リターゲティングタグ start -->
+<script async="" src="https://s.yimg.jp/images/listing/tool/cv/ytag.js"></script>
+<script>
+window.yjDataLayer = window.yjDataLayer || [];
+function ytag() { yjDataLayer.push(arguments); }
+ytag({
+  "type":"yjad_retargeting",
+  "config":{
+    "yahoo_retargeting_id": "SS7G0QBUQD",
+    "yahoo_retargeting_label": "",
+    "yahoo_retargeting_page_type": "",
+    "yahoo_retargeting_items":[
+      {item_id: '', category_id: '', price: '', quantity: ''}
+    ]
+  }
+});
+</script>
+<!-- 20250318 リターゲティングタグ end -->
+
+
+
+
+</body></html>

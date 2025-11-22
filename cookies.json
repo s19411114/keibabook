@@ -1,0 +1,22 @@
+[
+  {
+    "name": "XSRF-TOKEN",
+    "value": "eyJpdiI6IlZRTHJ5dGxGN0Nmc05CWWxQZ2dycGc9PSIsInZhbHVlIjoiTjBtTmhKRmlYb3ppbW1LazBpT3E3MGxiOTRwZmlpQnpZaitwOHQwK2VNTis0MHYrWHZmamI4ZUVZSXZCWDVMOEJcL3l2SmhKZ1J5QTRyTkJ3NjFsdlBnPT0iLCJtYWMiOiI4ZjY3Yjk5ZTU1MzUzMjUxNTYzOTc2N2Q2MWU4MGU3MmE0MjYxMjgzMjY3OTFjMjVkYjM0MzI2NmNmOTU0NGZjIn0%3D",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "None",
+    "expires": 1763817716
+  },
+  {
+    "name": "keibabook_session",
+    "value": "eyJpdiI6ImhpNGlXOWIxaDdURnhRM0FpUGpXWlE9PSIsInZhbHVlIjoiT2g1Rm5Hck1qUlRsb1BBQjRZeElKaXBadWFsN0Z6R1JFYzdzVzRJOTQxSUhIT0dsUThlWXI3NzJaT2p2TXdlWkROUHZMSkxiM2ZrUmczMWlVWE0zNlE9PSIsIm1hYyI6IjQ3YjY5MTgwOTk0NzA4YTc2MzkxMzkzMWY3NjA0Njg3ZjI2ZGQ2ZjhhNTdmOTEyMDNjYTI4N2I4MDc4NzE5YWUifQ%3D%3D",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None",
+    "expires": 1763817716
+  }
+]

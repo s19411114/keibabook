@@ -1,0 +1,181 @@
+{
+  "race_id": "202503060201",
+  "horses": [
+    {
+      "horse_num": "1",
+      "horse_name": "セイウンレガーメ",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0945958",
+      "extras": {
+        "row_text": "1 1 ※ ※ ※ ※ ※ セイウンレガーメ 牝2 杉原誠 55 436(+20) 188.3 15人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "2",
+      "horse_name": "ハルヒメ",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0950246",
+      "extras": {
+        "row_text": "1 2 ※ ※ ※ ※ ※ ハルヒメ 牝2 ☆ 西塚洸 54 392(-6) 7.2 3人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "3",
+      "horse_name": "グラティアム",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0950596",
+      "extras": {
+        "row_text": "2 3 ※ ※ ※ ※ ※ グラティアム 牝2 丹内祐 55 462(+8) 2.6 1人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "4",
+      "horse_name": "タマコロリン",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0952094",
+      "extras": {
+        "row_text": "2 4 ※ ※ ※ ※ ※ タマコロリン 牝2 ▲ 舟山瑠 52 472(-6) 37.7 9人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "5",
+      "horse_name": "エンゲルベルク",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0951004",
+      "extras": {
+        "row_text": "3 5 ※ ※ ※ ※ ※ エンゲルベルク 牝2 ▲ 水沼元 52 438(+4) 445.1 16人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "6",
+      "horse_name": "マユナイト",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0950380",
+      "extras": {
+        "row_text": "3 6 ※ ※ ※ ※ ※ マユナイト 牝2 斎藤新 55 390(+4) 20.5 8人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "7",
+      "horse_name": "アンセートゥモダン",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0952329",
+      "extras": {
+        "row_text": "4 7 ※ ※ ※ ※ ※ アンセートゥモダン 牝2 ◇ 今村聖 53 410(+6) 92.5 11人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "8",
+      "horse_name": "コスモラパウィラ",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0951125",
+      "extras": {
+        "row_text": "4 8 ※ ※ ※ ※ ※ コスモラパウィラ 牡2 石川裕 56 464(0) 16.8 7人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "9",
+      "horse_name": "アンバサダネージュ",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0950064",
+      "extras": {
+        "row_text": "5 9 ※ ※ ※ ※ ※ アンバサダネージュ 牡2 ▲ 佐藤翔 53 B 490(+8) 113.7 12人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "10",
+      "horse_name": "コブラツイスト",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0952611",
+      "extras": {
+        "row_text": "5 10 ※ ※ ※ ※ ※ コブラツイスト 牡2 ◇ 永島ま 54 446(+2) 8.7 5人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "11",
+      "horse_name": "イーガービーバー",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0946160",
+      "extras": {
+        "row_text": "6 11 ※ ※ ※ ※ ※ イーガービーバー 牡2 ▲ 石神道 53 462(+10) 135.2 13人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "12",
+      "horse_name": "アルサック",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0952204",
+      "extras": {
+        "row_text": "6 12 ※ ※ ※ ※ ※ アルサック 牝2 丸山元 55 486(+8) 4.1 2人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "13",
+      "horse_name": "メイポール",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0953666",
+      "extras": {
+        "row_text": "7 13 ※ ※ ※ ※ ※ メイポール 牝2 黛弘人 55 426(-2) 169.4 14人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "14",
+      "horse_name": "ドリームガッサン",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0949603",
+      "extras": {
+        "row_text": "7 14 ※ ※ ※ ※ ※ ドリームガッサン 牝2 ▲ 上里直 52 432(+10) 54.4 10人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "15",
+      "horse_name": "ニャンモロー",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0946411",
+      "extras": {
+        "row_text": "8 15 ※ ※ ※ ※ ※ ニャンモロー 牝2 菊沢一 55 468(-4) 8.1 4人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    },
+    {
+      "horse_num": "16",
+      "horse_name": "ドナソレイ",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/0946076",
+      "extras": {
+        "row_text": "8 16 ※ ※ ※ ※ ※ ドナソレイ 牝2 ▲ 石田拓 52 470(+2) 15.1 6人気"
+      },
+      "jockey": null,
+      "odds": null,
+      "weight": null
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "race_id": "202503060201",
+  "race_name": "第1回福島競馬 第1日目 1R",
+  "race_grade": "サラ系3歳未勝利",
+  "distance": "ダート1700m",
+  "date": "2025-03-06",
+  "horses": [
+    {
+      "_flags": [],
+      "horse_num": "1",
+      "horse_name": "馬名1",
+      "jockey": "騎手1",
+      "weight": "55",
+      "odds": "12.5",
+      "detail_url": "https://s.keibabook.co.jp/db/uma/dummy_link",
+      "father": "ドレフォン",
+      "mother": "セイウンアワード",
+      "mothers_father": "タニノギムレット",
+      "past_results": [
+        {
+          "date": "2025-10-20",
+          "venue": "東京",
+          "race_num": "1",
+          "finish_position": "1着",
+          "time": "1:35.0",
+          "jockey": "ルメール",
+          "weight": "55"
+        }
+      ],
+      "training": [
+        {
+          "date": "2025-11-05",
+          "location": "美浦南Ｗ",
+          "time": "68.9-53.5-38.6-11.9",
+          "evaluation": "馬ナリ余力"
+        }
+      ],
+      "stable_comment": "まだ素質だけで走っている感じ。使いつつ良くなってくれば。",
+      "previous_race_comment": "スタートで後手を踏んだのが全て。力負けではない。"
+    }
+  ]
+}
