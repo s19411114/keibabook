@@ -577,9 +577,9 @@ with tab2:
                                     st.text("血統データ: あり")
                             with col2:
                                 if 'stable_comment' in horse:
-                                    st.text_area("厩舎コメント", horse.get('stable_comment', ''), height=100)
+                                    st.text_area("厩舎コメント", horse.get('stable_comment', ''), height=100, key=f"stable_comment_{horse.get('horse_num', 0)}")
                                 if 'previous_race_comment' in horse:
-                                    st.text_area("前走コメント", horse.get('previous_race_comment', ''), height=100)
+                                    st.text_area("前走コメント", horse.get('previous_race_comment', ''), height=100, key=f"prev_comment_{horse.get('horse_num', 0)}")
                 else:
                     st.info("馬データがありません")
             else:
