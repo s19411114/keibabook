@@ -155,6 +155,8 @@ st.markdown("""
 # セッション状態の初期化
 if 'scraping_in_progress' not in st.session_state:
     st.session_state.scraping_in_progress = False
+if 'abort_scraping' not in st.session_state:
+    st.session_state.abort_scraping = False
 if 'scraped_data' not in st.session_state:
     st.session_state.scraped_data = None
 if 'db_manager' not in st.session_state:
@@ -343,7 +345,7 @@ with st.sidebar:
         headless_mode = st.checkbox("ヘッドレスモード", value=settings.get('playwright_headless', False))
 
 # メインコンテンツ
-tab1, tab2, tab3, tab4 = st.tabs(["📥 スクレイピング", "📊 データ確認", "🎯 レコメンド", "📝 ログ"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📥 スクレイピング", "📊 データ確認", "🏇 トラックバイアス", "🎯 レコメンド", "📝 ログ"])
 
 with tab1:
     st.header("データ取得実行")
@@ -351,8 +353,21 @@ with tab1:
     # 最終確認用の表示
     st.info(f"**対象**: {selected_date} {selected_venue_name} {selected_race_num}R")
     
-    # スクレイピング実行ボタン
-    if st.button("🚀 スクレイピング開始", type="primary", disabled=st.session_state.scraping_in_progress):
+    # ボタンエリア
+    col_btn1, col_btn2 = st.columns([3, 1])
+    
+    with col_btn1:
+        # スクレイピング実行ボタン
+        start_button = st.button("🚀 スクレイピング開始", type="primary", disabled=st.session_state.scraping_in_progress)
+    
+    with col_btn2:
+        # 中断ボタン
+        if st.session_state.scraping_in_progress:
+            if st.button("⛔ 中断", type="secondary"):
+                st.session_state.abort_scraping = True
+                st.warning("⚠️ 中断リクエストを送信しました...")
+    
+    if start_button:
         # 手動設定があればそちらを優先
         target_race_id = manual_race_id if manual_race_id != generated_race_id else generated_race_id
         target_race_key = manual_race_key if manual_race_key != generated_race_key else generated_race_key
@@ -383,9 +398,17 @@ with tab1:
             
             # スクレイピング実行
             async def run_scraping():
+                # 中断フラグをリセット
+                st.session_state.abort_scraping = False
+                incomplete_files = []  # 中途半端なファイルを追跡
+                
                 try:
                     status_text.text("初期化中...")
                     progress_bar.progress(10)
+                    
+                    # 中断チェック
+                    if st.session_state.abort_scraping:
+                        raise Exception("ユーザーによる中断")
                     
                     # DBマネージャーの設定
                     db_manager = st.session_state.db_manager if use_duplicate_check else None
@@ -396,13 +419,25 @@ with tab1:
                     status_text.text("ページ取得中 (KeibaBook)...")
                     progress_bar.progress(30)
                     
+                    # 中断チェック
+                    if st.session_state.abort_scraping:
+                        raise Exception("ユーザーによる中断")
+                    
                     # スクレイピング実行 (KeibaBook)
                     scraped_data = await scraper.scrape()
+                    
+                    # 中断チェック
+                    if st.session_state.abort_scraping:
+                        raise Exception("ユーザーによる中断")
                     
                     # JRAオッズ取得 (JRAの場合のみ)
                     if race_type == 'jra':
                         status_text.text("リアルタイムオッズ取得中 (JRA)...")
                         progress_bar.progress(60)
+                        
+                        # 中断チェック
+                        if st.session_state.abort_scraping:
+                            raise Exception("ユーザーによる中断")
                         
                         jra_odds = await JRAOddsFetcher.fetch_realtime_odds(selected_venue_name, selected_race_num)
                         
@@ -429,12 +464,16 @@ with tab1:
                     output_dir = Path(current_settings.get('output_dir', 'data'))
                     output_dir.mkdir(parents=True, exist_ok=True)
                     json_file = output_dir / f"{target_race_key}.json"
+                    incomplete_files.append(json_file)  # 追跡
+                    
                     with open(json_file, 'w', encoding='utf-8') as f:
                         json.dump(scraped_data, f, ensure_ascii=False, indent=2)
                     
                     # AI用JSONもエクスポート
                     if db_manager:
-                        db_manager.export_for_ai(target_race_id, str(output_dir / "json"))
+                        ai_json = db_manager.export_for_ai(target_race_id, str(output_dir / "json"))
+                        if ai_json:
+                            incomplete_files.append(Path(ai_json))  # 追跡
                     
                     progress_bar.progress(100)
                     status_text.text("完了！")
@@ -446,11 +485,26 @@ with tab1:
                     
                 except Exception as e:
                     logger.error(f"スクレイピングエラー: {e}")
-                    st.error(f"❌ エラーが発生しました: {e}")
-                    status_text.text("エラー")
-                    raise
+                    
+                    # 中断の場合は中途半端なファイルを削除
+                    if st.session_state.abort_scraping or "中断" in str(e):
+                        st.warning("🗑️ 中途半端なデータを削除しています...")
+                        for file_path in incomplete_files:
+                            try:
+                                if file_path.exists():
+                                    file_path.unlink()
+                                    logger.info(f"削除: {file_path}")
+                            except Exception as del_err:
+                                logger.error(f"ファイル削除エラー: {del_err}")
+                        st.info("✅ 中断しました。不完全なデータは削除されました。")
+                    else:
+                        st.error(f"❌ エラーが発生しました: {e}")
+                    
+                    status_text.text("中断" if st.session_state.abort_scraping else "エラー")
+                    progress_bar.progress(0)
                 finally:
                     st.session_state.scraping_in_progress = False
+                    st.session_state.abort_scraping = False
             
             # 非同期実行
             asyncio.run(run_scraping())
@@ -477,8 +531,22 @@ with tab2:
                     race_data = json.load(f)
                 
                 # JSONコピー機能
-                st.subheader("📋 JSONデータ (コピー用)")
-                json_str = json.dumps(race_data, ensure_ascii=False, indent=2)
+                st.subheader("📋 JSONデータ")
+                
+                col_json1, col_json2 = st.columns([3, 1])
+                with col_json1:
+                    st.info("💡 下のコードブロックから直接コピーできます")
+                with col_json2:
+                    # ダウンロードボタン
+                    json_str = json.dumps(race_data, ensure_ascii=False, indent=2)
+                    st.download_button(
+                        label="📥 JSONダウンロード",
+                        data=json_str,
+                        file_name=f"{selected_race_id}.json",
+                        mime="application/json"
+                    )
+                
+                # コピー用コードブロック
                 st.code(json_str, language='json')
                 
                 # レース情報表示
@@ -519,6 +587,140 @@ with tab2:
         st.info("まだデータがありません。スクレイピングを実行してください。")
 
 with tab3:
+    st.header("🏇 トラックバイアス分析")
+    st.markdown("レース結果から馬場の傾向を分析します（上位6頭のデータを使用）")
+    
+    # Netkeiba結果URL入力
+    st.subheader("📍 Netkeiba結果ページ")
+    
+    col_url1, col_url2 = st.columns([3, 1])
+    
+    with col_url1:
+        result_url = st.text_input(
+            "結果ページURL",
+            value="https://race.netkeiba.com/race/result.html?race_id=202508040611",
+            help="NetkeibaのレースIDを含むURL"
+        )
+    
+    with col_url2:
+        st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+        fetch_button = st.button("🔍 取得", type="primary")
+    
+    # レースIDを抽出
+    import re
+    race_id_match = re.search(r'race_id=(\d+)', result_url)
+    
+    if fetch_button and race_id_match:
+        race_id = race_id_match.group(1)
+        
+        with st.spinner(f"レース結果を取得中... (ID: {race_id})"):
+            # Netkeibaスクレイパーをインポート
+            from src.scrapers.netkeiba_result import NetkeibaResultScraper
+            
+            async def fetch_and_analyze():
+                scraper = NetkeibaResultScraper(headless=headless_mode)
+                result_data = await scraper.fetch_result(race_id)
+                return result_data
+            
+            # 非同期実行
+            result_data = asyncio.run(fetch_and_analyze())
+            
+            if result_data and result_data.get('horses'):
+                st.success(f"✅ 取得完了！ ({len(result_data['horses'])}頭)")
+                
+                # セッションに保存
+                st.session_state.track_bias_data = result_data
+            else:
+                st.error("❌ データ取得に失敗しました")
+    
+    # トラックバイアス指数を表示
+    if 'track_bias_data' in st.session_state and st.session_state.track_bias_data:
+        data = st.session_state.track_bias_data
+        
+        st.markdown("---")
+        st.subheader("📊 トラックバイアス指数")
+        
+        bias = data.get('track_bias', {})
+        
+        if bias and bias.get('bias_type') != 'データ不足':
+            # メトリクス表示
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric(
+                    "バイアスタイプ",
+                    bias.get('bias_type', 'N/A'),
+                    help="内外・ペースの傾向"
+                )
+            
+            with col2:
+                inner_outer = bias.get('inner_outer_bias', 0)
+                st.metric(
+                    "内外バイアス",
+                    f"{inner_outer:+.1f}",
+                    help="マイナス=内有利、プラス=外有利"
+                )
+            
+            with col3:
+                pace = bias.get('pace_bias', 0)
+                st.metric(
+                    "ペースバイアス",
+                    f"{pace:+.1f}",
+                    help="マイナス=前有利、プラス=後有利"
+                )
+            
+            with col4:
+                confidence = bias.get('confidence', 0)
+                st.metric(
+                    "信頼度",
+                    f"{confidence:.0%}",
+                    help="データの完全性"
+                )
+            
+            # 詳細情報
+            with st.expander("📈 詳細分析"):
+                st.write(f"**総合バイアススコア**: {bias.get('overall_bias_score', 0):.1f}/100")
+                st.write(f"**上がり3Fバイアス**: {bias.get('last_3f_bias', 0):.1f}/100")
+                
+                # 解釈
+                st.markdown("### 💡 解釈")
+                bias_type = bias.get('bias_type', '')
+                
+                if '内有利' in bias_type:
+                    st.info("🔵 **内枠有利**: 内枠の馬が好走しやすい馬場状態です")
+                elif '外有利' in bias_type:
+                    st.info("🔴 **外枠有利**: 外枠の馬が好走しやすい馬場状態です")
+                
+                if '前有利' in bias_type:
+                    st.info("⚡ **前残り**: 逃げ・先行馬が有利な展開です")
+                elif '後有利' in bias_type:
+                    st.info("🏃 **差し有利**: 差し・追込馬が有利な展開です")
+            
+            # 上位6頭の詳細
+            st.markdown("---")
+            st.subheader("🏆 上位6頭の成績")
+            
+            horses = data.get('horses', [])[:6]
+            
+            for i, horse in enumerate(horses, 1):
+                with st.expander(f"{i}着: {horse.get('horse_name', 'N/A')} ({horse.get('horse_num', '?')}番)"):
+                    col_h1, col_h2, col_h3 = st.columns(3)
+                    
+                    with col_h1:
+                        st.text(f"騎手: {horse.get('jockey', 'N/A')}")
+                        st.text(f"タイム: {horse.get('time', 'N/A')}")
+                    
+                    with col_h2:
+                        st.text(f"通過: {horse.get('passing', 'N/A')}")
+                        st.text(f"上がり: {horse.get('last_3f', 'N/A')}")
+                    
+                    with col_h3:
+                        st.text(f"人気: {horse.get('popularity', 'N/A')}番人気")
+                        st.text(f"オッズ: {horse.get('odds', 'N/A')}倍")
+        else:
+            st.warning("⚠️ トラックバイアス指数を計算できませんでした（データ不足）")
+
+with tab4:
     st.header("🎯 レコメンド機能")
     st.markdown("過小評価馬、穴馬候補、順位付けなど")
     
@@ -665,7 +867,7 @@ with tab3:
     else:
         st.info("まだデータがありません。スクレイピングを実行してください。")
 
-with tab4:
+with tab5:
     st.header("ログ・進捗記録")
     
     # URLログ表示
