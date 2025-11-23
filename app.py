@@ -513,77 +513,81 @@ with tab1:
             st.rerun()
 
 with tab2:
-    st.header("データ確認")
+    st.header("📊 データ確認")
     
-    # 保存済みレース一覧（JSONファイルから直接取得）
+    # 保存済みファイルを取得
     output_dir = Path(settings.get('output_dir', 'data'))
     json_files = list(output_dir.glob('*.json'))
-    race_ids = [f.stem for f in json_files if f.is_file()]
     
-    if race_ids:
-        selected_race_id = st.selectbox("レースを選択", sorted(race_ids, reverse=True))
-        
-        if selected_race_id:
-            # JSONファイルを読み込み
-            json_file = output_dir / f"{selected_race_id}.json"
+    # ファイル名からレース情報を抽出
+    race_data_map = {}
+    for json_file in json_files:
+        filename = json_file.stem  # 例: 20251122_福島11R
+        try:
+            # ファイル名をパース
+            parts = filename.split('_')
+            if len(parts) >= 2:
+                date_str = parts[0]  # 20251122
+                venue_race = parts[1]  # 福島11R
+                
+                # 日付をフォーマット
+                year = date_str[:4]
+                month = date_str[4:6]
+                day = date_str[6:8]
+                date_key = f"{year}-{month}-{day}"
+                
+                # 会場とレース番号を抽出
+                import re
+                match = re.match(r'(.+?)(\d+)R', venue_race)
+                if match:
+                    venue = match.group(1)
+                    race_num = int(match.group(2))
+                    
+                    if date_key not in race_data_map:
+                        race_data_map[date_key] = {}
+                    if venue not in race_data_map[date_key]:
+                        race_data_map[date_key][venue] = {}
+                    
+                    race_data_map[date_key][venue][race_num] = json_file
+        except Exception as e:
+            logger.warning(f"ファイル名パースエラー: {filename} - {e}")
+    
+    if race_data_map:
+        # 日付ごとに表示
+        for date_key in sorted(race_data_map.keys(), reverse=True):
+            year, month, day = date_key.split('-')
+            st.subheader(f"📅 {year}年{month}月{day}日")
             
-            if json_file.exists():
-                with open(json_file, 'r', encoding='utf-8') as f:
-                    race_data = json.load(f)
+            venues = race_data_map[date_key]
+            
+            # 会場ごとにグリッド表示
+            for venue in sorted(venues.keys()):
+                st.markdown(f"**{venue}**")
                 
-                # JSONコピー機能
-                st.subheader("📋 JSONデータ")
+                # 12レース分のボタンを横並びで表示
+                cols = st.columns(12)
+                for race_num in range(1, 13):
+                    with cols[race_num - 1]:
+                        if race_num in venues[venue]:
+                            # データあり - ダウンロードボタン
+                            json_file = venues[venue][race_num]
+                            with open(json_file, 'r', encoding='utf-8') as f:
+                                json_data = json.load(f)
+                            json_str = json.dumps(json_data, ensure_ascii=False, indent=2)
+                            
+                            st.download_button(
+                                label=f"●{race_num}R",
+                                data=json_str,
+                                file_name=f"{json_file.stem}.json",
+                                mime="application/json",
+                                key=f"download_{date_key}_{venue}_{race_num}",
+                                help=f"{venue} {race_num}Rのデータをダウンロード"
+                            )
+                        else:
+                            # データなし
+                            st.markdown(f"<div style='text-align: center; color: #666;'>○{race_num}R</div>", unsafe_allow_html=True)
                 
-                col_json1, col_json2 = st.columns([3, 1])
-                with col_json1:
-                    st.info("💡 下のコードブロックから直接コピーできます")
-                with col_json2:
-                    # ダウンロードボタン
-                    json_str = json.dumps(race_data, ensure_ascii=False, indent=2)
-                    st.download_button(
-                        label="📥 JSONダウンロード",
-                        data=json_str,
-                        file_name=f"{selected_race_id}.json",
-                        mime="application/json"
-                    )
-                
-                # コピー用コードブロック
-                st.code(json_str, language='json')
-                
-                # レース情報表示
-                st.subheader("レース情報")
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("レース名", race_data.get('race_name', 'N/A'))
-                with col2:
-                    st.metric("グレード", race_data.get('race_grade', 'N/A'))
-                with col3:
-                    st.metric("距離", race_data.get('distance', 'N/A'))
-                
-                # 馬一覧
-                st.subheader("出馬表")
-                horses = race_data.get('horses', [])
-                if horses:
-                    for horse in horses:
-                        with st.expander(f"🐴 {horse.get('horse_num', '?')}番: {horse.get('horse_name', 'N/A')}"):
-                            col1, col2 = st.columns(2)
-                            with col1:
-                                st.text(f"騎手: {horse.get('jockey', 'N/A')}")
-                                if 'current_odds' in horse:
-                                    st.metric("現在オッズ (JRA)", f"{horse['current_odds']}倍")
-                                if 'training_data' in horse and horse['training_data']:
-                                    st.text("調教データ: あり")
-                                if 'pedigree_data' in horse and horse['pedigree_data']:
-                                    st.text("血統データ: あり")
-                            with col2:
-                                if 'stable_comment' in horse:
-                                    st.text_area("厩舎コメント", horse.get('stable_comment', ''), height=100, key=f"stable_comment_{horse.get('horse_num', 0)}")
-                                if 'previous_race_comment' in horse:
-                                    st.text_area("前走コメント", horse.get('previous_race_comment', ''), height=100, key=f"prev_comment_{horse.get('horse_num', 0)}")
-                else:
-                    st.info("馬データがありません")
-            else:
-                st.warning(f"JSONファイルが見つかりません: {json_file}")
+                st.markdown("---")
     else:
         st.info("まだデータがありません。スクレイピングを実行してください。")
 
