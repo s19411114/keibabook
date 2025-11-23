@@ -515,15 +515,16 @@ with tab1:
 with tab2:
     st.header("データ確認")
     
-    # 保存済みレース一覧
-    race_ids = st.session_state.db_manager.get_race_ids()
+    # 保存済みレース一覧（JSONファイルから直接取得）
+    output_dir = Path(settings.get('output_dir', 'data'))
+    json_files = list(output_dir.glob('*.json'))
+    race_ids = [f.stem for f in json_files if f.is_file()]
     
     if race_ids:
-        selected_race_id = st.selectbox("レースを選択", race_ids)
+        selected_race_id = st.selectbox("レースを選択", sorted(race_ids, reverse=True))
         
         if selected_race_id:
             # JSONファイルを読み込み
-            output_dir = Path(settings.get('output_dir', 'data'))
             json_file = output_dir / f"{selected_race_id}.json"
             
             if json_file.exists():
