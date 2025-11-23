@@ -243,29 +243,41 @@ with col2:
     race_type = "jra" if race_type_display == "中央競馬 (JRA)" else "nar"
     
     if race_type == "nar":
-        venue_list = VenueManager.get_all_venues()
+        # 南関競馬会場を優先表示
+        minami_kanto = VenueManager.get_minami_kanto_venues()
+        other_venues = VenueManager.get_other_venues()
+        
+        # 南関競馬 + 区切り + その他会場
+        venue_options = minami_kanto + ["---"] + other_venues
+        
         default_venue = settings.get('venue', '大井')
-        selected_venue_name = st.selectbox(
+        default_index = venue_options.index(default_venue) if default_venue in venue_options else 0
+        
+        selected_venue_display = st.selectbox(
             "会場", 
-            venue_list, 
-            index=venue_list.index(default_venue) if default_venue in venue_list else 0
+            venue_options,
+            index=default_index,
+            format_func=lambda x: "━━━━━━━━━━" if x == "---" else x
         )
+        
+        # 区切り線が選択された場合は最初の会場を選択
+        selected_venue_name = selected_venue_display if selected_venue_display != "---" else minami_kanto[0]
     else:
-        # JRA会場 (スケジュールベース)
-        priority_order = ["福島", "京都", "東京", "中山", "阪神", "中京", "新潟", "小倉", "札幌", "函館"]
+        # JRA会場 (開催中の会場のみ表示)
+        priority_order = ["福島", "東京", "中山", "阪神", "中京", "京都", "新潟", "小倉", "札幌", "函館"]
         
         # 取得したスケジュールから会場リストを作成
         today_venues = list(set([s['venue'] for s in st.session_state.jra_schedule])) if st.session_state.jra_schedule else []
         
         if today_venues:
-            # 優先順にソート
+            # 開催中の会場のみを優先順にソート
             active_venues = sorted([v for v in today_venues if v in priority_order], key=lambda x: priority_order.index(x))
             active_venues += [v for v in today_venues if v not in priority_order]
             
-            selected_venue_name = st.selectbox("会場 (開催あり)", active_venues)
+            selected_venue_name = st.selectbox("会場", active_venues)
         else:
-            # 開催がない場合 (または取得失敗)
-            # 警告は出さず、手動選択であることを示す
+            # スケジュール取得失敗時のみ全会場表示
+            st.warning("⚠️ スケジュール取得に失敗しました。手動で会場を選択してください。")
             selected_venue_name = st.selectbox("会場 (手動選択)", priority_order)
 
 with col3:
