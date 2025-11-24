@@ -6,6 +6,8 @@
 
 ## ⚡ クイックスタート（必読）
 
+> 📘 **詳細な手順書**: [WORKFLOW.md](WORKFLOW.md) - Git管理、トラブル対応など
+
 ### 🔧 初回セットアップ（1回のみ）
 
 ```bash
@@ -130,6 +132,7 @@ playwright install --force chromium
 ## 📚 詳細ドキュメント（参考）
 
 ### ルートレベル
+- **`WORKFLOW.md`** - 開発ワークフロー統合版（Git管理、トラブル対応）⭐
 - `ARCHITECTURE.md` - システムアーキテクチャ
 - `DEVELOPMENT_ROADMAP.md` - 開発ロードマップ
 - `PROJECT_LOG.md` - 詳細な開発履歴
