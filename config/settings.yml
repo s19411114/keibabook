@@ -16,3 +16,5 @@ output_dir: "C:/GeminiCLI/TEST/keibabook/data"
 use_playwright: true
 playwright_headless: false
 playwright_timeout: 30000  # ms
+# 重複チェックを無効化（テスト・デバッグ用）
+skip_duplicate_check: true  # true: 重複チェックをスキップ, false: 重複チェックを実行（デフォルト）

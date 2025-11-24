@@ -1,22 +1,102 @@
 [
   {
-    "name": "XSRF-TOKEN",
-    "value": "eyJpdiI6IlZRTHJ5dGxGN0Nmc05CWWxQZ2dycGc9PSIsInZhbHVlIjoiTjBtTmhKRmlYb3ppbW1LazBpT3E3MGxiOTRwZmlpQnpZaitwOHQwK2VNTis0MHYrWHZmamI4ZUVZSXZCWDVMOEJcL3l2SmhKZ1J5QTRyTkJ3NjFsdlBnPT0iLCJtYWMiOiI4ZjY3Yjk5ZTU1MzUzMjUxNTYzOTc2N2Q2MWU4MGU3MmE0MjYxMjgzMjY3OTFjMjVkYjM0MzI2NmNmOTU0NGZjIn0%3D",
+    "name": "_yjsu_yjad",
+    "value": "1763922260.1e8ba1a9-1470-49d0-9c61-2b420f011b4f",
     "domain": ".keibabook.co.jp",
     "path": "/",
+    "expires": 1795458260,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "XA",
+    "value": "693598lki6kam&sd=A&t=1763922262&u=1763922262&v=1",
+    "domain": ".yahoo.co.jp",
+    "path": "/",
+    "expires": 1795458262.584788,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "XB",
+    "value": "a1f3e706-c899-11f0-9de9-a3c7071bfb48&v=6&u=1763922262&s=gh",
+    "domain": ".yahoo.co.jp",
+    "path": "/",
+    "expires": 1798482262.585108,
     "httpOnly": false,
     "secure": true,
-    "sameSite": "None",
-    "expires": 1763817716
+    "sameSite": "None"
+  },
+  {
+    "name": "_gid",
+    "value": "GA1.3.446816530.1763922266",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "expires": 1764008667,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_gat_gtag_UA_119142661_2",
+    "value": "1",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "expires": 1763922326,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "tk",
+    "value": "1jk02r60k6gwcsq6xizm5shzs8vasqr3uc1i1k22g8e2oqdpwf88weiq66031bjg3rvdz27bc2o4sehx2nqacho4wblnmuancxvybpqimfqyu56e5zh5q4qy77kfubbgpdwp5zmzgciq7wn6aj0guq9vg7cqvbhe20xw5cshh90tar0agb6trxsmkfvb1qfhdqvi852qi05pl1jtzmf2suqocxv65knw27hi5azyi6nsrlus1sk5kgq0tfmynctj",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "expires": 1766514266.568001,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "XSRF-TOKEN",
+    "value": "eyJpdiI6ImpoeHRSa1RId1pNUFwvemNSRFJIOGp3PT0iLCJ2YWx1ZSI6ImN0dFlnWFlMVTJSSzFGQ0lwUjdNMWFCaGNmdTl3WGI5RnYwb3pvYXZDZVczXC9XVXVFRUVEbnlGdnphT3pjOW9OV3BFT0lNcXUrN3JRRVliUitEMElZUT09IiwibWFjIjoiMTA5Yzk4ODBiYTBjMzQ2OWJkOTU0MzQ5NzNhYjBlM2U3ZTZkMzFmYWQzYTc2NDg4MzBiZTU3NTYwNWM5ZjFjNyJ9",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "expires": 1764008667.601807,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
   },
   {
     "name": "keibabook_session",
-    "value": "eyJpdiI6ImhpNGlXOWIxaDdURnhRM0FpUGpXWlE9PSIsInZhbHVlIjoiT2g1Rm5Hck1qUlRsb1BBQjRZeElKaXBadWFsN0Z6R1JFYzdzVzRJOTQxSUhIT0dsUThlWXI3NzJaT2p2TXdlWkROUHZMSkxiM2ZrUmczMWlVWE0zNlE9PSIsIm1hYyI6IjQ3YjY5MTgwOTk0NzA4YTc2MzkxMzkzMWY3NjA0Njg3ZjI2ZGQ2ZjhhNTdmOTEyMDNjYTI4N2I4MDc4NzE5YWUifQ%3D%3D",
+    "value": "eyJpdiI6IjhRSEJMdlFPRmgzMmR5R0tkeVV6bUE9PSIsInZhbHVlIjoiRU03c3VZSzdCa2lhbFZSY2JIWXNLVk54VkJ1bk9kZ2o2enhaREltaTdDR1BKclVvN0h0eHJ4OStBcytHdDA5RmhmTTVxVDZqXC9cL2ttXC9sQUM4dFBGVVE9PSIsIm1hYyI6ImU4Y2IwNGJkMmY5NjM2NWFjODdiYmM2MmVkNjgwODY1ZjdmYTA2ZTM1ZmM1YjEyMGRhNmM2M2E3NGU0OGUwNWUifQ%3D%3D",
     "domain": ".keibabook.co.jp",
     "path": "/",
+    "expires": -1,
     "httpOnly": true,
-    "secure": true,
-    "sameSite": "None",
-    "expires": 1763817716
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_ga_G6Q9M6R4NF",
+    "value": "GS2.1.s1763922264$o1$g1$t1763922267$j57$l0$h0",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "expires": 1798482267.809628,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_ga",
+    "value": "GA1.3.2141900335.1763922264",
+    "domain": ".keibabook.co.jp",
+    "path": "/",
+    "expires": 1798482267.813838,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
   }
 ]

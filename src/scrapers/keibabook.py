@@ -24,6 +24,7 @@ class KeibaBookScraper:
         self.shutuba_url = settings.get('shutuba_url', '')
         self.seiseki_url = settings.get('seiseki_url', '')  # 結果ページURL
         self.race_type = settings.get('race_type', 'jra')  # 'jra' or 'nar'
+        self.skip_duplicate_check = settings.get('skip_duplicate_check', False)  # 重複チェックをスキップするか
         self.db_manager = db_manager
         self.result_parser = ResultPageParser()  # 結果ページパーサー
         self.local_parser = LocalRacingParser()  # 地方競馬専用パーサー
@@ -340,7 +341,7 @@ class KeibaBookScraper:
         
         try:
             # 重複チェック
-            if self.db_manager and self.db_manager.is_url_fetched(self.seiseki_url):
+            if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(self.seiseki_url):
                 logger.info(f"スキップ（既取得）: {self.seiseki_url}")
                 return None
             
@@ -384,7 +385,7 @@ class KeibaBookScraper:
             point_url = f"{base_url}/point/{self.settings['race_id']}"
             
             # 重複チェック
-            if self.db_manager and self.db_manager.is_url_fetched(point_url):
+            if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(point_url):
                 logger.info(f"スキップ（既取得）: {point_url}")
                 return None
             
@@ -443,7 +444,7 @@ class KeibaBookScraper:
                 
                 # 重複チェック（個別馬ページは重複が多いため、コメントのみチェック）
                 comment_key = f"{horse_detail_url}_comment"
-                if self.db_manager and self.db_manager.is_url_fetched(comment_key):
+                if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(comment_key):
                     logger.debug(f"馬{horse_num}のコメントは既取得")
                     continue
                 
@@ -485,7 +486,7 @@ class KeibaBookScraper:
                 url = self.shutuba_url
                 
                 # 重複チェック（DBマネージャーが設定されている場合）
-                if self.db_manager and self.db_manager.is_url_fetched(url):
+                if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
                     logger.info(f"スキップ（既取得）: {url}")
                     # 既存データを返すか、空データを返すかは要件次第
                     # ここでは空データを返す（差分取得が必要な場合は別途実装）
@@ -523,7 +524,7 @@ class KeibaBookScraper:
                     await self.rate_limiter.wait()
                     
                     # 重複チェック
-                    if not (self.db_manager and self.db_manager.is_url_fetched(training_url)):
+                    if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(training_url)):
                         training_html_content = await self._fetch_page_content(page, training_url)
                         if self.db_manager:
                             self.db_manager.log_url(training_url, self.settings['race_id'], 'training', 'success')
@@ -553,7 +554,7 @@ class KeibaBookScraper:
                 await self.rate_limiter.wait()
                 
                 # 重複チェック
-                if not (self.db_manager and self.db_manager.is_url_fetched(pedigree_url)):
+                if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(pedigree_url)):
                     pedigree_html_content = await self._fetch_page_content(page, pedigree_url)
                     if self.db_manager:
                         self.db_manager.log_url(pedigree_url, self.settings['race_id'], 'pedigree', 'success')
@@ -580,7 +581,7 @@ class KeibaBookScraper:
                     await self.rate_limiter.wait()
                     
                     # 重複チェック
-                    if not (self.db_manager and self.db_manager.is_url_fetched(stable_comment_url)):
+                    if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(stable_comment_url)):
                         stable_comment_html_content = await self._fetch_page_content(page, stable_comment_url)
                         if self.db_manager:
                             self.db_manager.log_url(stable_comment_url, self.settings['race_id'], 'stable_comment', 'success')
@@ -610,7 +611,7 @@ class KeibaBookScraper:
                     await self.rate_limiter.wait()
                     
                     # 重複チェック
-                    if not (self.db_manager and self.db_manager.is_url_fetched(previous_race_comment_url)):
+                    if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(previous_race_comment_url)):
                         previous_race_comment_url_content = await self._fetch_page_content(page, previous_race_comment_url)
                         if self.db_manager:
                             self.db_manager.log_url(previous_race_comment_url, self.settings['race_id'], 'previous_race_comment', 'success')

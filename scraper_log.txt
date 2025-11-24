@@ -1,0 +1,14 @@
+スクレイピング開始...
+2025-11-24 05:04:50,175 INFO src.scrapers.keibabook - ページ取得成功: https://s.keibabook.co.jp/cyuou/syutuba/202503060201
+2025-11-24 05:04:56,060 INFO src.scrapers.keibabook - ページ取得成功: https://s.keibabook.co.jp/cyuou/cyokyo/0/202503060201
+2025-11-24 05:05:01,462 INFO src.scrapers.keibabook - ページ取得成功: https://s.keibabook.co.jp/cyuou/kettou/202503060201
+2025-11-24 05:05:07,010 INFO src.scrapers.keibabook - ページ取得成功: https://s.keibabook.co.jp/cyuou/danwa/0/202503060201
+2025-11-24 05:05:11,537 INFO src.scrapers.keibabook - ページ取得成功: https://s.keibabook.co.jp/cyuou/syoin/202503060201
+/mnt/c/GeminiCLI/TEST/keibabook/src/utils/db_manager.py:131: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  race_df.loc[race_df['race_id'] == race_id, list(race_row.keys())] = list(race_row.values())
+/mnt/c/GeminiCLI/TEST/keibabook/src/utils/db_manager.py:131: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  race_df.loc[race_df['race_id'] == race_id, list(race_row.keys())] = list(race_row.values())
+2025-11-24 05:05:13,356 INFO src.utils.db_manager - レースデータを保存: 202503060201
+✅ 保存完了: C:/GeminiCLI/TEST/keibabook/data/20250306_fukushima1R.json
+2025-11-24 05:05:13,900 INFO src.utils.db_manager - AI用JSONをエクスポート: C:/GeminiCLI/TEST/keibabook/data/json/202503060201.json
+✅ AI用JSONエクスポート: C:/GeminiCLI/TEST/keibabook/data/json/202503060201.json

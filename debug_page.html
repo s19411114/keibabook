@@ -14,10 +14,11 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="apple-touch-icon" href="//style.keibabook.co.jp/images/common/apple-touch-icon.png">
 <link rel="shortcut icon" href="//style.keibabook.co.jp/images/common/favicon.ico">
-<title>2025年11月20日川崎11R富士見オープ 出馬表|競馬ブック
+<title>出馬表 | 2025年11月9日福島01R2歳未勝利 | 競馬ブック
 </title>
 <meta name="keywords" content="競馬,予想,結果,レース,オッズ,競馬ブック,JRA,競馬場,馬主,騎手">
-<meta name="description" content="">
+<meta name="description" content="競馬ブック2025年11月9日福島01R2歳未勝利のページ。出馬表、オッズ、レース結果など提供しています。
+">
 <!--[if lt IE 9]>
 <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <script src="//www.keibabook.co.jp/testsite/smart/js/css3-mediaqueries.js"></script>
@@ -632,8 +633,8 @@ $(function(){
 
 					<div class="header_box logo">
 						<h1>
-														<a href="//s.keibabook.co.jp/" class="js-smartpremiumigai_show" style="display: none;">s.keibabook.co.jp</a>
-							<a href="//s.keibabook.co.jp/" class="js-smartpremium_show" style="display: block; background-image: url(&quot;//style.keibabook.co.jp/smart/images/common/bnr_smartpremium_kuro.png&quot;);">s.keibabook.co.jp</a>
+														<a href="//s.keibabook.co.jp/" class="js-smartpremiumigai_show" style="display: block;">s.keibabook.co.jp</a>
+							<a href="//s.keibabook.co.jp/" class="js-smartpremium_show" style="display: none; background-image: url(//style.keibabook.co.jp/smart/images/common/bnr_smartpremium_kuro.png);">s.keibabook.co.jp</a>
 														<dl style="" id="js-application" class="application"></dl>
 						</h1>
 					</div><!-- /.header_box logo -->
@@ -657,38 +658,31 @@ $(function(){
 
 <!-- ログインチェック -->
 
-	<!-- ログインしている -->
+	<!-- ログインしていない -->
+	<div class="login">
+		<a href="/login/login" class="login">ログイン<br>して下さい</a>
+		<span style="font-size: 50%; display: none;">&nbsp;ログイン</span>
+	</div><!-- /.header_box -->
+
 	<div class="header_box ">
-		<a href="/login/login" class="logout"></a>
-		<span style="font-size: 50%;">&nbsp;ログアウト</span>
+		<a href="/entry/top" class="entry"></a>
+		<span style="font-size: 50%;">&nbsp;会員登録</span>
 	</div><!-- /.header_box -->
 
-	<div class="header_box">
-		<a href="/mypage/index" class="mypage"></a>
-		<span style="font-size: 50%;">&nbsp;マイページ</span>
-	</div><!-- /.header_box -->
-
-	<!-- 20181115 -->
-	
-
-	<!-- 有料メニューによって -->
-			<!-- Smartプレミアム会員 -->
-		
-		<script>
-			$(function () {
-				$( '.js-smartpremium_show' ).css('display', 'block');
-				$( '.js-smartpremiumigai_show' ).css('display', 'none');
-			});
-		</script>
-
-	
 	<script>
 		$(function () {
-			$( '.js-free_show' ).css('display', 'none');
-			$( '.js-member_show' ).css('display', 'table-cell');
-			$( '.js-free_show_block' ).css('display', 'none');
-			$( '.js-member_show_block' ).css('display', 'block');
-		});
+			$( '.js-smartpremium_show' ).css('display', 'none');
+			$( '.js-smartpremiumigai_show' ).css('display', 'block');
+		})
+	</script>
+
+	<script>
+		$(function () {
+			$( '.js-free_show' ).css('display', 'table-cell');
+			$( '.js-member_show' ).css('display', 'none');
+			$( '.js-free_show_block' ).css('display', 'block');
+			$( '.js-member_show_block' ).css('display', 'none');
+		})
 	</script>
 
 </div><!-- /. -->
@@ -744,7 +738,7 @@ $(function(){
 								<option value="banushi">馬主名</option>
 								<option value="jockey">騎手名</option>
 								<option value="trainer">厩舎名</option>
-								</select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 8em;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-&lt;!-- 指定して下さい --&gt;-sr-container"><span class="select2-selection__rendered" id="select2-&lt;!-- 指定して下さい --&gt;-sr-container" title="馬名">馬名</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+								</select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 8em;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-&lt;!-- 指定して下さい --&gt;-vz-container"><span class="select2-selection__rendered" id="select2-&lt;!-- 指定して下さい --&gt;-vz-container" title="馬名">馬名</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
 								<input type="text" id="keyword" name="bamei" style="width: 40%;" maxlength="256" class="ime_on" value="" placeholder="検索したい文字">
 								<button class="bookbutton header_search_submit">検索</button>
 							</td>
@@ -777,8 +771,8 @@ $(function(){
 		<div class="globalmenu_center" id="globalmenu_center" style="display: block;">
 			<ul class="">
 				<li class=""><a href="/" title="HOME">HOME</a></li>
-				<li class=""><a href="/cyuou/top" title="中央競馬">中央競馬</a></li>
-				<li class="active"><a href="/chihou/top" title="地方競馬">地方競馬</a></li>
+				<li class="active"><a href="/cyuou/top" title="中央競馬">中央競馬</a></li>
+				<li class=""><a href="/chihou/top" title="地方競馬">地方競馬</a></li>
 				<li class=""><a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞</a></li>
 				<li class=""><a href="/db/search/horse" title="データ検索">データ検索</a></li>
 				<li class=""><a href="/kaigai/nittei" title="海外競馬">海外競馬</a></li>
@@ -814,10 +808,10 @@ $(function(){
 															<option value="/">HOME</option>
 							
 							<!-- 中央当日 -->
-															<option value="/cyuou/top">中央競馬</option>
+															<option value="/cyuou/top" selected="">中央競馬</option>
 							
 							<!-- 地方競馬 -->
-															<option value="/chihou/top" selected="">地方競馬</option>
+															<option value="/chihou/top">地方競馬</option>
 							
 							<!-- ニュース -->
 															<option value="/news/all">ニュース</option>
@@ -870,40 +864,31 @@ $(function(){
 
 	
 			
-						<!-- menutable start-->
-<div class="menutable">
-  <table class="open">
-    <tbody>
-	<tr>
-		<td class="">
-			<a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
-		</td>
-		<td class="">
-			<a href="//netshinbun.keibabook.co.jp//syukansi?target=_blank" title="週刊競馬ブックDigital" target="_blank">週刊競馬ブック<wbr>Digital<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
-		</td>
-		<td class="js-member_show" style="display: table-cell;">
-			<a href="/mypage/annai/subscription?target=_blank" title="週刊競馬ブックDigital定期購読">週刊競馬ブック<wbr>Digital定期購読<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
-		</td>
-		<td class="js-free_show" style="display: none;">
-			<a href="/entry/top" title="会員登録">会員登録</a>
-		</td>
-	</tr>
-<!--
-	<tr class="hiddenMenu" style="display: table-row;">
-		<td>
-			<a href="/chihou/nittei/top" title="年間日程">年間日程</a>
-		</td>
-		<td>
-			<a href="/chihou/cyokuzen" title="ＴＭ直前情報">ＴＭ直前情報</a>
-		</td>
-		<td>
-			<a href="https://keiba-lv-st.jp/?target=_blank" target="_blank" title="インターネット中継">インターネット中継</a>
-		</td>
-	</tr>
--->
-    </tbody>
-  </table>
-</div><!-- menutable end -->
+						
+				<!-- menutable start-->
+		<div class="menutable">
+			<table class="open">
+				<tbody>
+					<tr>
+						<td class="">
+							<a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+						</td>
+						<td class="">
+							<a href="//netshinbun.keibabook.co.jp//syukansi?target=_blank" title="週刊競馬ブックDigital" target="_blank">週刊競馬ブック<wbr>Digital<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+						</td>
+						<td class="js-member_show" style="display: none;">
+							<a href="/mypage/annai/subscription?target=_blank" title="週刊競馬ブックDigital定期購読">週刊競馬ブック<wbr>Digital定期購読<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+						</td>
+						<td class="js-free_show" style="display: table-cell;">
+							<a href="/entry/top" title="会員登録">会員登録</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+
+
 			</div><!-- /#menu end-->
 
 		<!-- pankuzu -->
@@ -1004,120 +989,143 @@ $(function(){
 					<div class="flex_between clearfix" style="">
     <div class="flex_between_left">
         <select class="selectboxlink" style="width: 130px; display: none;" label="開催日" tabindex="-1">
-                                    <option value="/chihou/nittei/20251119">11/19(水)</option>
-                                                <option value="/chihou/nittei/20251120" selected="">11/20(木)</option>
-                                                <option value="/chihou/nittei/20251121">11/21(金)</option>
-                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 130px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-mx33-container"><span class="select2-selection__rendered" id="select2-mx33-container" title="11/20(木)">11/20(木)</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                    <option value="/cyuou/nittei/2025110806">11/8(土)</option>
+                                                <option value="/cyuou/nittei/2025110906" selected="">11/9(日)</option>
+                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 130px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-99lm-container"><span class="select2-selection__rendered" id="select2-99lm-container" title="11/9(日)">11/9(日)</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
     </div>
 
     <div class="flex_between_right">
         <select class="selectboxlink right" style="width: 110px; display: none;" label="競馬場" tabindex="-1">
-                                    <option value="2025121104111120" selected="">川崎</option>
-                                                <option value="2025173401111120">名古屋</option>
-                                                <option value="2025193703111120">園田</option>
-                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 110px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-ptok-container"><span class="select2-selection__rendered" id="select2-ptok-container" title="川崎">川崎</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                    <option value="202505040201">東京</option>
+                                                <option value="202504000201">京都</option>
+                                                <option value="202503060201" selected="">福島</option>
+                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 110px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-ymcw-container"><span class="select2-selection__rendered" id="select2-ymcw-container" title="福島">福島</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
     </div>
-</div>
-<div class="tab race">
-    <ul>
-                        <li class=""><a href="2025121104011120">1R</a></li>
-                                <li class=""><a href="2025121104021120">2R</a></li>
-                                <li class=""><a href="2025121104031120">3R</a></li>
-                                <li class=""><a href="2025121104041120">4R</a></li>
-                                <li class=""><a href="2025121104051120">5R</a></li>
-                                <li class=""><a href="2025121104061120">6R</a></li>
-                                <li class=""><a href="2025121104071120">7R</a></li>
-                                <li class=""><a href="2025121104081120">8R</a></li>
-                                <li class=""><a href="2025121104091120">9R</a></li>
-                                <li class=""><a href="2025121104101120">10R</a></li>
-                                <li class="active"><a href="2025121104111120">11R</a></li>
-                                <li class=""><a href="2025121104121120">12R</a></li>
-                    </ul>
 </div>
 
+<div class="tab race">
+    <ul>
+                        <li class="active"><a href="202503060201" title="1R">1R</a></li>
+                                <li class=""><a href="202503060202">2R</a></li>
+                                <li class=""><a href="202503060203">3R</a></li>
+                                <li class=""><a href="202503060204">4R</a></li>
+                                <li class=""><a href="202503060205">5R</a></li>
+                                <li class=""><a href="202503060206">6R</a></li>
+                                <li class=""><a href="202503060207">7R</a></li>
+                                <li class=""><a href="202503060208">8R</a></li>
+                                <li class=""><a href="202503060209">9R</a></li>
+                                <li class=""><a href="202503060210">10R</a></li>
+                                <li class=""><a href="202503060211">11R</a></li>
+                                <li class=""><a href="202503060212">12R</a></li>
+                    </ul>
+</div>
 <div class="racetitle">
     <div class="racemei active">
-        <p>川崎</p>
-        <p>11R 富士見オープン</p>
+        <p>2025年11月9日 3回福島2日目</p>
+        <p>1R ２歳未勝利</p>
         <span class="open"></span>
     </div>
+
     <div class="racetitle_sub">
-        <p>サラ,オープン,別定</p>
-                <p>2100m (ダート・左) 晴・良</p>
-                
+                <p>[指定]</p>
+                                           <p>1150m (ダート・右) 曇・良</p>
+                                                                   <p>推定タイム ※</p>
+        
         <!-- 賞金 -->
                     <table class="syokin">
                 <tbody><tr>
                     <th>賞金</th>
-                    <td>①<span>600.0万</span></td>
-                    <td>②<span>240.0万</span></td>
+                    <td>①<span>560.0万</span></td>
+                    <td>②<span>220.0万</span></td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td>③<span>150.0万</span></td>
-                    <td>④<span>90.0万</span></td>
-                    <td>⑤<span>60.0万</span></td>
+                    <td>③<span>140.0万</span></td>
+                    <td>④<span>84.0万</span></td>
+                    <td>⑤<span>56.0万</span></td>
                 </tr>
             </tbody></table>
         
-    </div>
+
+                    </div>
 </div>
 <!-- コンテンツの切り替え -->
 
+
 <div class="menutable">
-        <table class="open sub">
-        <tbody>
-            <tr>
-                                <td class="active"><a href="/chihou/syutuba/2025121104111120" title="出馬表">出馬表</a></td>
-                
-                                <td class=""><a href="/chihou/odds/0/2025121104111120" title="オッズ">オッズ</a></td>
-                
-								<td class=""><a href="/chihou/nouryoku_html/2025121104111120" title="能力表HTML">能力表HTML</a></td>
+		<table class="open sub">
+		<tbody>
+			<tr>
+								<td class="active"><a href="/cyuou/syutuba/202503060201" title="出馬表">出馬表</a></td>
 				
-                                <td colspan="1" class=""><a href="/chihou/seiseki/2025121104111120" title="レース結果">レース結果</a></td>
-                <!--
-                <td class="button openBtn" rowspan="1" style="display: table-cell;">
-                    <p class="open">開く</p>
-                    <p class="openIcon">▼</p>
-                </td>
-                <td class="button closeBtn" rowspan="4" style="display: none;">
-                    <p class="close">閉じる</p>
-                    <p class="closeIcon">▲</p>
-                </td>
--->
-            </tr>
-
-            <!--<tr class="hiddenMenu" style="display: none;">-->
-            <tr class="">
-
-								<td class=""><a href="/chihou/taisenseiseki/2025121104111120" title="対戦成績">対戦成績</a></td>
+								<td class=""><a href="/cyuou/odds/0/202503060201" title="オッズ">オッズ</a></td>
 				
-                                <td class=""><a href="/chihou/cyokyo/1/2025121104111120" title="調教">調教</a></td>
-                
-                                <td class=""><a href="/chihou/danwa/1/2025121104111120" title="厩舎の話">厩舎の話</a></td>
-                
-                                <td class="">パドック情報</td>
-                            </tr>
+								<td class=""><a href="/cyuou/cpu/202503060201" title="ＣＰＵ予想">ＣＰＵ予想</a></td>
+				
+								<td class=""><a href="/cyuou/seiseki/202503060201" title="レース結果">レース結果</a></td>
+							</tr>
 
-            
-            <!--<tr class="hiddenMenu" style="display: none;">-->
-            <tr class="">
+			<tr>
+								<td class=""><a href="/cyuou/taisenseiseki/202503060201" title="対戦成績">対戦成績</a></td>
+				
+								<td class=""><a href="/cyuou/cyokyo/0/202503060201" title="調教">調教</a></td>
+				
+								<td class=""><a href="/cyuou/nouryoku_html/202503060201" title="能力表(HTML)">能力表(HTML)</a></td>
+				
+								<td class=""><a href="/cyuou/danwa/0/202503060201" title="厩舎の話">厩舎の話</a></td>
+							</tr>
 
-                                <td class=""><a href="/chihou/point/1/2025121104111120" title="ポイント">ポイント</a></td>
-                
-                
-                                <td class=""><a href="/chihou/tougaiseiseki/1/2025121104111120" title="当該成績">当該成績</a></td>
-                
-                                <td class=""><a href="/chihou/kettou/2025121104111120" title="血統表">血統表</a></td>
-                            </tr>
+			<tr>
+								<td class="">パドック情報</td>
+				
+								<td class="">ギリギリ情報</td>
+				
+								<td class=""><a href="/cyuou/cyokuzen/202503060201" title="ＴＭ直前情報">ＴＭ直前情報</a></td>
+												<td class=""><a href="/cyuou/kettou/202503060201" title="血統表">血統表</a></td>
+							</tr>
+
+			<tr>
+
+								<td class="">過去一覧</td>
+				
+								<td class=""><a href="/cyuou/syoin/202503060201" title="前走インタビュー" style="font-size: 1em;">前走<nobr>インタビュー</nobr></a></td>
+				
+				
+								<td class=""><a href="/cyuou/tougaiseiseki/0/202503060201" title="当該成績">当該成績</a></td>
+				
+								<td class="">特集ページ</td>
+							</tr>
+
+			<tr>
+
+								<td class=""><a href="/cyuou/data/202503060201" title="コースデータ">コースデータ</a></td>
+				
+								<td class=""><a href="/cyuou/rating/202503060201" title="レイティング">レイティング</a></td>
+				
+			</tr>
 
 
-        </tbody>
-    </table>
-    </div>
+
+
+		</tbody>
+	</table>
+	</div>
+
+<div class="midasi">
+    <p>出馬表&nbsp;16頭</p>
+</div>
+
+<div class="menuindex">
+    <ul class="syutuba clearfix">
+                <li class="">特別登録馬</li>
+        
+                <li class=""><a href="/cyuou/thursday/202503060201" title="枠順確定前出馬">枠順確定前出馬</a></li>
+                        <li class="active"><a href="/cyuou/syutuba/202503060201" title="確定出馬">確定出馬</a></li>
+            </ul>
+</div>
 
 <!-- 印入力部 -->
-<ul class="js-yoso-input mysirusi-input" style="display :none;" racekey="2025121104111120" umacd="">
+<ul class="js-yoso-input mysirusi-input" style="display :none;" racekey="202503060201" umacd="">
     <li class="sirusi" value="-1"><span>-</span></li>
     <li class="sirusi" value="0"><span>◎</span></li>
     <li class="sirusi" value="1"><span>○</span></li>
@@ -1130,767 +1138,907 @@ $(function(){
     <li class="sirusi" value="5"><span>注</span></li>
     <li class="sirusi" value="9"><span>消</span></li>
 </ul>
-<div class="midasi">
-    <p>出馬表</p>
-</div>
+
+<!-- 特集ページへのリンク -->
+
 <div class="section">
         <table class="default syutuba_sp" id="">
         <thead>
             <tr>
                 <th>枠<br>番</th>
                 <th>馬<br>番</th>
-                                <th class="tmyoso" rowspan="2">M<br>y<br>印</th>
-                                                                <th>大<br>木<br>尚</th>
-                                <th>善<br>林<br>浩</th>
-                                <th>髙<br>橋<br>佑</th>
-                                                <th class="left">
+                                <th class="tmyoso">M<br>y<br>印</th>
+                                                                <th>吉<br>田<br>幹</th>
+                                <th>安<br>中<br>貴</th>
+                                <th>松<br>永<br>篤</th>
+                                <th>C<br>P<br>U</th>
+                                <th class="left">
                     <p>馬名</p>
-                    <p>性齢 騎手
-                                                斤量
-                                            </p>
-                                        <p>短評</p>
-                                    </th>
+                    <p>性齢&nbsp;騎手&nbsp;斤量</p>
+                    <p>短評（※）</p>
+                </th>
                 <th>
                     <p>馬体重</p>
                     <p>単勝</p>
-                    <p style="font-size: 0.8rem;">最終</p>
-                </th>
+                                        <p style="font-size: 0.8rem;">(最終)</p>
+                    <!--確定-->
+                                    </th>
             </tr>
         </thead>
         <tbody>
-                        <tr>                <td class="waku"><p class="waku1">1</p></td>
-                <td class="umaban">1</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0902335--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0902335" id="sirusi-0902335">-</p>
-                    </div>
-                </td>
-                                                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td class="left">
+                                                    <tr>
+                                                            <td class="waku"><p class="waku1">1</p></td>
+                    <td class="umaban">1</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
 
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0902335">
-                                            ナガタエース
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        牡5&nbsp;
-                            <a href="/db/kisyu/ﾆ034">
-                            西啓太</a>
-                            &nbsp;53&nbsp;
-                                                                </p>
-
-
-                    
-                    <p class="tanpyo">
-                    
                         
-                                                    
-                                
-                                    
-                                                                            相手が強くて
+                        <p class="kbamei">
+                            <a href="/db/uma/0945958">
+                                セイウンレガーメ
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        <a href="/db/kisyu/ｽ062">杉原誠</a>
+                                        &nbsp;55
+                                                                                
                                         
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>500(-6)</p>
-                                        <p>
-                                                323.0
-                                            </p>
-                                        <p>10人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku2">2</p></td>
-                <td class="umaban">2</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0903464--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0903464" id="sirusi-0903464">-</p>
-                    </div>
-                </td>
-                                                                                                <td></td>
-                                                                <td></td>
-                                                                <td>△</td>
-                                                                <td class="left">
-
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0903464">
-                                            マインドユアミモザ
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        <span class="fontred">牝5</span>&nbsp;
-                            ◇<a href="/db/kisyu/ﾐ069">
-                            <strong>ミシェル</strong></a>
-                            &nbsp;49&nbsp;
-                                                                </p>
+                                                                                                                    </p>
 
 
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
+
                                     
                                     
-                                
-                                    
-                                                                            ４９キロは有利で
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>436(+20)</p>
+                                                                                <p>188.3</p>
+                                        <p>15人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku1">1</p></td>
+                    <td class="umaban">2</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0950246">
+                                ハルヒメ
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        ☆<a href="/db/kisyu/ﾆ038">西塚洸</a>
+                                        &nbsp;54
+                                                                                
                                         
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>468(-15)</p>
-                                        <p>
-                                                64.8
-                                            </p>
-                                        <p>6人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku3">3</p></td>
-                <td class="umaban">3</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0898125--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0898125" id="sirusi-0898125">-</p>
-                    </div>
-                </td>
-                                                                                                <td>▲</td>
-                                                                <td>◎</td>
-                                                                <td>○</td>
-                                                                <td class="left">
-
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0898125">
-                                            ツウカイノキズナ
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        セン5&nbsp;
-                            <a href="/db/kisyu/ﾎ036">
-                            本田重</a>
-                            &nbsp;55&nbsp;
-                                                                </p>
+                                                                                                                    </p>
 
 
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
+
                                     
                                     
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            条件緩和され
-                                        
-                            
-                        
-                        
-                                        </p>
+                                    <p class="tanpyo">
+                                                                                </p>
 
-                </td>
-                <td>
-                    <p>492(-1)</p>
-                                        <p>
-                                                <span class="fontred">4.8</span>
-                                            </p>
+                                    </td>
+                                    <td class="lh1">
+                                        <p>392(-6)</p>
+                                                                                <p><span class="fontred">7.2</span></p>
                                         <p>3人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku4">4</p></td>
-                <td class="umaban">4</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0872375--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0872375" id="sirusi-0872375">-</p>
-                    </div>
-                </td>
-                                                                                                <td><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.4 12.5" width="1em" height="1em">
-<desc><img src="//style.keibabook.co.jp/images/common/triangl.gif" width="1em"></desc>
-<polygon points="9.8,9.8 7.2,5.2 4.5,9.8 "></polygon><polygon class="tri_w" points="13.5,12 7.2,1 0.9,12 "></polygon>
-</svg></td>
-                                                                <td>△</td>
-                                                                <td><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.4 12.5" width="1em" height="1em">
-<desc><img src="//style.keibabook.co.jp/images/common/triangl.gif" width="1em"></desc>
-<polygon points="9.8,9.8 7.2,5.2 4.5,9.8 "></polygon><polygon class="tri_w" points="13.5,12 7.2,1 0.9,12 "></polygon>
-</svg></td>
-                                                                <td class="left">
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku2">2</p></td>
+                    <td class="umaban">3</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
 
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0872375">
-                                            セイカメテオポリス
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        牡7&nbsp;
-                            <a href="/db/kisyu/ｻ116">
-                            <strong>笹川翼</strong></a>
-                            &nbsp;57&nbsp;
-                                                                </p>
-
-
-                    
-                    <p class="tanpyo">
-                    
                         
-                                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            復調気配漂い
+                        <p class="kbamei">
+                            <a href="/db/uma/0950596">
+                                グラティアム
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        <a href="/db/kisyu/ﾀ112">丹内祐</a>
+                                        &nbsp;55
+                                                                                
                                         
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>543(-2)</p>
-                                        <p>
-                                                16.8
-                                            </p>
-                                        <p>4人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku5">5</p></td>
-                <td class="umaban">5</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0914029--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0914029" id="sirusi-0914029">-</p>
-                    </div>
-                </td>
-                                                                                                <td>△</td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td class="left">
-
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0914029">
-                                            グラインドアウト
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        <span class="fontred">牝4</span>&nbsp;
-                            <a href="/db/kisyu/ﾀ090">
-                            <strong>達城龍</strong></a>
-                            &nbsp;51&nbsp;
-                                                                </p>
+                                                                                                                    </p>
 
 
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            素質確か一考
-                                        
-                            
-                        
-                        
-                                        </p>
 
-                </td>
-                <td>
-                    <p>493(+9)</p>
-                                        <p>
-                                                161.9
-                                            </p>
-                                        <p>8人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku6">6</p></td>
-                <td class="umaban">6</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0897982--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0897982" id="sirusi-0897982">-</p>
-                    </div>
-                </td>
-                                                                                                <td>◎</td>
-                                                                <td><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.4 12.5" width="1em" height="1em">
-<desc><img src="//style.keibabook.co.jp/images/common/triangl.gif" width="1em"></desc>
-<polygon points="9.8,9.8 7.2,5.2 4.5,9.8 "></polygon><polygon class="tri_w" points="13.5,12 7.2,1 0.9,12 "></polygon>
-</svg></td>
-                                                                <td>▲</td>
-                                                                <td class="left">
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
 
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0897982">
-                                            オピニオンリーダー
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        牡5&nbsp;
-                            <a href="/db/kisyu/ﾔ082">
-                            矢野貴</a>
-                            &nbsp;57&nbsp;
-                                                                </p>
-
-
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            力出せる態勢
-                                        
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>460(+6)</p>
-                                        <p>
-                                                <span class="fontred">4.1</span>
-                                            </p>
-                                        <p>2人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku7">7</p></td>
-                <td class="umaban">7</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0887518--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0887518" id="sirusi-0887518">-</p>
-                    </div>
-                </td>
-                                                                                                <td>△</td>
-                                                                <td>△</td>
-                                                                <td>△</td>
-                                                                <td class="left">
-
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0887518">
-                                            サヨノフィールド
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        牡6&nbsp;
-                            <a href="/db/kisyu/ﾌ105">
-                            <strong>古岡勇</strong></a>
-                            &nbsp;53&nbsp;
-                                                                </p>
-
-
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            叩いて前進も
-                                        
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>525(-9)</p>
-                                        <p>
-                                                95.0
-                                            </p>
-                                        <p>7人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku7">7</p></td>
-                <td class="umaban">8</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0884947--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0884947" id="sirusi-0884947">-</p>
-                    </div>
-                </td>
-                                                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td class="left">
-
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0884947">
-                                            キャッスルブレイヴ
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        牡6&nbsp;
-                            <a href="/db/kisyu/ﾅ072">
-                            <strong>仲野光</strong></a>
-                            &nbsp;55&nbsp;
-                                                                </p>
-
-
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            凡退続きでは
-                                        
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>507(0)</p>
-                                        <p>
-                                                308.0
-                                            </p>
-                                        <p>9人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku8">8</p></td>
-                <td class="umaban">9</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0867191--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0867191" id="sirusi-0867191">-</p>
-                    </div>
-                </td>
-                                                                                                <td>△</td>
-                                                                <td>△</td>
-                                                                <td>△</td>
-                                                                <td class="left">
-
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0867191">
-                                            ユアヒストリー
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        牡7&nbsp;
-                            <a href="/db/kisyu/ﾊ087">
-                            張田昂</a>
-                            &nbsp;57&nbsp;
-                                                                </p>
-
-
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            当舞台好相性
-                                        
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>476(0)</p>
-                                        <p>
-                                                58.0
-                                            </p>
-                                        <p>5人気</p>
-                                                        </td>
-            </tr>
-                        <tr>                <td class="waku"><p class="waku8">8</p></td>
-                <td class="umaban">10</td>
-                                                <td class="tmyoso">
-                    <p class="myumamark">★<!--0872296--></p>
-                    <div class="js-yoso">
-                        <p class="js-yoso-show" umacd="0872296" id="sirusi-0872296">-</p>
-                    </div>
-                </td>
-                                                                                                <td>○</td>
-                                                                <td>○</td>
-                                                                <td>◎</td>
-                                                                <td class="left">
-
-                    
-                    <p class="kbamei">
-                                            <a href="/db/uma/0872296">
-                                            グロリアムンディ
-                        </a>
-                    </p>
-
-                    
-                    <p class="kisyu">
-                                                                        牡7&nbsp;
-                            <a href="/db/kisyu/ﾐ044">
-                            御神本訓</a>
-                            &nbsp;57&nbsp;
-                                                                </p>
-
-
-                    
-                    <p class="tanpyo">
-                    
-                        
-                                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                    
-                                
-                                    
-                                                                            地力上位中心
-                                        
-                            
-                        
-                        
-                                        </p>
-
-                </td>
-                <td>
-                    <p>509(-6)</p>
-                                        <p>
-                                                <span class="fontred">1.4</span>
-                                            </p>
+                                    </td>
+                                    <td class="lh1">
+                                        <p>462(+8)</p>
+                                                                                <p><span class="fontred">2.6</span></p>
                                         <p>1人気</p>
-                                                        </td>
-            </tr>
-                    </tbody>
-    </table>
-    <div class="annotation" style="width: 100%;">
-        <p class="textleft">
-                    </p>
-    </div>
-</div>
-<div class="flex_syutuba clearfix">
-    <div id="fullcontent">
-                <div class="boxsection">
-            <p class="title">見解</p>
-            <p>グロリアムンディはダートグレード競走でＶ歴がある実績馬。圧勝した２走前を見ても、ＯＰ特別なら地力上位は明白。休み明けを苦にするタイプではなく、Ｖ発進が期待できる。オピニオンリーダーも久々だが、順調に攻めを積んで力を出せる仕上がり。川崎では４戦４連対。引き続き重視。長丁場に高い適性があり、コース替わり歓迎のツウカイノキズナが３番手。</p>
-        </div>
-                        <div class="boxsection">
-            <p class="title">展開</p>
-                        <p>ペース M</p>
-            <table>
-                <tbody><tr>
-                    <th>
-                        逃げ
-                    </th>
-                    <td>
-                        <span class="marusuji">⑥</span><span class="marusuji">⑩</span> 
-                    </td>
-                    <th>
-                        好位
-                    </th>
-                    <td>
-                        <span class="marusuji">②</span><span class="marusuji">⑦</span><span class="marusuji">⑨</span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        中位
-                    </th>
-                    <td>
-                        <span class="marusuji">③</span><span class="marusuji">⑤</span><span class="marusuji">①</span> 
-                    </td>
-                    <th>
-                        後方
-                    </th>
-                    <td>
-                        <span class="marusuji">⑧</span><span class="marusuji">④</span>
-                    </td>
-                </tr>
-            </tbody></table>
-            <p>　この組み合わせならオピニオンリーダーの逃げをグロリアムンディがマークする形か。マインドユアミモザ、サヨノフィールド、ユアヒストリーあたりが続き、差のない中団にツウカイノキズナ。馬群はひと固まりのままレースが進み、直線では激しい追い比べに。</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku2">2</p></td>
+                    <td class="umaban">4</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0952094">
+                                タマコロリン
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        ▲<a href="/db/kisyu/ﾌ118">舟山瑠</a>
+                                        &nbsp;52
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>472(-6)</p>
+                                                                                <p>37.7</p>
+                                        <p>9人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku3">3</p></td>
+                    <td class="umaban">5</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0951004">
+                                エンゲルベルク
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        ▲<a href="/db/kisyu/ﾐ070">水沼元</a>
+                                        &nbsp;52
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>438(+4)</p>
+                                                                                <p>445.1</p>
+                                        <p>16人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku3">3</p></td>
+                    <td class="umaban">6</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0950380">
+                                マユナイト
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        <a href="/db/kisyu/ｻ124">斎藤新</a>
+                                        &nbsp;55
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>390(+4)</p>
+                                                                                <p>20.5</p>
+                                        <p>8人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku4">4</p></td>
+                    <td class="umaban">7</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0952329">
+                                アンセートゥモダン
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        ◇<a href="/db/kisyu/ｲ140">今村聖</a>
+                                        &nbsp;53
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>410(+6)</p>
+                                                                                <p>92.5</p>
+                                        <p>11人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku4">4</p></td>
+                    <td class="umaban">8</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0951125">
+                                コスモラパウィラ
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        牡2&nbsp;
+                                        <a href="/db/kisyu/ｲ120">石川裕</a>
+                                        &nbsp;56
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>464(0)</p>
+                                                                                <p>16.8</p>
+                                        <p>7人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku5">5</p></td>
+                    <td class="umaban">9</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0950064">
+                                アンバサダネージュ
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        牡2&nbsp;
+                                        ▲<a href="/db/kisyu/ｻ129">佐藤翔</a>
+                                        &nbsp;53
+                                                                                B
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>490(+8)</p>
+                                                                                <p>113.7</p>
+                                        <p>12人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku5">5</p></td>
+                    <td class="umaban">10</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0952611">
+                                コブラツイスト
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        牡2&nbsp;
+                                        ◇<a href="/db/kisyu/ﾅ078">永島ま</a>
+                                        &nbsp;54
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>446(+2)</p>
+                                                                                <p><span class="fontred">8.7</span></p>
+                                        <p>5人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku6">6</p></td>
+                    <td class="umaban">11</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0946160">
+                                イーガービーバー
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        牡2&nbsp;
+                                        ▲<a href="/db/kisyu/ｲ142">石神道</a>
+                                        &nbsp;53
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>462(+10)</p>
+                                                                                <p>135.2</p>
+                                        <p>13人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku6">6</p></td>
+                    <td class="umaban">12</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0952204">
+                                アルサック
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        <a href="/db/kisyu/ﾏ106">丸山元</a>
+                                        &nbsp;55
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>486(+8)</p>
+                                                                                <p><span class="fontred">4.1</span></p>
+                                        <p>2人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku7">7</p></td>
+                    <td class="umaban">13</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0953666">
+                                メイポール
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        <a href="/db/kisyu/ﾏ100">黛弘人</a>
+                                        &nbsp;55
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>426(-2)</p>
+                                                                                <p>169.4</p>
+                                        <p>14人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku7">7</p></td>
+                    <td class="umaban">14</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0949603">
+                                ドリームガッサン
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        ▲<a href="/db/kisyu/ｳ075">上里直</a>
+                                        &nbsp;52
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>432(+10)</p>
+                                                                                <p>54.4</p>
+                                        <p>10人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku8">8</p></td>
+                    <td class="umaban">15</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0946411">
+                                ニャンモロー
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        <a href="/db/kisyu/ｷ056">菊沢一</a>
+                                        &nbsp;55
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>468(-4)</p>
+                                                                                <p><span class="fontred">8.1</span></p>
+                                        <p>4人気</p>
+                                                                            </td>
+                                </tr>
+                                                                        <tr>
+                                                            <td class="waku"><p class="waku8">8</p></td>
+                    <td class="umaban">16</td>
+                                                            <td class="tmyoso">※</td>
+                                                                                                                        <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                                                <td>※</td>
+                                                            <td class="left">
+
+                        
+                        <p class="kbamei">
+                            <a href="/db/uma/0946076">
+                                ドナソレイ
+                            </a>
+                        </p>
+
+                        
+                        <p class="kisyu">
+                                                                    
+                                        <span class="fontred">牝2</span>&nbsp;
+                                        ▲<a href="/db/kisyu/ｲ141">石田拓</a>
+                                        &nbsp;52
+                                                                                
+                                        
+                                                                                                                    </p>
+
+
+
+                                    
+                                    
+                                    <p class="tanpyo">
+                                                                                </p>
+
+                                    </td>
+                                    <td class="lh1">
+                                        <p>470(+2)</p>
+                                                                                <p>15.1</p>
+                                        <p>6人気</p>
+                                                                            </td>
+                                </tr>
+                                                            </tbody>
+                        </table>
+                                                ※Smartプレミアム会員・Smart会員以外の方は予想印、予測オッズ、展開は非表示となります。<br>
+                        ※Smartプレミアム会員は各馬の短評をご覧いただけます。
+                                            </div>
+
+                                                                                <div class="flex_syutuba clearfix">
+                        <div class="  boxsection">
+                            <p class="title">AI指数</p>
+                                                        <p>
+                                AI指数は競馬ブックsmartプレミアム会員限定コンテンツとなります。
+                            </p>
+                                                        <div class="supportbox">
+                                <div class="box-title">AI指数とは・・・</div>
+                                <div class="box-honbun">
+                                    <p>関東関西のＴＭ予想を基盤に、レイティング、厩舎、騎手、展開の有利さなどをＡＩが独自に分析。その数値をトータルして、Ｓ→Ａ→Ｂ→Ｃ順にランク別に表したもの。</p>
+                                    <p>※レース前日の午後に提供。</p>
+                                </div>
+                                <p class="footer_right">
+                                    ※2024年3月31日以降のレースが対象です
+                                </p>
+                            </div>
+                        </div>
                     </div>
-            </div>
+                                        <div class="flex_syutuba clearfix">
+                                            </div>
+                    
+
+                    <!-- トラックマン予想連番 -->
+                    <div class="section">
+                        <div class="boxsection">
+                            <p class="title">トラックマン予想連番</p>
+                                                                                    <div class="renban">
+                                <table class="default renban width100">
+                                    <tbody>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <tr>
+                                            <td class="name" rowspan="2.5">
+                                                <nobr>
+                                                    <a href="/tm/others/%EF%BC%A3%EF%BC%B0%EF%BC%B5"><p>ＣＰＵ</p></a>                                                </nobr>
+                                            </td>
+                                                                                                                                                                                <td class="atari">3⇔12</td>
+                                                                                                                                                                                                                                                                        <td>3⇔2</td>
+                                                                                                                                                                                                                                                                        <td>3⇔15</td>
+                                                                                                                                                                                                                                                                                                                    <td>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                                                                        <td>12⇔2</td>
+                                                                                                                                                                                                                                                                        <td>12⇔15</td>
+                                                                                                                                                                                                                                                                        <td>2⇔15</td>
+                                                                                                                                                                                <td></td>
+                                                                                                                                                                            </tr>
+                                                                                                                                                                                                        <tr>
+                                            <td class="name" rowspan="3.25">
+                                                <nobr>
+                                                    <a href="/tm/others/%E3%83%AC%E3%82%A4%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0"><p>レイティング</p></a>                                                </nobr>
+                                            </td>
+                                                                                                                                    <td class="atari">3⇔12</td>
+                                                                                                                                                                                                                                                                        <td>3⇔10</td>
+                                                                                                                                                                                                                                                                        <td>3⇔15</td>
+                                                                                                                                                                                                                                                                        <td>12⇔10</td>
+                                                                                    </tr>
+                                        <tr>
+                                                                                                                                                                                                                                                                        <td>12⇔15</td>
+                                                                                                                                                                                                                                                                        <td>10⇔15</td>
+                                                                                                                                                                                                                                                                        <td>3→2</td>
+                                                                                                                                                                                                                                                                        <td>3→7</td>
+                                                                                    </tr>
+                                        <tr>
+                                                                                                                                                                                                                                                                        <td>3→16</td>
+                                                                                                                                                                                                                            <td></td>
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                                                                                                            </tr>
+                                                                                                                                                                                                        <tr>
+                                            <td class="name" rowspan="3">
+                                                <nobr>
+                                                    <a href="/tm/others/%EF%BC%B6%E4%BD%9C%E6%88%A6"><p>Ｖ作戦</p></a>                                                </nobr>
+                                            </td>
+                                                                                                                                    <td class="atari">3⇔12</td>
+                                                                                                                                                                                                                                                                        <td>3⇔10</td>
+                                                                                                                                                                                                                                                                        <td>12⇔10</td>
+                                                                                                                                                                                                                                                                        <td>3⇔16</td>
+                                                                                    </tr>
+                                        <tr>
+                                                                                                                                                                                                                                                                        <td>3→2</td>
+                                                                                                                                                                                                                                                                        <td>12→16</td>
+                                                                                                                                                                                                                                                                        <td>12→2</td>
+                                                                                                                                                                                                                                                                        <td>3→15</td>
+                                                                                    </tr>
+                                        <tr>
+                                                                                                                                                                                                                                                                        <td>10→16</td>
+                                                                                                                                                                                                                                                                        <td>10→2</td>
+                                                                                                                                                                                                                                                                        <td>12→15</td>
+                                                                                                                                                                                                                                                                        <td>3→8</td>
+                                                                                    </tr>
+                                        <tr>
+                                                                                                                                                                                                                        </tr>
+                                                                                                                    </tbody>
+                                </table>
+                                <p>※<span class="atari">&nbsp;</span>は的中した連番です。</p>
+                            </div>
+                                                    </div>
+                                                <p>※ 有料メニュー「競馬ブックSmart」に登録すると、厳選した予想者の連番を事前にご覧いただけます。</p>
+                                            </div>
+
+
+										
+
+                    <!-- 関係するニュースを呼び出す -->
+                    <div class="flex_syutuba clearfix">
+                                    <!-- 関係するニュース -->
+            <div class="section">
+                <div id="news_kankei"><!-- {url:s.keibabook.co.jp/news/kankei/race/202503060201,use:free,}.content_cache --><!-- 関係するニュースはありません --></div><!-- /. -->
+            </div><!-- /.section -->
+
+            <script type="text/javascript">
+            $( document ).ready( function() {
+                ajaxload_news( 'news_kankei','race','202503060201');            } );
+        </script>
+
+        <!-- 関係するニュース 終わり -->
+                            </div>
+                    <!-- menutable start-->
+<div class="midasi_sub" style="display: none;">
+    <p><span class="left">開催当日情報</span></p>
 </div>
 
-<!-- 地方競馬フッターメニュー -->
+
+<div class="menutable" style="display: none;">
+  <table class="open">
+    <tbody>
+      <tr>
+<!--
+        <td class="active">
+          <a href="/cyuou/top" title="Top">Top</a>
+        </td>
+-->
+        <td class="">
+          <a href="/cyuou/syusouba" title="今週の出走馬検索">今週の出走馬検索</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/tmmenu" title="TM直前情報">TM直前情報</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/todaymember" title="コンピュータの推奨">コンピュータの推奨</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="">
+          <a href="/cyuou/todaybunseki" title="今日を分析する">今日を分析する</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/win5/top" title="ＷＩＮ５">ＷＩＮ５</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/bestcyokyo" title="ベスト調教">ベスト調教</a>
+        </td>
+      </tr>
+      <tr>
+		  <td class="">
+			<a href="/cyuou/sokuhou" title="払戻金">払戻金</a>
+		  </td>
+        </tr>
+    </tbody>
+  </table><!-- /. -->
+</div><!-- menutable end-->
+
+
+<div class="midasi_sub" style="display: none;">
+    <p><span class="left">その他の情報</span></p>
+</div>
+
+
+<div class="menutable" style="display: none;">
+  <table class="open">
+    <tbody>
+      <tr>
+<!--
+        <td class="">
+          <a href="/cyuou/nittei/top" title="年間日程">年間日程</a>
+        </td>
+-->
+        <td class="">
+          <a href="/cyuou/jisouyotei" title="次走予定">次走予定</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/tourokuba" title="新規登録馬">新規登録馬</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/masyoba" title="抹消馬">抹消馬</a>
+        </td>
+      </tr>
+<!--
+      <tr>
+        <td class="">
+          <a href="/cyuou/seisai" title="先週の制裁">先週の制裁</a>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+-->
+    </tbody>
+  </table><!-- /. -->
+</div><!-- menutable end-->
+
+
 <div class="bookbutton">
-	<a href="/chihou/top">
-	<p>地方競馬Topへ</p>
+	<a href="/cyuou/top">
+	<p>中央競馬Topへ</p>
 	</a>
 </div>
 
-<script src="//style.keibabook.co.jp/www/js/mysirusi.js?20200922"></script>
-<script type="text/javascript">
-$( document ).ready( function() {
-	sirusi_get();
-} );
-</script>
-<!-- 前へ・次へ Start -->
-<p id="before_race"><a href="2025121104101120">10R</a></p>
-<p id="next_race"><a href="2025121104121120">12R</a></p>
-
-
+                    <!-- 前へ・次へ Start -->
+                                                            <p id="next_race"><a href="202503060202">2R</a></p>
+                    
+                    
         <script>
 
         /*-------------------------------------
@@ -1932,26 +2080,113 @@ $( document ).ready( function() {
 
         </script>
         
-<!-- 前へ・次へ End -->
-									</div><!-- /.main end -->
+                    <!-- 前へ・次へ End -->
+
+                                        
+        <div class="sectionfull">
+        <div id="smart"><!-- <p class="annai">広告エリア</p> -->
+			
+				<div class="annai" style="display: none;">
+				
+					<p class="title">
+					有料メニューの案内
+					</p>
+					<p class="honbun" style="display: block;">
+					全データをご覧になりたい場合は、<a href="/mypage/entrycheck">競馬ブックSmart</a>にご登録下さい。
+					</p>
+					
+				</div><!-- /.annai -->
+				
+				<div class="banner_button smart">
+					<a href="/mypage/entrycheck">
+					<div class="text">
+						<p class="title">有料メニュー登録</p>
+						<p class="honbun">※制限されている内容をご覧になりたい場合は、有料メニューにご登録下さい。</p>
+						<!--	<p class="honbun">※全データをご覧いただけます。</p>	-->
+					</div>
+					</a>
+				</div></div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- スマホサイトの有料メニューのご案内 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'smart', 'smart' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+                    
+                    <link rel="stylesheet" href="//style.keibabook.co.jp/www/js/colorbox/colorbox.css?20251025" type="text/css">
+                    <script src="//style.keibabook.co.jp/www/js/colorbox/jquery.colorbox-min.js" type="text/javascript" charset="utf-8"></script>
+                    <script src="//style.keibabook.co.jp/www/js/cyokyomovie.js" type="text/javascript" charset="utf-8"></script>
+                    <script src="//style.keibabook.co.jp/www/js/mysirusi.js?20200922"></script>
+                    <script type="text/javascript">
+                    $( document ).ready( function() {
+                        sirusi_get();
+                    } );
+                    $(function() {
+                        $(".swipebox").swipebox();
+
+                    });
+                    </script>
+                    <link rel="stylesheet" type="text/css" href="//style.keibabook.co.jp/www/css/swipebox.css?20240118">
+                    <script type="text/javascript" src="//style.keibabook.co.jp/www/js/jquery.swipebox.js"></script>
+                    <script>
+                    $(function() {
+
+                        $(".youtube").colorbox({
+                            iframe:true,
+                            width:"80%",
+                            height:"45%",
+                            maxWidth:"80%",
+                            maxHeight:"45%",
+                            opacity: 0.8
+                        });
+
+                    });
+
+                    </script>
+                    									</div><!-- /.main end -->
 
 				<!-- /.side start -->
 				<div class="side">
-					<!-- sidemenuindex start-->
-<div class="sidemenuindex">
-	<ul class="kessai clearfix">
-		<li class="menu"><p>地方競馬メニュー</p></li>
-		<li><a href="/chihou/top" title="Top">Top</a></li>
-		<li><a href="/chihou/nittei/top" title="年間日程">年間日程</a></li>
-		<li><a href="/chihou/cyokuzen" title="ＴＭ直前情報">ＴＭ直前情報</a></li>
-		<li><a href="http://keiba-lv-st.jp/?target=_blank" target="_blank" title="インターネット中継">インターネット中継</a></li>
-	<!--
-	<li><a href="/chihou/column" title="コラム">コラム</a></li>
-		<li><a href="/chihou/topix" title="トピックス">トピックス</a></li>
-	-->
-	</ul>
-</div><!-- /.sidemenuindex -->
-				</div><!-- /.side end  -->
+					                    
+        <div class="sectionfull">
+        <div id="omatase">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- お待たせ最新案内を取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'omatase', 'omatase' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+                    
+        <div class="sectionfull">
+        <div id="henkousub">
+        </div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- 変更情報を取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'henkousub', 'henkousub' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+
+                    				</div><!-- /.side end  -->
 
 			</div><!-- /#flex_container_top end -->
 
@@ -2352,8 +2587,8 @@ $( document ).ready( function() {
 
 			//
 			
-				//alert('会員');
-				$('.js-free_drawermenu').css('display', 'none');
+				//alert('非会員');
+				$('.js-member_drawermenu').css('display', 'none');
 
 			
 		});
@@ -2406,4 +2641,4 @@ ytag({
 
 
 
-</body></html>
+<div id="cboxOverlay" style="display: none;"></div><div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none;"><div id="cboxWrapper"><div><div id="cboxTopLeft" style="float: left;"></div><div id="cboxTopCenter" style="float: left;"></div><div id="cboxTopRight" style="float: left;"></div></div><div style="clear: left;"><div id="cboxMiddleLeft" style="float: left;"></div><div id="cboxContent" style="float: left;"><div id="cboxTitle" style="float: left;"></div><div id="cboxCurrent" style="float: left;"></div><button type="button" id="cboxPrevious"></button><button type="button" id="cboxNext"></button><button type="button" id="cboxSlideshow"></button><div id="cboxLoadingOverlay" style="float: left;"></div><div id="cboxLoadingGraphic" style="float: left;"></div></div><div id="cboxMiddleRight" style="float: left;"></div></div><div style="clear: left;"><div id="cboxBottomLeft" style="float: left;"></div><div id="cboxBottomCenter" style="float: left;"></div><div id="cboxBottomRight" style="float: left;"></div></div></div><div style="position: absolute; width: 9999px; visibility: hidden; display: none; max-width: none;"></div></div></body></html>

@@ -18,8 +18,8 @@ async def debug_login():
     print(f"Testing login for user: {login_id}")
 
     async with async_playwright() as p:
-        # Launch browser (headless=False to see what's happening)
-        browser = await p.chromium.launch(headless=False)
+        # Launch browser (headless=True for background execution)
+        browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         
         try:
@@ -53,9 +53,9 @@ async def debug_login():
                 # Save cookies
                 cookies = await page.context.cookies()
                 import json
-                with open('cookies_debug.json', 'w') as f:
+                with open('cookies.json', 'w') as f:
                     json.dump(cookies, f, indent=2)
-                print("Cookies saved to cookies_debug.json")
+                print("Cookies saved to cookies.json")
             else:
                 print("Login FAILED. Still on login page.")
                 

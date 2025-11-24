@@ -632,8 +632,8 @@ $(function(){
 
 					<div class="header_box logo">
 						<h1>
-														<a href="//s.keibabook.co.jp/" class="js-smartpremiumigai_show" style="display: none;">s.keibabook.co.jp</a>
-							<a href="//s.keibabook.co.jp/" class="js-smartpremium_show" style="display: block; background-image: url(&quot;//style.keibabook.co.jp/smart/images/common/bnr_smartpremium_kuro.png&quot;);">s.keibabook.co.jp</a>
+														<a href="//s.keibabook.co.jp/" class="js-smartpremiumigai_show" style="display: block;">s.keibabook.co.jp</a>
+							<a href="//s.keibabook.co.jp/" class="js-smartpremium_show" style="display: none; background-image: url(//style.keibabook.co.jp/smart/images/common/bnr_smartpremium_kuro.png);">s.keibabook.co.jp</a>
 														<dl style="" id="js-application" class="application"></dl>
 						</h1>
 					</div><!-- /.header_box logo -->
@@ -657,38 +657,31 @@ $(function(){
 
 <!-- ログインチェック -->
 
-	<!-- ログインしている -->
+	<!-- ログインしていない -->
+	<div class="login">
+		<a href="/login/login" class="login">ログイン<br>して下さい</a>
+		<span style="font-size: 50%; display: none;">&nbsp;ログイン</span>
+	</div><!-- /.header_box -->
+
 	<div class="header_box ">
-		<a href="/login/login" class="logout"></a>
-		<span style="font-size: 50%;">&nbsp;ログアウト</span>
+		<a href="/entry/top" class="entry"></a>
+		<span style="font-size: 50%;">&nbsp;会員登録</span>
 	</div><!-- /.header_box -->
 
-	<div class="header_box">
-		<a href="/mypage/index" class="mypage"></a>
-		<span style="font-size: 50%;">&nbsp;マイページ</span>
-	</div><!-- /.header_box -->
-
-	<!-- 20181115 -->
-	
-
-	<!-- 有料メニューによって -->
-			<!-- Smartプレミアム会員 -->
-		
-		<script>
-			$(function () {
-				$( '.js-smartpremium_show' ).css('display', 'block');
-				$( '.js-smartpremiumigai_show' ).css('display', 'none');
-			});
-		</script>
-
-	
 	<script>
 		$(function () {
-			$( '.js-free_show' ).css('display', 'none');
-			$( '.js-member_show' ).css('display', 'table-cell');
-			$( '.js-free_show_block' ).css('display', 'none');
-			$( '.js-member_show_block' ).css('display', 'block');
-		});
+			$( '.js-smartpremium_show' ).css('display', 'none');
+			$( '.js-smartpremiumigai_show' ).css('display', 'block');
+		})
+	</script>
+
+	<script>
+		$(function () {
+			$( '.js-free_show' ).css('display', 'table-cell');
+			$( '.js-member_show' ).css('display', 'none');
+			$( '.js-free_show_block' ).css('display', 'block');
+			$( '.js-member_show_block' ).css('display', 'none');
+		})
 	</script>
 
 </div><!-- /. -->
@@ -744,7 +737,7 @@ $(function(){
 								<option value="banushi">馬主名</option>
 								<option value="jockey">騎手名</option>
 								<option value="trainer">厩舎名</option>
-								</select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 8em;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-&lt;!-- 指定して下さい --&gt;-5o-container"><span class="select2-selection__rendered" id="select2-&lt;!-- 指定して下さい --&gt;-5o-container" title="馬名">馬名</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+								</select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 8em;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-&lt;!-- 指定して下さい --&gt;-1c-container"><span class="select2-selection__rendered" id="select2-&lt;!-- 指定して下さい --&gt;-1c-container" title="馬名">馬名</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
 								<input type="text" id="keyword" name="bamei" style="width: 40%;" maxlength="256" class="ime_on" value="" placeholder="検索したい文字">
 								<button class="bookbutton header_search_submit">検索</button>
 							</td>
@@ -777,8 +770,8 @@ $(function(){
 		<div class="globalmenu_center" id="globalmenu_center" style="display: block;">
 			<ul class="">
 				<li class=""><a href="/" title="HOME">HOME</a></li>
-				<li class=""><a href="/cyuou/top" title="中央競馬">中央競馬</a></li>
-				<li class="active"><a href="/chihou/top" title="地方競馬">地方競馬</a></li>
+				<li class="active"><a href="/cyuou/top" title="中央競馬">中央競馬</a></li>
+				<li class=""><a href="/chihou/top" title="地方競馬">地方競馬</a></li>
 				<li class=""><a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞</a></li>
 				<li class=""><a href="/db/search/horse" title="データ検索">データ検索</a></li>
 				<li class=""><a href="/kaigai/nittei" title="海外競馬">海外競馬</a></li>
@@ -814,10 +807,10 @@ $(function(){
 															<option value="/">HOME</option>
 							
 							<!-- 中央当日 -->
-															<option value="/cyuou/top">中央競馬</option>
+															<option value="/cyuou/top" selected="">中央競馬</option>
 							
 							<!-- 地方競馬 -->
-															<option value="/chihou/top" selected="">地方競馬</option>
+															<option value="/chihou/top">地方競馬</option>
 							
 							<!-- ニュース -->
 															<option value="/news/all">ニュース</option>
@@ -870,40 +863,31 @@ $(function(){
 
 	
 			
-						<!-- menutable start-->
-<div class="menutable">
-  <table class="open">
-    <tbody>
-	<tr>
-		<td class="">
-			<a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
-		</td>
-		<td class="">
-			<a href="//netshinbun.keibabook.co.jp//syukansi?target=_blank" title="週刊競馬ブックDigital" target="_blank">週刊競馬ブック<wbr>Digital<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
-		</td>
-		<td class="js-member_show" style="display: table-cell;">
-			<a href="/mypage/annai/subscription?target=_blank" title="週刊競馬ブックDigital定期購読">週刊競馬ブック<wbr>Digital定期購読<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
-		</td>
-		<td class="js-free_show" style="display: none;">
-			<a href="/entry/top" title="会員登録">会員登録</a>
-		</td>
-	</tr>
-<!--
-	<tr class="hiddenMenu" style="display: table-row;">
-		<td>
-			<a href="/chihou/nittei/top" title="年間日程">年間日程</a>
-		</td>
-		<td>
-			<a href="/chihou/cyokuzen" title="ＴＭ直前情報">ＴＭ直前情報</a>
-		</td>
-		<td>
-			<a href="https://keiba-lv-st.jp/?target=_blank" target="_blank" title="インターネット中継">インターネット中継</a>
-		</td>
-	</tr>
--->
-    </tbody>
-  </table>
-</div><!-- menutable end -->
+						
+				<!-- menutable start-->
+		<div class="menutable">
+			<table class="open">
+				<tbody>
+					<tr>
+						<td class="">
+							<a href="//netshinbun.keibabook.co.jp/?target=_blank" title="ネット新聞" target="_blank">ネット新聞<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+						</td>
+						<td class="">
+							<a href="//netshinbun.keibabook.co.jp//syukansi?target=_blank" title="週刊競馬ブックDigital" target="_blank">週刊競馬ブック<wbr>Digital<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+						</td>
+						<td class="js-member_show" style="display: none;">
+							<a href="/mypage/annai/subscription?target=_blank" title="週刊競馬ブックDigital定期購読">週刊競馬ブック<wbr>Digital定期購読<img src="//style.keibabook.co.jp/images/common/icon_target_blank.svg" style="width :1em; margin-left: 2px;"></a>
+						</td>
+						<td class="js-free_show" style="display: table-cell;">
+							<a href="/entry/top" title="会員登録">会員登録</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+
+
 			</div><!-- /#menu end-->
 
 		<!-- pankuzu -->
@@ -1006,119 +990,129 @@ $(function(){
     <div class="flex_between clearfix" style="">
     <div class="flex_between_left">
         <select class="selectboxlink" style="width: 130px; display: none;" label="開催日" tabindex="-1">
-                                    <option value="/chihou/nittei/20251119">11/19(水)</option>
-                                                <option value="/chihou/nittei/20251120" selected="">11/20(木)</option>
-                                                <option value="/chihou/nittei/20251121">11/21(金)</option>
-                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 130px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-4r40-container"><span class="select2-selection__rendered" id="select2-4r40-container" title="11/20(木)">11/20(木)</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                    <option value="/cyuou/nittei/2025110806">11/8(土)</option>
+                                                <option value="/cyuou/nittei/2025110906" selected="">11/9(日)</option>
+                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 130px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-ccun-container"><span class="select2-selection__rendered" id="select2-ccun-container" title="11/9(日)">11/9(日)</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
     </div>
 
     <div class="flex_between_right">
         <select class="selectboxlink right" style="width: 110px; display: none;" label="競馬場" tabindex="-1">
-                                    <option value="2025121104111120" selected="">川崎</option>
-                                                <option value="2025173401111120">名古屋</option>
-                                                <option value="2025193703111120">園田</option>
-                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 110px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-h6to-container"><span class="select2-selection__rendered" id="select2-h6to-container" title="川崎">川崎</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                    <option value="202505040201">東京</option>
+                                                <option value="202504000201">京都</option>
+                                                <option value="202503060201" selected="">福島</option>
+                                </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 110px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-4e1u-container"><span class="select2-selection__rendered" id="select2-4e1u-container" title="福島">福島</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
     </div>
-</div>
-<div class="tab race">
-    <ul>
-                        <li class=""><a href="2025121104011120">1R</a></li>
-                                <li class=""><a href="2025121104021120">2R</a></li>
-                                <li class=""><a href="2025121104031120">3R</a></li>
-                                <li class=""><a href="2025121104041120">4R</a></li>
-                                <li class=""><a href="2025121104051120">5R</a></li>
-                                <li class=""><a href="2025121104061120">6R</a></li>
-                                <li class=""><a href="2025121104071120">7R</a></li>
-                                <li class=""><a href="2025121104081120">8R</a></li>
-                                <li class=""><a href="2025121104091120">9R</a></li>
-                                <li class=""><a href="2025121104101120">10R</a></li>
-                                <li class="active"><a href="2025121104111120">11R</a></li>
-                                <li class=""><a href="2025121104121120">12R</a></li>
-                    </ul>
 </div>
 
+<div class="tab race">
+    <ul>
+                        <li class="active"><a href="202503060201" title="1R">1R</a></li>
+                                <li class=""><a href="202503060202">2R</a></li>
+                                <li class=""><a href="202503060203">3R</a></li>
+                                <li class=""><a href="202503060204">4R</a></li>
+                                <li class=""><a href="202503060205">5R</a></li>
+                                <li class=""><a href="202503060206">6R</a></li>
+                                <li class=""><a href="202503060207">7R</a></li>
+                                <li class=""><a href="202503060208">8R</a></li>
+                                <li class=""><a href="202503060209">9R</a></li>
+                                <li class=""><a href="202503060210">10R</a></li>
+                                <li class=""><a href="202503060211">11R</a></li>
+                                <li class=""><a href="202503060212">12R</a></li>
+                    </ul>
+</div>
 <div class="racetitle">
     <div class="racemei active">
-        <p>川崎</p>
-        <p>11R 富士見オープン</p>
+        <p>2025年11月9日 3回福島2日目</p>
+        <p>1R ２歳未勝利</p>
         <span class="open"></span>
     </div>
+
     <div class="racetitle_sub">
-        <p>サラ,オープン,別定</p>
-                <p>2100m (ダート・左) 晴・良</p>
-                
+                <p>[指定]</p>
+                                           <p>1150m (ダート・右) 曇・良</p>
+                                                                   <p>推定タイム ※</p>
+        
         <!-- 賞金 -->
                     <table class="syokin">
                 <tbody><tr>
                     <th>賞金</th>
-                    <td>①<span>600.0万</span></td>
-                    <td>②<span>240.0万</span></td>
+                    <td>①<span>560.0万</span></td>
+                    <td>②<span>220.0万</span></td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td>③<span>150.0万</span></td>
-                    <td>④<span>90.0万</span></td>
-                    <td>⑤<span>60.0万</span></td>
+                    <td>③<span>140.0万</span></td>
+                    <td>④<span>84.0万</span></td>
+                    <td>⑤<span>56.0万</span></td>
                 </tr>
             </tbody></table>
         
-    </div>
+
+                    </div>
 </div>
 
   
-  <!-- コンテンツの切り替え -->
+    <!-- コンテンツの切り替え -->
+
 
 <div class="menutable">
-        <table class="open sub">
-        <tbody>
-            <tr>
-                                <td class=""><a href="/chihou/syutuba/2025121104111120" title="出馬表">出馬表</a></td>
-                
-                                <td class=""><a href="/chihou/odds/0/2025121104111120" title="オッズ">オッズ</a></td>
-                
-								<td class=""><a href="/chihou/nouryoku_html/2025121104111120" title="能力表HTML">能力表HTML</a></td>
+		<table class="open sub">
+		<tbody>
+			<tr>
+								<td class=""><a href="/cyuou/syutuba/202503060201" title="出馬表">出馬表</a></td>
 				
-                                <td colspan="1" class=""><a href="/chihou/seiseki/2025121104111120" title="レース結果">レース結果</a></td>
-                <!--
-                <td class="button openBtn" rowspan="1" style="display: table-cell;">
-                    <p class="open">開く</p>
-                    <p class="openIcon">▼</p>
-                </td>
-                <td class="button closeBtn" rowspan="4" style="display: none;">
-                    <p class="close">閉じる</p>
-                    <p class="closeIcon">▲</p>
-                </td>
--->
-            </tr>
-
-            <!--<tr class="hiddenMenu" style="display: none;">-->
-            <tr class="">
-
-								<td class=""><a href="/chihou/taisenseiseki/2025121104111120" title="対戦成績">対戦成績</a></td>
+								<td class=""><a href="/cyuou/odds/0/202503060201" title="オッズ">オッズ</a></td>
 				
-                                <td class=""><a href="/chihou/cyokyo/1/2025121104111120" title="調教">調教</a></td>
-                
-                                <td class=""><a href="/chihou/danwa/1/2025121104111120" title="厩舎の話">厩舎の話</a></td>
-                
-                                <td class="">パドック情報</td>
-                            </tr>
+								<td class=""><a href="/cyuou/cpu/202503060201" title="ＣＰＵ予想">ＣＰＵ予想</a></td>
+				
+								<td class=""><a href="/cyuou/seiseki/202503060201" title="レース結果">レース結果</a></td>
+							</tr>
 
-            
-            <!--<tr class="hiddenMenu" style="display: none;">-->
-            <tr class="">
+			<tr>
+								<td class=""><a href="/cyuou/taisenseiseki/202503060201" title="対戦成績">対戦成績</a></td>
+				
+								<td class=""><a href="/cyuou/cyokyo/0/202503060201" title="調教">調教</a></td>
+				
+								<td class=""><a href="/cyuou/nouryoku_html/202503060201" title="能力表(HTML)">能力表(HTML)</a></td>
+				
+								<td class=""><a href="/cyuou/danwa/0/202503060201" title="厩舎の話">厩舎の話</a></td>
+							</tr>
 
-                                <td class=""><a href="/chihou/point/1/2025121104111120" title="ポイント">ポイント</a></td>
-                
-                
-                                <td class=""><a href="/chihou/tougaiseiseki/1/2025121104111120" title="当該成績">当該成績</a></td>
-                
-                                <td class="active"><a href="/chihou/kettou/2025121104111120" title="血統表">血統表</a></td>
-                            </tr>
+			<tr>
+								<td class="">パドック情報</td>
+				
+								<td class="">ギリギリ情報</td>
+				
+								<td class=""><a href="/cyuou/cyokuzen/202503060201" title="ＴＭ直前情報">ＴＭ直前情報</a></td>
+												<td class="active"><a href="/cyuou/kettou/202503060201" title="血統表">血統表</a></td>
+							</tr>
+
+			<tr>
+
+								<td class="">過去一覧</td>
+				
+								<td class=""><a href="/cyuou/syoin/202503060201" title="前走インタビュー" style="font-size: 1em;">前走<nobr>インタビュー</nobr></a></td>
+				
+				
+								<td class=""><a href="/cyuou/tougaiseiseki/0/202503060201" title="当該成績">当該成績</a></td>
+				
+								<td class="">特集ページ</td>
+							</tr>
+
+			<tr>
+
+								<td class=""><a href="/cyuou/data/202503060201" title="コースデータ">コースデータ</a></td>
+				
+								<td class=""><a href="/cyuou/rating/202503060201" title="レイティング">レイティング</a></td>
+				
+			</tr>
 
 
-        </tbody>
-    </table>
-    </div>
+
+
+		</tbody>
+	</table>
+	</div>
 
 
 <div class="midasi">
@@ -1127,208 +1121,453 @@ $(function(){
 
 <div class="section">
 
-
-<!-- タブの中身 -->
+  <!-- タブの中身 -->
 <div class="">
+
 
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku1">１</span>
-                    <span class="wakulink"><a href="/db/uma/0902335" class="umalink_click" umacd="0902335">ナガタエース</a>(牡5)</span>
+                    <span class="waku waku1">1</span>
+                    <span class="wakulink"><a href="/db/uma/0945958" class="umalink_click" umacd="0945958">セイウンレガーメ</a>(牝2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0819486" class="umalink_click" umacd="0819486"><p>タリスマニックGB</p><p>Talismanic</p></a></td><td rowspan="2"><a href="/db/uma/0445458" class="umalink_click" umacd="0445458"><p>メダグリア　ドーロ</p></a></td><td class="boba"><a href="/db/uma/0083901" class="umalink_click" umacd="0083901"><p>El Prado</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0445459" class="umalink_click" umacd="0445459"><p>Cappucino Bay</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0433934" class="umalink_click" umacd="0433934"><p>Magic Mission</p></a></td><td><a href="/db/uma/0078296" class="umalink_click" umacd="0078296"><p>Machiavellian</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0433935" class="umalink_click" umacd="0433935"><p>Dream Ticket</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0695105" class="umalink_click" umacd="0695105"><p>メイケイペガムーン</p><p>Meikei Pega Moon</p></a></td><td rowspan="2"><a href="/db/uma/0523358" class="umalink_click" umacd="0523358"><p>アドマイヤムーン</p></a></td><td class="boba"><a href="/db/uma/0085603" class="umalink_click" umacd="0085603"><p>エンドスウィープ</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0336384" class="umalink_click" umacd="0336384"><p>マイケイティーズ</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0218350" class="umalink_click" umacd="0218350"><p>ベラミロード</p></a></td><td><a href="/db/uma/0066457" class="umalink_click" umacd="0066457"><p>アレミロード</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0154283" class="umalink_click" umacd="0154283"><p>ベラミスキー</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0775061" class="umalink_click" umacd="0775061"><p>ゴールドドリーム</p><p>Gold Dream</p></a></td><td rowspan="2"><a href="/db/uma/0420140" class="umalink_click" umacd="0420140"><p>ゴールドアリュール</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0523264" class="umalink_click" umacd="0523264"><p>モンヴェール</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0790451" class="umalink_click" umacd="0790451"><p>ラソ</p><p>Lazo</p></a></td><td rowspan="2"><a href="/db/uma/0611042" class="umalink_click" umacd="0611042"><p>パイロ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0522926" class="umalink_click" umacd="0522926"><p>カウントオンミー</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku2">２</span>
-                    <span class="wakulink"><a href="/db/uma/0903464" class="umalink_click" umacd="0903464">マインドユアミモザ</a>(牝5)</span>
+                    <span class="waku waku1">2</span>
+                    <span class="wakulink"><a href="/db/uma/0950246" class="umalink_click" umacd="0950246">ハルヒメ</a>(牝2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0825077" class="umalink_click" umacd="0825077"><p>マインドユアビスケッツUSA</p><p>Mind Your Biscuits</p></a></td><td rowspan="2"><a href="/db/uma/0450847" class="umalink_click" umacd="0450847"><p>ポッセ</p></a></td><td class="boba"><a href="/db/uma/0088888" class="umalink_click" umacd="0088888"><p>Silver Deputy</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0450848" class="umalink_click" umacd="0450848"><p>Raska</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0825078" class="umalink_click" umacd="0825078"><p>Jazzmane</p></a></td><td><a href="/db/uma/0462680" class="umalink_click" umacd="0462680"><p>Toccet</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0540359" class="umalink_click" umacd="0540359"><p>Alljazz</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0674716" class="umalink_click" umacd="0674716"><p>エイシンキンチェム</p><p>Eishin Kincsem</p></a></td><td rowspan="2"><a href="/db/uma/0132777" class="umalink_click" umacd="0132777"><p>フジキセキ</p></a></td><td class="boba"><a href="/db/uma/0068096" class="umalink_click" umacd="0068096"><p>サンデーサイレンス</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0074179" class="umalink_click" umacd="0074179"><p>ミルレーサー</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0545936" class="umalink_click" umacd="0545936"><p>アルカイックレディ</p></a></td><td><a href="/db/uma/0089433" class="umalink_click" umacd="0089433"><p>Mr. Greeley</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0183653" class="umalink_click" umacd="0183653"><p>No More Ironing</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0825077" class="umalink_click" umacd="0825077"><p>マインドユアビスケッツUSA</p><p>Mind Your Biscuits</p></a></td><td rowspan="2"><a href="/db/uma/0450847" class="umalink_click" umacd="0450847"><p>ポッセ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0825078" class="umalink_click" umacd="0825078"><p>Jazzmane</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0813593" class="umalink_click" umacd="0813593"><p>ゴルトキルシェ</p><p>Gold Kirsche</p></a></td><td rowspan="2"><a href="/db/uma/0187581" class="umalink_click" umacd="0187581"><p>ステイゴールド</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0503357" class="umalink_click" umacd="0503357"><p>ダリシア</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku3">３</span>
-                    <span class="wakulink"><a href="/db/uma/0898125" class="umalink_click" umacd="0898125">ツウカイノキズナ</a>(セン5)</span>
+                    <span class="waku waku2">3</span>
+                    <span class="wakulink"><a href="/db/uma/0950596" class="umalink_click" umacd="0950596">グラティアム</a>(牝2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0696060" class="umalink_click" umacd="0696060"><p>キズナ</p><p>Kizuna</p></a></td><td rowspan="2"><a href="/db/uma/0476263" class="umalink_click" umacd="0476263"><p>ディープインパクト</p></a></td><td class="boba"><a href="/db/uma/0068096" class="umalink_click" umacd="0068096"><p>サンデーサイレンス</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0158937" class="umalink_click" umacd="0158937"><p>ウインドインハーヘア</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0078255" class="umalink_click" umacd="0078255"><p>キャットクイル</p></a></td><td><a href="/db/uma/0066453" class="umalink_click" umacd="0066453"><p>Storm Cat</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0062007" class="umalink_click" umacd="0062007"><p>Pacific Princess</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0669604" class="umalink_click" umacd="0669604"><p>エイコオウイング</p><p>Eiko Wing</p></a></td><td rowspan="2"><a href="/db/uma/0062533" class="umalink_click" umacd="0062533"><p>アフリート</p></a></td><td class="boba"><a href="/db/uma/0075355" class="umalink_click" umacd="0075355"><p>Mr. Prospector</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0059615" class="umalink_click" umacd="0059615"><p>Polite Lady</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0214040" class="umalink_click" umacd="0214040"><p>ホクトブルーバード</p></a></td><td><a href="/db/uma/0066910" class="umalink_click" umacd="0066910"><p>アサティス</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0141212" class="umalink_click" umacd="0141212"><p>ホクトフローラ</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0891326" class="umalink_click" umacd="0891326"><p>ナダルUSA</p><p>Nadal</p></a></td><td rowspan="2"><a href="/db/uma/0660458" class="umalink_click" umacd="0660458"><p>ブレイム</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0891327" class="umalink_click" umacd="0891327"><p>Ascending Angel</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0814192" class="umalink_click" umacd="0814192"><p>アリア</p><p>Aria</p></a></td><td rowspan="2"><a href="/db/uma/0452834" class="umalink_click" umacd="0452834"><p>ダイワメジャー</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0670761" class="umalink_click" umacd="0670761"><p>ラプターセイハート</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku4">４</span>
-                    <span class="wakulink"><a href="/db/uma/0872375" class="umalink_click" umacd="0872375">セイカメテオポリス</a>(牡7)</span>
+                    <span class="waku waku2">4</span>
+                    <span class="wakulink"><a href="/db/uma/0952094" class="umalink_click" umacd="0952094">タマコロリン</a>(牝2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0608638" class="umalink_click" umacd="0608638"><p>マジェスティックウォリアーUSA</p><p>Majestic Warrior</p></a></td><td rowspan="2"><a href="/db/uma/0078282" class="umalink_click" umacd="0078282"><p>エーピー　インディ</p></a></td><td class="boba"><a href="/db/uma/0063967" class="umalink_click" umacd="0063967"><p>Seattle Slew</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0078281" class="umalink_click" umacd="0078281"><p>Weekend Surprise</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0406384" class="umalink_click" umacd="0406384"><p>Dream Supreme</p></a></td><td><a href="/db/uma/0056587" class="umalink_click" umacd="0056587"><p>Seeking the Gold</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0080544" class="umalink_click" umacd="0080544"><p>Spinning Round</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0725826" class="umalink_click" umacd="0725826"><p>ボウピープ</p><p>Bo Peep</p></a></td><td rowspan="2"><a href="/db/uma/0581278" class="umalink_click" umacd="0581278"><p>ディープスカイ</p></a></td><td class="boba"><a href="/db/uma/0336157" class="umalink_click" umacd="0336157"><p>アグネスタキオン</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0466795" class="umalink_click" umacd="0466795"><p>アビ</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0655746" class="umalink_click" umacd="0655746"><p>ボーントゥブーギー</p></a></td><td><a href="/db/uma/0410056" class="umalink_click" umacd="0410056"><p>Tobougg</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0440324" class="umalink_click" umacd="0440324"><p>Braissim</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0775061" class="umalink_click" umacd="0775061"><p>ゴールドドリーム</p><p>Gold Dream</p></a></td><td rowspan="2"><a href="/db/uma/0420140" class="umalink_click" umacd="0420140"><p>ゴールドアリュール</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0523264" class="umalink_click" umacd="0523264"><p>モンヴェール</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0815292" class="umalink_click" umacd="0815292"><p>タマノパルフェット</p><p>Tamano Parfaite</p></a></td><td rowspan="2"><a href="/db/uma/0593904" class="umalink_click" umacd="0593904"><p>ハードスパン</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0415451" class="umalink_click" umacd="0415451"><p>ダンシングハピネス</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku5">５</span>
-                    <span class="wakulink"><a href="/db/uma/0914029" class="umalink_click" umacd="0914029">グラインドアウト</a>(牝4)</span>
+                    <span class="waku waku3">5</span>
+                    <span class="wakulink"><a href="/db/uma/0951004" class="umalink_click" umacd="0951004">エンゲルベルク</a>(牝2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0824577" class="umalink_click" umacd="0824577"><p>アメリカンペイトリオットUSA</p><p>American Patriot</p></a></td><td rowspan="2"><a href="/db/uma/0561512" class="umalink_click" umacd="0561512"><p>ウォー　フロント</p></a></td><td class="boba"><a href="/db/uma/0075452" class="umalink_click" umacd="0075452"><p>Danzig</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0207863" class="umalink_click" umacd="0207863"><p>Starry Dreamer</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0701326" class="umalink_click" umacd="0701326"><p>Life Well Lived</p></a></td><td><a href="/db/uma/0407389" class="umalink_click" umacd="0407389"><p>Tiznow</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0408052" class="umalink_click" umacd="0408052"><p>Well Dressed</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0449800" class="umalink_click" umacd="0449800"><p>クィーンロマンス</p><p>Queen Romance</p></a></td><td rowspan="2"><a href="/db/uma/0085922" class="umalink_click" umacd="0085922"><p>ティンバーカントリー</p></a></td><td class="boba"><a href="/db/uma/0066441" class="umalink_click" umacd="0066441"><p>Woodman</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0066764" class="umalink_click" umacd="0066764"><p>Fall Aspen</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0222412" class="umalink_click" umacd="0222412"><p>オグリロマンス</p></a></td><td><a href="/db/uma/0056029" class="umalink_click" umacd="0056029"><p>ノーザンテースト</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0151326" class="umalink_click" umacd="0151326"><p>オグリローマン</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0794550" class="umalink_click" umacd="0794550"><p>サングレーザー</p><p>Sungrazer</p></a></td><td rowspan="2"><a href="/db/uma/0476263" class="umalink_click" umacd="0476263"><p>ディープインパクト</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0441696" class="umalink_click" umacd="0441696"><p>マンティスハント</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0830247" class="umalink_click" umacd="0830247"><p>ダンスナンバー</p><p>Dance Number</p></a></td><td rowspan="2"><a href="/db/uma/0670993" class="umalink_click" umacd="0670993"><p>グランプリボス</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0645844" class="umalink_click" umacd="0645844"><p>ハニーカラー</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku6">６</span>
-                    <span class="wakulink"><a href="/db/uma/0897982" class="umalink_click" umacd="0897982">オピニオンリーダー</a>(牡5)</span>
+                    <span class="waku waku3">6</span>
+                    <span class="wakulink"><a href="/db/uma/0950380" class="umalink_click" umacd="0950380">マユナイト</a>(牝2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0567799" class="umalink_click" umacd="0567799"><p>シニスターミニスターUSA</p><p>Sinister Minister</p></a></td><td rowspan="2"><a href="/db/uma/0210335" class="umalink_click" umacd="0210335"><p>オールド　トリエステ</p></a></td><td class="boba"><a href="/db/uma/0078282" class="umalink_click" umacd="0078282"><p>A.P. Indy</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0064282" class="umalink_click" umacd="0064282"><p>Lovlier Linda</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0567800" class="umalink_click" umacd="0567800"><p>Sweet Minister</p></a></td><td><a href="/db/uma/0087067" class="umalink_click" umacd="0087067"><p>The Prime Minister</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0236492" class="umalink_click" umacd="0236492"><p>Sweet Blue</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0792892" class="umalink_click" umacd="0792892"><p>ルレシャンテ</p><p>Loure Chanter</p></a></td><td rowspan="2"><a href="/db/uma/0644334" class="umalink_click" umacd="0644334"><p>ヴィクトワールピサ</p></a></td><td class="boba"><a href="/db/uma/0428636" class="umalink_click" umacd="0428636"><p>ネオユニヴァース</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0194522" class="umalink_click" umacd="0194522"><p>ホワイトウォーターアフェア</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0196926" class="umalink_click" umacd="0196926"><p>トレアンサンブル</p></a></td><td><a href="/db/uma/0059911" class="umalink_click" umacd="0059911"><p>トニービン</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0130132" class="umalink_click" umacd="0130132"><p>ダイナアクトレス</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0891150" class="umalink_click" umacd="0891150"><p>ミスチヴィアスアレックスUSA</p><p>Mischevious Alex</p></a></td><td rowspan="2"><a href="/db/uma/0620652" class="umalink_click" umacd="0620652"><p>イントゥ　ミスチーフ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0891151" class="umalink_click" umacd="0891151"><p>White Pants Night</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0697537" class="umalink_click" umacd="0697537"><p>プランタンビジュー</p><p>Printemps Bijou</p></a></td><td rowspan="2"><a href="/db/uma/0452834" class="umalink_click" umacd="0452834"><p>ダイワメジャー</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0278487" class="umalink_click" umacd="0278487"><p>スプリングチケット</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku7">７</span>
-                    <span class="wakulink"><a href="/db/uma/0887518" class="umalink_click" umacd="0887518">サヨノフィールド</a>(牡6)</span>
+                    <span class="waku waku4">7</span>
+                    <span class="wakulink"><a href="/db/uma/0952329" class="umalink_click" umacd="0952329">アンセートゥモダン</a>(牝2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0682673" class="umalink_click" umacd="0682673"><p>マクフィGB</p><p>Makfi</p></a></td><td rowspan="2"><a href="/db/uma/0510426" class="umalink_click" umacd="0510426"><p>ドバウィ</p></a></td><td class="boba"><a href="/db/uma/0382420" class="umalink_click" umacd="0382420"><p>Dubai Millennium</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0274805" class="umalink_click" umacd="0274805"><p>Zomaradah</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0492883" class="umalink_click" umacd="0492883"><p>Dhelaal</p></a></td><td><a href="/db/uma/0013192" class="umalink_click" umacd="0013192"><p>Green Desert</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0087988" class="umalink_click" umacd="0087988"><p>Irish Valley</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0725404" class="umalink_click" umacd="0725404"><p>ハッピーセーラー</p><p>Happy Sailor</p></a></td><td rowspan="2"><a href="/db/uma/0164822" class="umalink_click" umacd="0164822"><p>ダンスインザダーク</p></a></td><td class="boba"><a href="/db/uma/0068096" class="umalink_click" umacd="0068096"><p>サンデーサイレンス</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0074398" class="umalink_click" umacd="0074398"><p>ダンシングキイ</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0289142" class="umalink_click" umacd="0289142"><p>ブライドウッド</p></a></td><td><a href="/db/uma/0075452" class="umalink_click" umacd="0075452"><p>Danzig</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0087223" class="umalink_click" umacd="0087223"><p>Braiswick</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0813275" class="umalink_click" umacd="0813275"><p>ルヴァンスレーヴ</p><p>Le Vent Se Leve</p></a></td><td rowspan="2"><a href="/db/uma/0424563" class="umalink_click" umacd="0424563"><p>シンボリクリスエス</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0614617" class="umalink_click" umacd="0614617"><p>マエストラーレ</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0754923" class="umalink_click" umacd="0754923"><p>メジャーフォルム</p><p>Major Forme</p></a></td><td rowspan="2"><a href="/db/uma/0452834" class="umalink_click" umacd="0452834"><p>ダイワメジャー</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0336295" class="umalink_click" umacd="0336295"><p>ビルアンドクー</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku7">８</span>
-                    <span class="wakulink"><a href="/db/uma/0884947" class="umalink_click" umacd="0884947">キャッスルブレイヴ</a>(牡6)</span>
+                    <span class="waku waku4">8</span>
+                    <span class="wakulink"><a href="/db/uma/0951125" class="umalink_click" umacd="0951125">コスモラパウィラ</a>(牡2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0582826" class="umalink_click" umacd="0582826"><p>スマートファルコン</p><p>Smart Falcon</p></a></td><td rowspan="2"><a href="/db/uma/0420140" class="umalink_click" umacd="0420140"><p>ゴールドアリュール</p></a></td><td class="boba"><a href="/db/uma/0068096" class="umalink_click" umacd="0068096"><p>サンデーサイレンス</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0192711" class="umalink_click" umacd="0192711"><p>ニキーヤ</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0140217" class="umalink_click" umacd="0140217"><p>ケイシュウハーブ</p></a></td><td><a href="/db/uma/0059278" class="umalink_click" umacd="0059278"><p>ミシシッピアン</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0125711" class="umalink_click" umacd="0125711"><p>キョウエイシラユキ</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0616384" class="umalink_click" umacd="0616384"><p>シルクパサージュ</p><p>Silk Passage</p></a></td><td rowspan="2"><a href="/db/uma/0188937" class="umalink_click" umacd="0188937"><p>マイネルラヴ</p></a></td><td class="boba"><a href="/db/uma/0056587" class="umalink_click" umacd="0056587"><p>Seeking the Gold</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0080067" class="umalink_click" umacd="0080067"><p>Heart of Joy</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0451923" class="umalink_click" umacd="0451923"><p>シルクグラフィック</p></a></td><td><a href="/db/uma/0067120" class="umalink_click" umacd="0067120"><p>ブライアンズタイム</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0212065" class="umalink_click" umacd="0212065"><p>カッティングウェイ</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0880609" class="umalink_click" umacd="0880609"><p>フォーウィールドライブUSA</p><p>Four Wheel Drive</p></a></td><td rowspan="2"><a href="/db/uma/0784502" class="umalink_click" umacd="0784502"><p>アメリカン　ファラオ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0880610" class="umalink_click" umacd="0880610"><p>Funfair</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0831879" class="umalink_click" umacd="0831879"><p>エンジェルスマイル</p><p>Angel Smile</p></a></td><td rowspan="2"><a href="/db/uma/0600561" class="umalink_click" umacd="0600561"><p>エイシンフラッシュ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0668239" class="umalink_click" umacd="0668239"><p>アドマイヤエレノア</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku8">９</span>
-                    <span class="wakulink"><a href="/db/uma/0867191" class="umalink_click" umacd="0867191">ユアヒストリー</a>(牡7)</span>
+                    <span class="waku waku5">9</span>
+                    <span class="wakulink"><a href="/db/uma/0950064" class="umalink_click" umacd="0950064">アンバサダネージュ</a>(牡2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0644542" class="umalink_click" umacd="0644542"><p>ルーラーシップ</p><p>Rulership</p></a></td><td rowspan="2"><a href="/db/uma/0441764" class="umalink_click" umacd="0441764"><p>キングカメハメハ</p></a></td><td class="boba"><a href="/db/uma/0080715" class="umalink_click" umacd="0080715"><p>Kingmambo</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0403503" class="umalink_click" umacd="0403503"><p>マンファス</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0163868" class="umalink_click" umacd="0163868"><p>エアグルーヴ</p></a></td><td><a href="/db/uma/0059911" class="umalink_click" umacd="0059911"><p>トニービン</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0066841" class="umalink_click" umacd="0066841"><p>ダイナカール</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0725007" class="umalink_click" umacd="0725007"><p>アイムユアドリーム</p><p>I'm Your Dream</p></a></td><td rowspan="2"><a href="/db/uma/0132777" class="umalink_click" umacd="0132777"><p>フジキセキ</p></a></td><td class="boba"><a href="/db/uma/0068096" class="umalink_click" umacd="0068096"><p>サンデーサイレンス</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0074179" class="umalink_click" umacd="0074179"><p>ミルレーサー</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0579071" class="umalink_click" umacd="0579071"><p>ビオンドパンテーラ</p></a></td><td><a href="/db/uma/0056587" class="umalink_click" umacd="0056587"><p>Seeking the Gold</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0285502" class="umalink_click" umacd="0285502"><p>ラプーマ</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0567799" class="umalink_click" umacd="0567799"><p>シニスターミニスターUSA</p><p>Sinister Minister</p></a></td><td rowspan="2"><a href="/db/uma/0210335" class="umalink_click" umacd="0210335"><p>オールド　トリエステ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0567800" class="umalink_click" umacd="0567800"><p>Sweet Minister</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0810971" class="umalink_click" umacd="0810971"><p>ヴォーグショコラ</p><p>Vogue Chocolat</p></a></td><td rowspan="2"><a href="/db/uma/0712208" class="umalink_click" umacd="0712208"><p>アイルハヴアナザー</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0664712" class="umalink_click" umacd="0664712"><p>グラニースミス</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
 <div class="">
 
+
     <!-- 1頭ずつ -->
     <div class="bameibox">
         <dl class="dl-table">
             <dt class="dt-midashi" style="">
                 <p class="waku">
-                    <span class="waku waku8">10</span>
-                    <span class="wakulink"><a href="/db/uma/0872296" class="umalink_click" umacd="0872296">グロリアムンディ</a>(牡7)</span>
+                    <span class="waku waku5">10</span>
+                    <span class="wakulink"><a href="/db/uma/0952611" class="umalink_click" umacd="0952611">コブラツイスト</a>(牡2)</span>
                 </p>
             </dt>
 
         </dl>
         <div class="section">
-            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0441764" class="umalink_click" umacd="0441764"><p>キングカメハメハ</p><p>King Kamehameha</p></a></td><td rowspan="2"><a href="/db/uma/0080715" class="umalink_click" umacd="0080715"><p>キングマンボ</p></a></td><td class="boba"><a href="/db/uma/0075355" class="umalink_click" umacd="0075355"><p>Mr. Prospector</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0059947" class="umalink_click" umacd="0059947"><p>Miesque</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0403503" class="umalink_click" umacd="0403503"><p>マンファス</p></a></td><td><a href="/db/uma/0067099" class="umalink_click" umacd="0067099"><p>ラストタイクーン</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0196683" class="umalink_click" umacd="0196683"><p>Pilot Bird</p></a></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0732114" class="umalink_click" umacd="0732114"><p>ベットーレITY</p><p>Bettolle</p></a></td><td rowspan="2"><a href="/db/uma/0401010" class="umalink_click" umacd="0401010"><p>ブル　エア　フォース</p></a></td><td class="boba"><a href="/db/uma/0085581" class="umalink_click" umacd="0085581"><p>Sri Pekan</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0274615" class="umalink_click" umacd="0274615"><p>Carillon Miss</p></a></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0732115" class="umalink_click" umacd="0732115"><p>Happy Sue</p></a></td><td><a href="/db/uma/0367793" class="umalink_click" umacd="0367793"><p>City On a Hill</p></a></td></tr><tr><td class="hinba"><a href="/db/uma/0732116" class="umalink_click" umacd="0732116"><p>Fun Lover</p></a></td></tr></tbody></table>
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0725920" class="umalink_click" umacd="0725920"><p>ハッピースプリント</p><p>Happy Sprint</p></a></td><td rowspan="2"><a href="/db/uma/0275675" class="umalink_click" umacd="0275675"><p>アッミラーレ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0244762" class="umalink_click" umacd="0244762"><p>マーゴーン</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0755947" class="umalink_click" umacd="0755947"><p>カゼニモマケズ</p><p>Kazenimomakezu</p></a></td><td rowspan="2"><a href="/db/uma/0611042" class="umalink_click" umacd="0611042"><p>パイロ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0455753" class="umalink_click" umacd="0455753"><p>ミココロ</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
         </div><!-- /.section -->
     </div><!-- /. -->
 
 </div><!-- /. -->
+<div class="">
 
+
+    <!-- 1頭ずつ -->
+    <div class="bameibox">
+        <dl class="dl-table">
+            <dt class="dt-midashi" style="">
+                <p class="waku">
+                    <span class="waku waku6">11</span>
+                    <span class="wakulink"><a href="/db/uma/0946160" class="umalink_click" umacd="0946160">イーガービーバー</a>(牡2)</span>
+                </p>
+            </dt>
+
+        </dl>
+        <div class="section">
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0616529" class="umalink_click" umacd="0616529"><p>トランセンド</p><p>Transcend</p></a></td><td rowspan="2"><a href="/db/uma/0189051" class="umalink_click" umacd="0189051"><p>ワイルドラッシュ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0167120" class="umalink_click" umacd="0167120"><p>シネマスコープ</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0722414" class="umalink_click" umacd="0722414"><p>スーリール</p><p>Sourire</p></a></td><td rowspan="2"><a href="/db/uma/0208929" class="umalink_click" umacd="0208929"><p>スペシャルウィーク</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0460845" class="umalink_click" umacd="0460845"><p>グローリーブラッド</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
+        </div><!-- /.section -->
+    </div><!-- /. -->
+
+</div><!-- /. -->
+<div class="">
+
+
+    <!-- 1頭ずつ -->
+    <div class="bameibox">
+        <dl class="dl-table">
+            <dt class="dt-midashi" style="">
+                <p class="waku">
+                    <span class="waku waku6">12</span>
+                    <span class="wakulink"><a href="/db/uma/0952204" class="umalink_click" umacd="0952204">アルサック</a>(牝2)</span>
+                </p>
+            </dt>
+
+        </dl>
+        <div class="section">
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0771874" class="umalink_click" umacd="0771874"><p>シルバーステート</p><p>Silver State</p></a></td><td rowspan="2"><a href="/db/uma/0476263" class="umalink_click" umacd="0476263"><p>ディープインパクト</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0488581" class="umalink_click" umacd="0488581"><p>シルヴァースカヤ</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0791684" class="umalink_click" umacd="0791684"><p>スマートレイチェル</p><p>Smart Rachel</p></a></td><td rowspan="2"><a href="/db/uma/0441764" class="umalink_click" umacd="0441764"><p>キングカメハメハ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0554747" class="umalink_click" umacd="0554747"><p>ショウナンアクト</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
+        </div><!-- /.section -->
+    </div><!-- /. -->
+
+</div><!-- /. -->
+<div class="">
+
+
+    <!-- 1頭ずつ -->
+    <div class="bameibox">
+        <dl class="dl-table">
+            <dt class="dt-midashi" style="">
+                <p class="waku">
+                    <span class="waku waku7">13</span>
+                    <span class="wakulink"><a href="/db/uma/0953666" class="umalink_click" umacd="0953666">メイポール</a>(牝2)</span>
+                </p>
+            </dt>
+
+        </dl>
+        <div class="section">
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0679654" class="umalink_click" umacd="0679654"><p>ホッコータルマエ</p><p>Hokko Tarumae</p></a></td><td rowspan="2"><a href="/db/uma/0441764" class="umalink_click" umacd="0441764"><p>キングカメハメハ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0441692" class="umalink_click" umacd="0441692"><p>マダムチェロキー</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0721662" class="umalink_click" umacd="0721662"><p>ファンファーレ</p><p>Fanfare</p></a></td><td rowspan="2"><a href="/db/uma/0159424" class="umalink_click" umacd="0159424"><p>フレンチデピュティ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0523861" class="umalink_click" umacd="0523861"><p>エリモフィナーレ</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
+        </div><!-- /.section -->
+    </div><!-- /. -->
+
+</div><!-- /. -->
+<div class="">
+
+
+    <!-- 1頭ずつ -->
+    <div class="bameibox">
+        <dl class="dl-table">
+            <dt class="dt-midashi" style="">
+                <p class="waku">
+                    <span class="waku waku7">14</span>
+                    <span class="wakulink"><a href="/db/uma/0949603" class="umalink_click" umacd="0949603">ドリームガッサン</a>(牝2)</span>
+                </p>
+            </dt>
+
+        </dl>
+        <div class="section">
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0792027" class="umalink_click" umacd="0792027"><p>キャプテンキング</p><p>Captain King</p></a></td><td rowspan="2"><a href="/db/uma/0280026" class="umalink_click" umacd="0280026"><p>ファスリエフ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0641823" class="umalink_click" umacd="0641823"><p>ストロベリーパフェ</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0835063" class="umalink_click" umacd="0835063"><p>フルゴラ</p><p>Fulgora</p></a></td><td rowspan="2"><a href="/db/uma/0600561" class="umalink_click" umacd="0600561"><p>エイシンフラッシュ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0484421" class="umalink_click" umacd="0484421"><p>デュークタイフーン</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
+        </div><!-- /.section -->
+    </div><!-- /. -->
+
+</div><!-- /. -->
+<div class="">
+
+
+    <!-- 1頭ずつ -->
+    <div class="bameibox">
+        <dl class="dl-table">
+            <dt class="dt-midashi" style="">
+                <p class="waku">
+                    <span class="waku waku8">15</span>
+                    <span class="wakulink"><a href="/db/uma/0946411" class="umalink_click" umacd="0946411">ニャンモロー</a>(牝2)</span>
+                </p>
+            </dt>
+
+        </dl>
+        <div class="section">
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0843407" class="umalink_click" umacd="0843407"><p>フィレンツェファイアUSA</p><p>Firenze Fire</p></a></td><td rowspan="2"><a href="/db/uma/0737944" class="umalink_click" umacd="0737944"><p>ポセイドンズ　ウォリアー</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0745203" class="umalink_click" umacd="0745203"><p>My Every Wish</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0773174" class="umalink_click" umacd="0773174"><p>ナムラバイオレット</p><p>Namura Violet</p></a></td><td rowspan="2"><a href="/db/uma/0193943" class="umalink_click" umacd="0193943"><p>チーフベアハート</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0417925" class="umalink_click" umacd="0417925"><p>ナムラテンニョ</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
+        </div><!-- /.section -->
+    </div><!-- /. -->
+
+</div><!-- /. -->
+<div class="">
+
+
+    <!-- 1頭ずつ -->
+    <div class="bameibox">
+        <dl class="dl-table">
+            <dt class="dt-midashi" style="">
+                <p class="waku">
+                    <span class="waku waku8">16</span>
+                    <span class="wakulink"><a href="/db/uma/0946076" class="umalink_click" umacd="0946076">ドナソレイ</a>(牝2)</span>
+                </p>
+            </dt>
+
+        </dl>
+        <div class="section">
+            <table class="kettou sandai"><tbody><tr><td rowspan="4"><a href="/db/uma/0810656" class="umalink_click" umacd="0810656"><p>マテラスカイUSA</p><p>Matera Sky</p></a></td><td rowspan="2"><a href="/db/uma/0435323" class="umalink_click" umacd="0435323"><p>スペイツタウン</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0570346" class="umalink_click" umacd="0570346"><p>Mostaqeleh</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="4" class="hinba"><a href="/db/uma/0832801" class="umalink_click" umacd="0832801"><p>ポッドギル</p><p>Pod Gill</p></a></td><td rowspan="2"><a href="/db/uma/0558025" class="umalink_click" umacd="0558025"><p>フリオーソ</p></a></td><td class="boba"><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr><tr><td rowspan="2" class="hinba"><a href="/db/uma/0553680" class="umalink_click" umacd="0553680"><p>カネショウメロン</p></a></td><td><p>*********</p></td></tr><tr><td class="hinba"><p>*********</p></td></tr></tbody></table>
+        </div><!-- /.section -->
+    </div><!-- /. -->
+
+</div><!-- /. -->
 </div>
 
 
 
+        <div class="sectionfull">
+        <div id="smart"><!-- <p class="annai">広告エリア</p> -->
+			
+				<div class="annai" style="display: none;">
+				
+					<p class="title">
+					有料メニューの案内
+					</p>
+					<p class="honbun" style="display: block;">
+					全データをご覧になりたい場合は、<a href="/mypage/entrycheck">競馬ブックSmart</a>にご登録下さい。
+					</p>
+					
+				</div><!-- /.annai -->
+				
+				<div class="banner_button smart">
+					<a href="/mypage/entrycheck">
+					<div class="text">
+						<p class="title">有料メニュー登録</p>
+						<p class="honbun">※制限されている内容をご覧になりたい場合は、有料メニューにご登録下さい。</p>
+						<!--	<p class="honbun">※全データをご覧いただけます。</p>	-->
+					</div>
+					</a>
+				</div></div><!-- /. -->
+        </div><!-- /.sectionfull -->
 
-<!-- 地方競馬フッターメニュー -->
+        <!-- スマホサイトの有料メニューのご案内 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'smart', 'smart' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+<!-- menutable start-->
+<div class="midasi_sub" style="display: none;">
+    <p><span class="left">開催当日情報</span></p>
+</div>
+
+
+<div class="menutable" style="display: none;">
+  <table class="open">
+    <tbody>
+      <tr>
+<!--
+        <td class="active">
+          <a href="/cyuou/top" title="Top">Top</a>
+        </td>
+-->
+        <td class="">
+          <a href="/cyuou/syusouba" title="今週の出走馬検索">今週の出走馬検索</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/tmmenu" title="TM直前情報">TM直前情報</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/todaymember" title="コンピュータの推奨">コンピュータの推奨</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="">
+          <a href="/cyuou/todaybunseki" title="今日を分析する">今日を分析する</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/win5/top" title="ＷＩＮ５">ＷＩＮ５</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/bestcyokyo" title="ベスト調教">ベスト調教</a>
+        </td>
+      </tr>
+      <tr>
+		  <td class="">
+			<a href="/cyuou/sokuhou" title="払戻金">払戻金</a>
+		  </td>
+        </tr>
+    </tbody>
+  </table><!-- /. -->
+</div><!-- menutable end-->
+
+
+<div class="midasi_sub" style="display: none;">
+    <p><span class="left">その他の情報</span></p>
+</div>
+
+
+<div class="menutable" style="display: none;">
+  <table class="open">
+    <tbody>
+      <tr>
+<!--
+        <td class="">
+          <a href="/cyuou/nittei/top" title="年間日程">年間日程</a>
+        </td>
+-->
+        <td class="">
+          <a href="/cyuou/jisouyotei" title="次走予定">次走予定</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/tourokuba" title="新規登録馬">新規登録馬</a>
+        </td>
+        <td class="">
+          <a href="/cyuou/masyoba" title="抹消馬">抹消馬</a>
+        </td>
+      </tr>
+<!--
+      <tr>
+        <td class="">
+          <a href="/cyuou/seisai" title="先週の制裁">先週の制裁</a>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+-->
+    </tbody>
+  </table><!-- /. -->
+</div><!-- menutable end-->
+
+
 <div class="bookbutton">
-	<a href="/chihou/top">
-	<p>地方競馬Topへ</p>
+	<a href="/cyuou/top">
+	<p>中央競馬Topへ</p>
 	</a>
 </div>
 
@@ -1338,7 +1577,61 @@ $(function(){
 
 				<!-- /.side start -->
 				<div class="side">
-					
+					  
+    
+        <div class="sectionfull">
+        <div id="omatase"><div class="omatase">
+  <p class="title">お待たせ最新案内</p>
+
+  
+        <p><a href="/cyuou/seiseki/202504000612">京都(日) 12R 成績速報</a></p>
+    
+  
+        <p><a href="/cyuou/seiseki/202505040512">東京(日) 12R 成績速報</a></p>
+    
+  
+        <p><a href="/cyuou/girigiri/202504000612">京都(日) 12R ギリギリ情報</a></p>
+    
+  
+        <p><a href="/cyuou/paddok/202504000612">京都(日) 12R パドック情報</a></p>
+    
+  
+        <p><a href="/cyuou/seiseki/202504000611">京都(日) 11R 成績速報</a></p>
+    
+  
+  <!-- 更新ボタン -->
+  <div class="button">
+    <p class="get_omatase">更新</p>
+  </div>
+</div><!-- /.omatase -->
+
+<script>
+$(function(){
+  /*-------------------------------------
+  お待たせ最新案内の更新
+  ---------------------------------------*/
+  $('.get_omatase').on('click', function(){
+    //confirm('お待たせ最新案内を更新しますか？');
+    ajaxload('omatase', 'omatase');
+  });
+});
+</script>
+</div><!-- /. -->
+        </div><!-- /.sectionfull -->
+
+        <!-- お待たせ最新案内を取得 -->
+        <div class="sectionfull">
+        <script type="text/javascript">
+        $( document ).ready( function() {
+            var cache = (new Date).getTime();
+            ajaxload( 'omatase', 'omatase' );
+        } );
+        </script>
+        </div><!-- /.sectionfull -->
+        
+
+  
+
 
 				</div><!-- /.side end  -->
 
@@ -1741,8 +2034,8 @@ $(function(){
 
 			//
 			
-				//alert('会員');
-				$('.js-free_drawermenu').css('display', 'none');
+				//alert('非会員');
+				$('.js-member_drawermenu').css('display', 'none');
 
 			
 		});
