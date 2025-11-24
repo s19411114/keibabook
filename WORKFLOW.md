@@ -10,13 +10,17 @@
 
 ## 🚀 作業開始手順
 
-### 毎回実行するコマンド
+> **注意**: プロジェクトの標準ワークフローは Docker です。必要がある場合のみ `LEGACY_VENV.md` を参照して venv を使用してください。
+
+**公式ドキュメント（一本化）**: `DEV_GUIDE.md` を必ず参照してください（詳細セットアップ、実行コマンド、トラブルシューティングを含む）。
+
+### 毎回実行するコマンド（推奨: Docker）
 ```bash
 # WSLでプロジェクトフォルダに移動
 cd /mnt/c/GeminiCLI/TEST/keibabook
 
-# 仮想環境を有効化
-source venv/bin/activate
+# Dockerで作業 (コンテナに入る)
+docker-compose exec app bash
 
 # 現在のブランチとステータスを確認
 git status
@@ -26,12 +30,12 @@ git log --oneline -5
 ### 初回セットアップ（1回のみ）
 ```bash
 cd /mnt/c/GeminiCLI/TEST/keibabook
-python3 -m venv venv
-source venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-playwright install chromium
+# 推奨: Docker を利用
+./docker-start.sh
 ```
+
+### 旧来の仮想環境(必要な場合のみ)
+旧来ワークフロー（ローカルvenv）を使う場合は `LEGACY_VENV.md` を参照してください。通常は Docker を推奨します。
 
 ---
 

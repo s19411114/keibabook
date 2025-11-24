@@ -6,24 +6,41 @@
 
 ## ⚡ クイックスタート（必読）
 
-> 📘 **詳細な手順書**: [WORKFLOW.md](WORKFLOW.md) - Git管理、トラブル対応など
+> **注意**: 今後はDockerを開発の標準ワークフローとします。ローカルの `venv` 手順は `LEGACY_VENV.md` のみに残し、通常は Docker を使用してください。
 
-### 🔧 初回セットアップ（1回のみ）
+> 📘 **詳細な手順書（統合）**: [DEV_GUIDE.md](DEV_GUIDE.md) - Docker-first の開発手順（公式）
+
+**セキュリティ**: 認証情報は `config/settings.yml` に書き込まないでください。`LOGIN_ID` / `LOGIN_PASSWORD` を環境変数で渡すことを推奨します。
+
+### 🔧 初回セットアップ（1回のみ｜推奨: Docker）
 
 ```bash
+cd /mnt/c/GeminiCLI/TEST/keibabook
+# 推奨: Docker (WSL/Ubuntu から起動)
+./docker-start.sh
+```
+
+### 🚀 作業開始コマンド（毎回実行｜Docker推奨）
+
+```bash
+cd /mnt/c/GeminiCLI/TEST/keibabook
+docker-compose exec app bash
+```
+
+### 🧭 旧来の仮想環境（Legacy: 必要ならこちら）
+
+Dockerを使わない場合に備え、従来の仮想環境手順は `LEGACY_VENV.md` にまとめています。通常は Docker を使ってください。
+
+> 詳細手順は `DEV_GUIDE.md` を参照してください。
+
+```bash
+# 旧来: 仮想環境を使う場合
 cd /mnt/c/GeminiCLI/TEST/keibabook
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 playwright install chromium
-```
-
-### 🚀 作業開始コマンド（毎回実行）
-
-```bash
-cd /mnt/c/GeminiCLI/TEST/keibabook
-source venv/bin/activate
 ```
 
 ### 📱 アプリ起動
@@ -108,9 +125,16 @@ keibabook/
 
 ---
 
-## 🐛 トラブルシューティング
+### 🐛 トラブルシューティング
 
-### ModuleNotFoundError
+**推奨**: Dockerを使っている場合はコンテナ内でコマンドを実行してください。例:
+
+```bash
+docker-compose exec app bash
+pip install -r requirements.txt
+```
+
+### ModuleNotFoundError (Legacy: venv を使う場合のみ)
 ```bash
 source venv/bin/activate  # 仮想環境を有効化
 pip install -r requirements.txt

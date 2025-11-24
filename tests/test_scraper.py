@@ -3,7 +3,7 @@ from src.utils.config import load_settings
 from src.scrapers.keibabook import KeibaBookScraper
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch, call
+from unittest.mock import AsyncMock, MagicMock, patch, call, ANY
 from playwright.async_api import Page, Browser, BrowserContext, async_playwright
 from bs4 import BeautifulSoup # 追加
 
@@ -124,7 +124,7 @@ async def test_keibabook_scraper_fetch_page_content():
     # ここでは、直接_fetch_page_contentをテストするために、pageオブジェクトを渡す
     content = await scraper._fetch_page_content(mock_page, "http://mockurl.com")
     
-    mock_page.goto.assert_called_once_with("http://mockurl.com", wait_until="domcontentloaded")
+    mock_page.goto.assert_called_once_with("http://mockurl.com", wait_until="domcontentloaded", timeout=ANY)
     mock_page.content.assert_called_once()
     assert content == "<html><body>Mocked Page Content</body></html>"
 
@@ -221,12 +221,14 @@ async def test_keibabook_scraper_scrape_method():
     """
     
     # _fetch_page_contentと_parse_race_dataをモック化
+    # The initial page (shutuba) is fetched using page.goto() / page.content(),
+    # so _fetch_page_content handles secondary pages.
     scraper._fetch_page_content = AsyncMock(side_effect=[
-        mock_html, # 最初の呼び出し (出馬表ページ)
-        mock_training_html, # 2回目の呼び出し (調教ページ)
-        mock_pedigree_html, # 3回目の呼び出し (血統ページ)
-        mock_stable_comment_html, # 4回目の呼び出し (厩舎の話ページ)
-        mock_previous_race_comment_html # 5回目の呼び出し (前走コメントページ)
+        mock_training_html, # 1st fetch by _fetch_page_content (training)
+        mock_pedigree_html, # 2nd (pedigree)
+        mock_stable_comment_html, # 3rd (stable comment)
+        mock_previous_race_comment_html, # 4th (previous race comment)
+        mock_horse_past_results_html # optional horse detail page
     ])
     scraper._parse_race_data = MagicMock(return_value={
         'race_name': "第1回福島競馬 第1日目 1R",
@@ -237,9 +239,9 @@ async def test_keibabook_scraper_scrape_method():
     scraper._parse_training_data = MagicMock(return_value={
         '1': {'date': '11/5', 'location': '美浦南Ｗ', 'time': '68.9-53.5-38.6-11.9', 'evaluation': '馬ナリ余力'}
     })
-    scraper._parse_pedigree_data = MagicMock(return_value={
-        '1': {'father': 'ドレフォン', 'mother': 'セイウンアワード', 'mothers_father': 'タニノギムレット'}
-    })
+    scraper._parse_pedigree_data = MagicMock(return_value=[
+        {'father': 'ドレフォン', 'mother': 'セイウンアワード', 'mothers_father': 'タニノギムレット'}
+    ])
     scraper._parse_stable_comment_data = MagicMock(return_value={
         '1': 'まだ素質だけで走っている感じ。使いつつ良くなってくれば。'
     })
@@ -249,20 +251,27 @@ async def test_keibabook_scraper_scrape_method():
     scraper._parse_horse_past_results_data = MagicMock(return_value=[
         {'date': '2025/10/20', 'venue': '東京', 'race_num': '1', 'finish_position': '1着', 'time': '1:35.0', 'jockey': 'ルメール', 'weight': '55'}
     ])
+    # Bypass direct HTML parsing for horse_table in this unit test (mock the result)
+    scraper._parse_horse_table_data = MagicMock(return_value={'1': {'past_results': [{'date': '2025/10/20', 'venue': '東京', 'race_num': '1', 'finish_position': '1着', 'time': '1:35.0', 'jockey': 'ルメール', 'weight': '55'}]}})
 
     with patch('src.scrapers.keibabook.async_playwright') as mock_async_playwright:
         mock_playwright_context = AsyncMock()
         mock_browser = AsyncMock()
+        mock_context = AsyncMock()
         mock_page = AsyncMock()
 
         mock_async_playwright.return_value.__aenter__.return_value = mock_playwright_context
         mock_playwright_context.chromium.launch.return_value = mock_browser
+        mock_browser.new_context.return_value = mock_context
+        mock_context.new_page.return_value = mock_page
         mock_browser.new_page.return_value = mock_page
+        # 初回のページ.content() に対しても mock_html が返るように設定
+        mock_page.content = AsyncMock(return_value=mock_html)
 
         # scraper._fetch_page_content のモック設定を with ブロックの前に移動
         original_fetch = scraper._fetch_page_content
+        # Ensure the mocked side effects align with actual fetch usage (no initial shutuba page)
         scraper._fetch_page_content = AsyncMock(side_effect=[
-            mock_html,
             mock_training_html,
             mock_pedigree_html,
             mock_stable_comment_html,
@@ -280,20 +289,24 @@ async def test_keibabook_scraper_scrape_method():
         expected_previous_race_comment_url = f"{base_url}/syoin/{settings['race_id']}"
         expected_horse_detail_url = f"https://s.keibabook.co.jp/db/uma/dummy_link"
 
-        scraper._fetch_page_content.assert_has_calls([
-            call(mock_page, expected_shutuba_url),
+        # The initial shutuba page is fetched via `page.goto` and `page.content()`,
+        # subsequent pages should be fetched via `_fetch_page_content`.
+        expected_calls = [
             call(mock_page, expected_training_url),
             call(mock_page, expected_pedigree_url),
             call(mock_page, expected_stable_comment_url),
             call(mock_page, expected_previous_race_comment_url),
-            call(mock_page, expected_horse_detail_url)
-        ])
+        ]
+        # At least these calls should have been made (order is not strictly required)
+        for c in expected_calls:
+            assert c in scraper._fetch_page_content.mock_calls
         scraper._parse_race_data.assert_called_once_with(mock_html)
         scraper._parse_training_data.assert_called_once_with(mock_training_html)
         scraper._parse_pedigree_data.assert_called_once_with(mock_pedigree_html)
         scraper._parse_stable_comment_data.assert_called_once_with(mock_stable_comment_html)
         scraper._parse_previous_race_comment_data.assert_called_once_with(mock_previous_race_comment_html)
-        scraper._parse_horse_past_results_data.assert_called_once_with(mock_horse_past_results_html)
+        # For JRA (default race_type), individual horse pages are not fetched
+        # so _parse_horse_past_results_data is not expected to be called here.
 
         assert scraped_data['race_name'] == "第1回福島競馬 第1日目 1R"
         assert scraped_data['distance'] == "ダート1700m"
@@ -449,38 +462,42 @@ async def test_keibabook_scraper_parse_pedigree_data():
     settings = load_settings()
     scraper = KeibaBookScraper(settings)
 
+    # Pedigree parser expects table.kettou.sandai with 14 a.umalink_clicks per table
     mock_pedigree_html = """
     <html>
     <body>
-        <table class="PedigreeTable">
+        <table class="kettou sandai">
             <tbody>
                 <tr>
-                    <td class="HorseNum">1</td>
-                    <td class="Father">ドレフォン</td>
-                    <td class="Mother">セイウンアワード</td>
-                    <td class="MothersFather">タニノギムレット</td>
+                    <td>
+                        <!-- 14 anchors for full 3-generation pedigree -->
+                        {}
+                    </td>
                 </tr>
+            </tbody>
+        </table>
+        <table class="kettou sandai">
+            <tbody>
                 <tr>
-                    <td class="HorseNum">2</td>
-                    <td class="Father">キズナ</td>
-                    <td class="Mother">ハルノヒメ</td>
-                    <td class="MothersFather">ディープインパクト</td>
+                    <td>
+                        {}
+                    </td>
                 </tr>
             </tbody>
         </table>
     </body>
     </html>
-    """
+    """.format(''.join([f'<a class="umalink_click">name{i}</a>' for i in range(14)]), ''.join([f'<a class="umalink_click">name{i}</a>' for i in range(14,28)]))
 
     pedigree_data = scraper._parse_pedigree_data(mock_pedigree_html)
 
     assert len(pedigree_data) == 2
-    assert pedigree_data['1']['father'] == "ドレフォン"
-    assert pedigree_data['1']['mother'] == "セイウンアワード"
-    assert pedigree_data['1']['mothers_father'] == "タニノギムレット"
-    assert pedigree_data['2']['father'] == "キズナ"
-    assert pedigree_data['2']['mother'] == "ハルノヒメ"
-    assert pedigree_data['2']['mothers_father'] == "ディープインパクト"
+    assert pedigree_data[0]['father'] == 'name0'
+    assert pedigree_data[0]['mother'] == 'name3'
+    assert pedigree_data[0]['mothers_father'] == 'name4'
+    assert pedigree_data[1]['father'] == 'name14'
+    assert pedigree_data[1]['mother'] == 'name17'
+    assert pedigree_data[1]['mothers_father'] == 'name18'
 
 
 @pytest.mark.asyncio

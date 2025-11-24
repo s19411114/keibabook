@@ -24,6 +24,20 @@ cd /mnt/c/GeminiCLI/TEST/keibabook
 
 # Docker起動
 ./docker-start.sh
+
+### 認証情報（環境変数）
+このリポジトリでは認証情報は `config/settings.yml` に平文保存しないでください。代わりに以下の方法を推奨します。
+
+1. Docker 実行時に環境変数を設定する
+```bash
+export LOGIN_ID="your_id"
+export LOGIN_PASSWORD="your_password"
+```
+2. またはプロジェクト直下に `.env` を作成して `docker-compose` に読み込ませる（`.env` は `.gitignore` に追加してください）
+```
+LOGIN_ID=your_id
+LOGIN_PASSWORD=your_password
+```
 ```
 
 ### 代替: Windows から起動 (内部的にWSL経由)
@@ -33,6 +47,8 @@ docker-start.bat
 ```
 
 ダブルクリックでも起動できます（内部的にWSL経由で実行されます）
+
+> ⚠️ **注意**: Docker 使用時はプロジェクト直下の `venv/` は無視してください。コンテナ内で実行するため、ホストの仮想環境をアクティベートしないでください。
 
 ---
 
@@ -161,8 +177,9 @@ keibabook/
 - pandas
 - その他 (requirements.txt参照)
 
-**重要**: venvの依存関係は引き継がれません。
-Dockerは`requirements.txt`から全て再インストールします。
+**重要**: venvの依存関係は引き継がれません。Dockerは`requirements.txt`から全て再インストールします。
+
+> 補足: Dockerfile には `playwright install chromium` を含めています。ローカルで venv を使って実行する場合のみ、`playwright install chromium` を手動で実行してください。
 
 ---
 

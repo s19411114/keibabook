@@ -6,24 +6,21 @@
 
 ---
 
-## 🐳 開発環境
+## 🐳 開発環境（概要）
 
-**このプロジェクトはDocker Compose環境を使用します。**
-
-### 起動方法
+このプロジェクトは Docker Compose を使用します。詳細・手順は `DEV_GUIDE.md` を参照してください。
 
 ```bash
-# Windows から
-docker-start.bat
-
-# WSL から
+# WSL (推奨)
 ./docker-start.sh
+
+# Windows (代替)
+docker-start.bat
 ```
 
 ### 詳細
 
-- [DOCKER_SETUP.md](DOCKER_SETUP.md) - 完全なセットアップガイド
-- `.agent/workflows/docker.md` - ワークフローコマンド
+詳細は `DOCKER_SETUP.md` と `DEV_GUIDE.md` を参照してください。
 
 ---
 

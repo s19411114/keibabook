@@ -54,6 +54,9 @@ Thumbs.db
 cookies.txt
 cookies.json
 *.cookie
+# Example env files
+.env
+.env.*
 # config/settings.yml # Commented out to allow tracking of template, but be careful not to commit secrets!
 
 # Temporary files

@@ -2,36 +2,31 @@
 description: Docker環境の起動と使用方法
 ---
 
-# Docker環境ワークフロー
+# Docker環境ワークフロー（簡易）
 
-このプロジェクトはDocker Compose環境を使用します。
+このドキュメントは簡易ガイドです。詳細な手順とトラブルシューティングについては `DEV_GUIDE.md` を参照してください。
 
-## 🚀 起動方法
+## 簡易起動方法（WSL推奨）
 
-### Windows から起動
-
-// turbo
-```cmd
-cd c:\GeminiCLI\TEST\keibabook
-docker-start.bat
-```
-
-### WSL から起動
-
-// turbo
 ```bash
 cd /mnt/c/GeminiCLI/TEST/keibabook
-chmod +x docker-start.sh
 ./docker-start.sh
 ```
 
-## 💻 コンテナ内で作業
+## コンテナ内での基本操作
 
-### コンテナに入る
-
-// turbo
 ```bash
+# コンテナに入る
 docker-compose exec app bash
+
+# スクレイピング
+python run_scraper.py
+
+# Streamlit起動
+streamlit run app.py
+
+# テスト実行
+pytest tests/
 ```
 
 ### スクレイピング実行
@@ -70,17 +65,9 @@ exit
 docker-compose down
 ```
 
-## 🔧 メンテナンス
+## メンテナンス
 
-### 依存関係を追加した場合
-
-1. `requirements.txt` を編集
-2. イメージを再ビルド:
-
-// turbo
-```bash
-docker-compose build
-```
+`DOCKER_SETUP.md` に詳細が書かれています。`requirements.txt` を更新した場合は `docker-compose build` を実行してください。
 
 ### トラブル時
 
@@ -101,6 +88,6 @@ docker-compose up -d
 - **ファイル変更は自動同期**: コンテナ内外で即座に反映
 - **データは永続化**: `data/`フォルダは保持されます
 
-## 📚 詳細ドキュメント
+## 詳細ドキュメント
 
-詳細は [DOCKER_SETUP.md](../DOCKER_SETUP.md) を参照してください。
+詳細が必要な場合は `DEV_GUIDE.md` 及び `DOCKER_SETUP.md` を参照してください。

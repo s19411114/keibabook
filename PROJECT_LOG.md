@@ -31,14 +31,15 @@
 
 ### 3.1. 開発環境のセットアップ
 
+> **注意**: プロジェクトの標準は Docker です。以下の venv 手順はレガシーです。Docker のセットアップ方法は `DOCKER_SETUP.md` を参照してください。
+
 1.  **プロジェクトディレクトリに移動:**
     ```bash
     cd /mnt/c/geminicli/test/keibabook
     ```
-2.  **仮想環境をアクティベート:**
+2.  **旧来の仮想環境をアクティベート (レガシー)**
     ```bash
-bash
-source venv/bin/activate
+    source venv/bin/activate
     ```
     (プロンプトの先頭に `(venv)` が表示される)
 

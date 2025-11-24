@@ -21,6 +21,9 @@ services:
       - PYTHONUNBUFFERED=1
       # Playwrightの設定
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      # ログイン情報（開発用）: コンテナへ環境変数で安全に渡してください
+      - LOGIN_ID=${LOGIN_ID:-}
+      - LOGIN_PASSWORD=${LOGIN_PASSWORD:-}
     stdin_open: true
     tty: true
     # コンテナ起動時にbashを実行

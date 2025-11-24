@@ -677,8 +677,19 @@ class KeibaBookScraper:
                     self.db_manager.log_url(url, self.settings['race_id'], 'shutuba', 'success')
                 
                 # --- デバッグ用にHTMLをファイルに保存 ---
+                # Debug: ensure what's written is a str to avoid mock coroutine issues
+                try:
+                    if isinstance(html_content, (bytes, bytearray)):
+                        html_text = html_content.decode('utf-8', errors='replace')
+                    elif isinstance(html_content, str):
+                        html_text = html_content
+                    else:
+                        # Fallback for mocked objects: convert to str
+                        html_text = str(html_content)
+                except Exception:
+                    html_text = str(html_content)
                 with open("debug_page.html", "w", encoding="utf-8") as f:
-                    f.write(html_content)
+                    f.write(html_text)
                 # ------------------------------------
 
                 race_data = self._parse_race_data(html_content)

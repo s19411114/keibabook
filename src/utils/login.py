@@ -12,7 +12,7 @@ class KeibaBookLogin:
     LOGIN_URL = "https://s.keibabook.co.jp/login/login"
     
     @staticmethod
-    async def login(page: Page, login_id: str, password: str, cookie_file: str = 'cookies.json') -> bool:
+    async def login(page: Page, login_id: str, password: str, cookie_file: str = 'cookies.json', save_cookies: bool = True) -> bool:
         """
         Perform login and save cookies
         
@@ -51,11 +51,12 @@ class KeibaBookLogin:
             if "login" not in page.url:
                 logger.info(f"Login SUCCESS! Redirected to: {page.url}")
                 
-                # Save cookies
-                cookies = await page.context.cookies()
-                with open(cookie_file, 'w', encoding='utf-8') as f:
-                    json.dump(cookies, f, indent=2, ensure_ascii=False)
-                logger.info(f"Cookies saved to {cookie_file}")
+                # Save cookies (optional) for faster subsequent runs
+                if save_cookies and cookie_file:
+                    cookies = await page.context.cookies()
+                    with open(cookie_file, 'w', encoding='utf-8') as f:
+                        json.dump(cookies, f, indent=2, ensure_ascii=False)
+                    logger.info(f"Cookies saved to {cookie_file}")
                 return True
             else:
                 logger.error("Login FAILED. Still on login page.")

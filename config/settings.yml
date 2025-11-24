@@ -14,11 +14,12 @@ seiseki_url: "https://s.keibabook.co.jp/cyuou/seiseki/202505040611"
 output_dir: "data"
 # Playwright オプション
 use_playwright: true
-playwright_headless: false
+playwright_headless: true
 playwright_timeout: 30000  # ms
 # 重複チェックを無効化（テスト・デバッグ用）
 skip_duplicate_check: true  # true: 重複チェックをスキップ, false: 重複チェックを実行（デフォルト）
 # ログイン情報（自動ログイン用）
 # ⚠️ 以下にあなたのログイン情報を入力してください
-login_id: "s19411114"
-login_password: "19741209"
+login_id: ""
+login_password: ""
+# 認証情報は環境変数で管理してください（推奨）: `LOGIN_ID`, `LOGIN_PASSWORD`
