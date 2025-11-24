@@ -91,6 +91,27 @@ class KeibaBookScraper:
                 horse_num_elem = row.select_one(".umaban")
                 horse_name_elem = row.select_one(".kbamei a")
                 jockey_elem = row.select_one(".kisyu a")
+                
+                # 予想印 (tmyoso)
+                mark_elem = row.select_one(".tmyoso")
+                mark = mark_elem.get_text(strip=True) if mark_elem else ""
+                
+                # オッズ・人気 (lh1クラスなどにある場合が多いが、構造が複雑なためテキストから抽出)
+                # 例: 436(+20)188.315人気 -> 188.3, 15人気
+                odds_pop_elem = row.select_one(".lh1")
+                odds = ""
+                popularity = ""
+                if odds_pop_elem:
+                    text = odds_pop_elem.get_text(strip=True)
+                    # 簡易的な抽出（正規表現などが望ましいが、まずはテキスト全体を保存）
+                    # "人気"で分割してみる
+                    if "人気" in text:
+                        parts = text.split("人気")
+                        if len(parts) > 0:
+                            # 直前の数値をオッズ、その前を人気と推定
+                            # ここでは単純にテキスト全体を保存しておく
+                            pass
+                    odds = text # 一旦そのまま保存
 
                 if horse_num_elem and horse_name_elem and jockey_elem:
                     horse_name_link = horse_name_elem['href'] if horse_name_elem.has_attr('href') else ""
@@ -98,7 +119,9 @@ class KeibaBookScraper:
                         'horse_num': horse_num_elem.get_text(strip=True),
                         'horse_name': horse_name_elem.get_text(strip=True),
                         'jockey': jockey_elem.get_text(strip=True),
-                        'horse_name_link': horse_name_link
+                        'horse_name_link': horse_name_link,
+                        'prediction_mark': mark,
+                        'odds_text': odds # 後で加工できるようにテキスト全体を保存
                     })
         race_data['horses'] = horses
         return race_data
@@ -172,8 +195,32 @@ class KeibaBookScraper:
 
     def _parse_pedigree_data(self, html_content):
         """
-        血統データをパース（修正版）
+        血統データをパース（三代血統完全版）
         実際のHTML構造: table.kettou.sandai
+        
+        ログイン済みの場合、三代血統全体が取得可能:
+        
+        1代前 (2頭):
+        - links[0]: 父
+        - links[3]: 母
+        
+        2代前 (4頭):
+        - links[1]: 父父 (父の父)
+        - links[2]: 父母 (父の母)
+        - links[4]: 母父 (母の父)
+        - links[5]: 母母 (母の母)
+        
+        3代前 (8頭):
+        - links[6]: 父父父
+        - links[7]: 父父母
+        - links[8]: 父母父
+        - links[9]: 父母母
+        - links[10]: 母父父
+        - links[11]: 母父母
+        - links[12]: 母母父
+        - links[13]: 母母母
+        
+        合計: 2 + 4 + 8 = 14頭
         
         注意: 血統ページには馬番が含まれていないため、
         出馬表の馬の順番と血統テーブルの順番が一致していると仮定
@@ -190,20 +237,92 @@ class KeibaBookScraper:
         for table in pedigree_tables:
             # テーブル内のリンクを取得
             links = table.select("a.umalink_click")
-            if len(links) >= 3:
-                # 父馬（最初のリンク）
-                father = links[0].get_text(strip=True).replace('\n', ' ')
+            
+            if len(links) >= 14:
+                # 三代血統完全版（14頭）
+                pedigree_data = {
+                    # 1代前
+                    'father': links[0].get_text(strip=True).replace('\n', ' '),
+                    'mother': links[3].get_text(strip=True).replace('\n', ' '),
+                    
+                    # 2代前
+                    'father_father': links[1].get_text(strip=True).replace('\n', ' '),
+                    'father_mother': links[2].get_text(strip=True).replace('\n', ' '),
+                    'mothers_father': links[4].get_text(strip=True).replace('\n', ' '),
+                    'mothers_mother': links[5].get_text(strip=True).replace('\n', ' '),
+                    
+                    # 3代前
+                    'father_father_father': links[6].get_text(strip=True).replace('\n', ' '),
+                    'father_father_mother': links[7].get_text(strip=True).replace('\n', ' '),
+                    'father_mother_father': links[8].get_text(strip=True).replace('\n', ' '),
+                    'father_mother_mother': links[9].get_text(strip=True).replace('\n', ' '),
+                    'mothers_father_father': links[10].get_text(strip=True).replace('\n', ' '),
+                    'mothers_father_mother': links[11].get_text(strip=True).replace('\n', ' '),
+                    'mothers_mother_father': links[12].get_text(strip=True).replace('\n', ' '),
+                    'mothers_mother_mother': links[13].get_text(strip=True).replace('\n', ' ')
+                }
                 
+                pedigree_list.append(pedigree_data)
+                logger.debug(f"三代血統完全取得(14頭): 父={pedigree_data['father']}, 母={pedigree_data['mother']}")
+            elif len(links) >= 6:
+                # 二代血統まで（6頭）
+                pedigree_data = {
+                    # 1代前
+                    'father': links[0].get_text(strip=True).replace('\n', ' '),
+                    'mother': links[3].get_text(strip=True).replace('\n', ' '),
+                    
+                    # 2代前
+                    'father_father': links[1].get_text(strip=True).replace('\n', ' '),
+                    'father_mother': links[2].get_text(strip=True).replace('\n', ' '),
+                    'mothers_father': links[4].get_text(strip=True).replace('\n', ' '),
+                    'mothers_mother': links[5].get_text(strip=True).replace('\n', ' '),
+                    
+                    # 3代前（データなし）
+                    'father_father_father': '',
+                    'father_father_mother': '',
+                    'father_mother_father': '',
+                    'father_mother_mother': '',
+                    'mothers_father_father': '',
+                    'mothers_father_mother': '',
+                    'mothers_mother_father': '',
+                    'mothers_mother_mother': ''
+                }
+                
+                pedigree_list.append(pedigree_data)
+                logger.warning(f"二代血統のみ(6頭): 父={pedigree_data['father']}, 母={pedigree_data['mother']}")
+            elif len(links) >= 3:
+                # ログインしていない場合（父、母、母父のみ）
                 # 母馬と母父を取得（hinbaクラス内）
                 mother_links = table.select("td.hinba a.umalink_click")
                 mother = mother_links[0].get_text(strip=True).replace('\n', ' ') if len(mother_links) > 0 else ''
                 mothers_father = mother_links[1].get_text(strip=True).replace('\n', ' ') if len(mother_links) > 1 else ''
                 
-                pedigree_list.append({
-                    'father': father,
+                pedigree_data = {
+                    # 1代前
+                    'father': links[0].get_text(strip=True).replace('\n', ' '),
                     'mother': mother,
-                    'mothers_father': mothers_father
-                })
+                    
+                    # 2代前
+                    'father_father': '',
+                    'father_mother': '',
+                    'mothers_father': mothers_father,
+                    'mothers_mother': '',
+                    
+                    # 3代前（データなし）
+                    'father_father_father': '',
+                    'father_father_mother': '',
+                    'father_mother_father': '',
+                    'father_mother_mother': '',
+                    'mothers_father_father': '',
+                    'mothers_father_mother': '',
+                    'mothers_mother_father': '',
+                    'mothers_mother_mother': ''
+                }
+                
+                pedigree_list.append(pedigree_data)
+                logger.warning(f"血統データ不完全（ログイン未済?）: 父={pedigree_data['father']}, 母={pedigree_data['mother']}")
+            else:
+                logger.warning(f"血統データ不足: {len(links)}個のリンクのみ")
         
         logger.debug(f"血統データ取得: {len(pedigree_list)}頭分")
         return pedigree_list

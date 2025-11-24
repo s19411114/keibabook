@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: keibabook-dev
+    volumes:
+      # プロジェクトディレクトリをマウント
+      - .:/app
+      # venvは除外 (Dockerは独自のPython環境を使用)
+      - /app/venv
+      # __pycache__も除外
+      - /app/__pycache__
+    ports:
+      # Streamlit用ポート
+      - "8501:8501"
+      # 追加のポート (必要に応じて)
+      - "8502:8502"
+    environment:
+      # Python出力をバッファリングしない (ログがリアルタイムで表示される)
+      - PYTHONUNBUFFERED=1
+      # Playwrightの設定
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    stdin_open: true
+    tty: true
+    # コンテナ起動時にbashを実行
+    command: bash

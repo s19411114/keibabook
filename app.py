@@ -534,33 +534,39 @@ with tab2:
     # ファイル名からレース情報を抽出
     race_data_map = {}
     for json_file in json_files:
-        filename = json_file.stem  # 例: 20251122_福島11R
+        filename = json_file.stem  # 例: 20251124_tokyo11R
         try:
-            # ファイル名をパース
+            # 新しいファイル名形式に対応 (YYYYMMDD_venueRR)
             parts = filename.split('_')
             if len(parts) >= 2:
-                date_str = parts[0]  # 20251122
-                venue_race = parts[1]  # 福島11R
+                date_str = parts[0]  # 20251124
+                venue_race = parts[1]  # tokyo11R
                 
                 # 日付をフォーマット
-                year = date_str[:4]
-                month = date_str[4:6]
-                day = date_str[6:8]
-                date_key = f"{year}-{month}-{day}"
-                
-                # 会場とレース番号を抽出
-                import re
-                match = re.match(r'(.+?)(\d+)R', venue_race)
-                if match:
-                    venue = match.group(1)
-                    race_num = int(match.group(2))
+                if len(date_str) == 8:
+                    year = date_str[:4]
+                    month = date_str[4:6]
+                    day = date_str[6:8]
+                    date_key = f"{year}-{month}-{day}"
                     
-                    if date_key not in race_data_map:
-                        race_data_map[date_key] = {}
-                    if venue not in race_data_map[date_key]:
-                        race_data_map[date_key][venue] = {}
-                    
-                    race_data_map[date_key][venue][race_num] = json_file
+                    # 会場とレース番号を抽出
+                    import re
+                    # 日本語会場名または英語会場名に対応
+                    match = re.match(r'([a-zA-Z]+|[^0-9]+)(\d+)R', venue_race)
+                    if match:
+                        venue = match.group(1)
+                        race_num = int(match.group(2))
+                        
+                        # 英語会場名を日本語に変換（必要なら）
+                        venue_map = {"tokyo": "東京", "kyoto": "京都", "fukushima": "福島", "hanshin": "阪神", "nakayama": "中山"}
+                        venue_jp = venue_map.get(venue.lower(), venue)
+                        
+                        if date_key not in race_data_map:
+                            race_data_map[date_key] = {}
+                        if venue_jp not in race_data_map[date_key]:
+                            race_data_map[date_key][venue_jp] = {}
+                        
+                        race_data_map[date_key][venue_jp][race_num] = json_file
         except Exception as e:
             logger.warning(f"ファイル名パースエラー: {filename} - {e}")
     
@@ -568,69 +574,54 @@ with tab2:
         # 日付ごとに表示
         for date_key in sorted(race_data_map.keys(), reverse=True):
             year, month, day = date_key.split('-')
-            st.subheader(f"📅 {year}年{month}月{day}日")
-            
-            venues = race_data_map[date_key]
-            
-            # 会場ごとにグリッド表示
-            for venue in sorted(venues.keys()):
-                st.markdown(f"**{venue}**")
+            with st.expander(f"📅 {year}年{month}月{day}日", expanded=True):
+                venues = race_data_map[date_key]
                 
-                # 12レース分のボタンを横並びで表示
-                cols = st.columns(12)
-                for race_num in range(1, 13):
-                    with cols[race_num - 1]:
-                        if race_num in venues[venue]:
-                            # データあり - ダウンロードボタン
-                            json_file = venues[venue][race_num]
-                            with open(json_file, 'r', encoding='utf-8') as f:
-                                json_data = json.load(f)
-                            json_str = json.dumps(json_data, ensure_ascii=False, indent=2)
-                            
-                            st.download_button(
-                                label=f"●{race_num}R",
-                                data=json_str,
-                                file_name=f"{json_file.stem}.json",
-                                mime="application/json",
-                                key=f"download_{date_key}_{venue}_{race_num}",
-                                help=f"{venue} {race_num}Rのデータをダウンロード"
-                            )
-                        else:
-                            # データなし
-                            st.markdown(f"<div style='text-align: center; color: #666;'>○{race_num}R</div>", unsafe_allow_html=True)
-                
-                st.markdown("---")
-    else:
-        st.info("まだデータがありません。スクレイピングを実行してください。")
+                # 会場ごとにグリッド表示
+                for venue in sorted(venues.keys()):
+                    st.markdown(f"**{venue}**")
+                    
+                    # 12レース分のボタンを横並びで表示
+                    cols = st.columns(12)
+                    for race_num in range(1, 13):
+                        with cols[race_num - 1]:
+                            if race_num in venues[venue]:
+                                # データあり - 選択ボタン
+                                if st.button(f"●{race_num}R", key=f"sel_{date_key}_{venue}_{race_num}"):
+                                    st.session_state.selected_file = venues[venue][race_num]
+                            else:
+                                # データなし
+                                st.markdown(f"<div style='text-align: center; color: #666; font-size: 0.8em; padding-top: 5px;'>○{race_num}</div>", unsafe_allow_html=True)
+                    st.markdown("---")
 
-with tab3:
-    st.header("🏇 トラックバイアス分析")
-    st.markdown("レース結果から馬場の傾向を分析します（上位6頭のデータを使用）")
-    
-    # Netkeiba結果URL入力
-    st.subheader("📍 Netkeiba結果ページ")
-    
-    col_url1, col_url2 = st.columns([3, 1])
-    
-    with col_url1:
-        result_url = st.text_input(
-            "結果ページURL",
-            value="https://race.netkeiba.com/race/result.html?race_id=202508040611",
-            help="NetkeibaのレースIDを含むURL"
-        )
-    
-    with col_url2:
-        st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
-        fetch_button = st.button("🔍 取得", type="primary")
-    
-    # レースIDを抽出
-    import re
-    race_id_match = re.search(r'race_id=(\d+)', result_url)
-    
-    if fetch_button and race_id_match:
-        race_id = race_id_match.group(1)
-        
-        with st.spinner(f"レース結果を取得中... (ID: {race_id})"):
+        # 選択されたファイルのデータを表示
+        if 'selected_file' in st.session_state and st.session_state.selected_file:
+            json_file = st.session_state.selected_file
+            st.markdown("### 📝 選択中のレースデータ")
+            
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    json_data = json.load(f)
+                
+                # 基本情報表示
+                st.info(f"📍 {json_data.get('race_name', '不明なレース')} ({json_data.get('race_grade', '-')})")
+                
+                # データ整形（コピー用）
+                copy_text = f"レース名: {json_data.get('race_name')}\n"
+                copy_text += f"グレード: {json_data.get('race_grade')}\n"
+                copy_text += "-" * 30 + "\n"
+                
+                horses = json_data.get('horses', [])
+                
+                # テーブルデータ作成
+                table_data = []
+                for horse in horses:
+                    # コピー用テキスト作成
+                    mark = horse.get('prediction_mark', '-')
+                    odds = horse.get('odds_text', '-')
+                    pedigree = horse.get('pedigree_data', {})
+                    father = pedigree.get('father', '-')
+                    mother = pedigree.get('mother', '-')
             # Netkeibaスクレイパーをインポート
             from src.scrapers.netkeiba_result import NetkeibaResultScraper
             

@@ -36,7 +36,7 @@ output/
 shutuba_normalized/
 
 # Logs
-*.log
+# *.log
 logs/
 
 # IDE
@@ -54,7 +54,40 @@ Thumbs.db
 cookies.txt
 cookies.json
 *.cookie
+# config/settings.yml # Commented out to allow tracking of template, but be careful not to commit secrets!
 
 # Temporary files
 tmp/
 temp/
+
+# Debug files
+debug_*.html
+debug_*.txt
+*_temp.txt
+schedule_temp.txt
+
+# Temporary JSON files
+output.json
+fixed_*.json
+shutuba_*.json
+past_results.json
+pedigree.json
+previous_race_comment.json
+stable_comment.json
+training.json
+pedigree_queue*.json
+
+# Raw HTML dumps
+raw_html/
+raw_comments/
+
+# Backup directories
+backup_*/
+
+# Temporary files
+noisy_list.txt
+out
+tall -e .
+
+# Docker
+.dockerignore
