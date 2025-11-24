@@ -170,25 +170,42 @@ class KeibaBookScraper:
         return training_data
 
     def _parse_pedigree_data(self, html_content):
+        """
+        血統データをパース（修正版）
+        実際のHTML構造: table.kettou.sandai
+        
+        注意: 血統ページには馬番が含まれていないため、
+        出馬表の馬の順番と血統テーブルの順番が一致していると仮定
+        
+        Returns:
+            リスト形式で血統データを返す（後で馬番とマッチング）
+        """
         soup = BeautifulSoup(html_content, 'html.parser')
-        pedigree_data = {}
+        pedigree_list = []
 
-        pedigree_table = soup.select_one(".PedigreeTable tbody")
-        if pedigree_table:
-            for row in pedigree_table.find_all('tr'):
-                horse_num_elem = row.select_one(".HorseNum")
-                father_elem = row.select_one(".Father")
-                mother_elem = row.select_one(".Mother")
-                mothers_father_elem = row.select_one(".MothersFather")
-
-                if horse_num_elem and father_elem and mother_elem and mothers_father_elem:
-                    horse_num = horse_num_elem.get_text(strip=True)
-                    pedigree_data[horse_num] = {
-                        'father': father_elem.get_text(strip=True),
-                        'mother': mother_elem.get_text(strip=True),
-                        'mothers_father': mothers_father_elem.get_text(strip=True)
-                    }
-        return pedigree_data
+        # 実際のHTML構造: table.kettou.sandai
+        pedigree_tables = soup.select("table.kettou.sandai")
+        
+        for table in pedigree_tables:
+            # テーブル内のリンクを取得
+            links = table.select("a.umalink_click")
+            if len(links) >= 3:
+                # 父馬（最初のリンク）
+                father = links[0].get_text(strip=True).replace('\n', ' ')
+                
+                # 母馬と母父を取得（hinbaクラス内）
+                mother_links = table.select("td.hinba a.umalink_click")
+                mother = mother_links[0].get_text(strip=True).replace('\n', ' ') if len(mother_links) > 0 else ''
+                mothers_father = mother_links[1].get_text(strip=True).replace('\n', ' ') if len(mother_links) > 1 else ''
+                
+                pedigree_list.append({
+                    'father': father,
+                    'mother': mother,
+                    'mothers_father': mothers_father
+                })
+        
+        logger.debug(f"血統データ取得: {len(pedigree_list)}頭分")
+        return pedigree_list
 
     def _parse_stable_comment_data(self, html_content):
         soup = BeautifulSoup(html_content, 'html.parser')
@@ -564,12 +581,13 @@ class KeibaBookScraper:
                     logger.info(f"スキップ（既取得）: {pedigree_url}")
                     pedigree_html_content = ""
                 
-                parsed_pedigree_data = self._parse_pedigree_data(pedigree_html_content) if pedigree_html_content else {}
+                parsed_pedigree_data = self._parse_pedigree_data(pedigree_html_content) if pedigree_html_content else []
 
-                for horse in race_data.get('horses', []):
-                    horse_num = horse.get('horse_num')
-                    if horse_num in parsed_pedigree_data:
-                        horse['pedigree_data'] = parsed_pedigree_data[horse_num]
+                # 血統データをインデックスでマッチング（血統ページには馬番がないため）
+                horses = race_data.get('horses', [])
+                for idx, horse in enumerate(horses):
+                    if idx < len(parsed_pedigree_data):
+                        horse['pedigree_data'] = parsed_pedigree_data[idx]
                     else:
                         horse['pedigree_data'] = {}
 
