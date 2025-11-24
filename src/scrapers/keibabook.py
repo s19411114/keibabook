@@ -1,4 +1,5 @@
 import os
+import json
 import time
 import asyncio
 from src.utils.config import load_settings
@@ -493,14 +494,52 @@ class KeibaBookScraper:
     async def scrape(self):
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=self.settings.get("playwright_headless", True))
-            page = await browser.new_page()
+            context = await browser.new_context()
+            page = await context.new_page()
             try:
                 # タイムアウト設定（任意）
                 timeout_ms = self.settings.get("playwright_timeout")
                 if timeout_ms:
                     page.set_default_timeout(timeout_ms)
 
+                # Cookieを読み込む（存在する場合）
+                cookie_file = self.settings.get('cookie_file', 'cookies.json')
+                if os.path.exists(cookie_file):
+                    try:
+                        with open(cookie_file, 'r', encoding='utf-8') as f:
+                            cookies = json.load(f)
+                        await context.add_cookies(cookies)
+                        logger.info(f"Cookieを読み込みました: {cookie_file}")
+                    except Exception as e:
+                        logger.warning(f"Cookie読み込みエラー: {e}")
+                
+                # ログイン確認: まず対象URLにアクセスしてログイン状態を確認
                 url = self.shutuba_url
+                await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms or 30000)
+                
+                # ログイン状態をチェック（HTMLに「ログインしていない」があるか）
+                content = await page.content()
+                if "ログインしていない" in content or "ログイン" in await page.title():
+                    logger.warning("ログインが必要です。自動ログインを実行します...")
+                    
+                    # 自動ログイン
+                    login_id = self.settings.get('login_id')
+                    password = self.settings.get('login_password')
+                    
+                    if login_id and password:
+                        from src.utils.login import KeibaBookLogin
+                        login_success = await KeibaBookLogin.login(page, login_id, password, cookie_file)
+                        
+                        if login_success:
+                            logger.info("自動ログイン成功！")
+                            # ログイン後、再度対象URLへ
+                            await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms or 30000)
+                        else:
+                            logger.error("自動ログイン失敗。無料範囲のデータのみ取得されます。")
+                    else:
+                        logger.error("ログイン情報が設定されていません（login_id, login_password）")
+                else:
+                    logger.info("ログイン済み")
                 
                 # 重複チェック（DBマネージャーが設定されている場合）
                 if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
@@ -512,7 +551,7 @@ class KeibaBookScraper:
                 # レート制御: サイト負担を軽減
                 await self.rate_limiter.wait()
                 
-                html_content = await self._fetch_page_content(page, url)
+                html_content = await page.content()
                 
                 # URL取得をログに記録
                 if self.db_manager:
