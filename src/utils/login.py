@@ -105,39 +105,106 @@ class KeibaBookLogin:
 
     @staticmethod
     async def is_logged_in(page: Page, test_url: str = "https://s.keibabook.co.jp/") -> bool:
-        """Return True if navigation to test_url does not redirect to login."""
+        """
+        Return True if navigation to test_url does not redirect to login.
+        Also checks for premium content indicators.
+        """
         try:
-            await page.goto(test_url, wait_until='domcontentloaded', timeout=10000)
+            await page.goto(test_url, wait_until='domcontentloaded', timeout=15000)
+            current_url = page.url
+            
             # If the URL contains 'login', assume not logged in
-            if 'login' in page.url:
+            if 'login' in current_url:
+                logger.debug(f"Login check failed: redirected to login page ({current_url})")
                 return False
+            
+            # Additional check: look for premium content indicators in the page
+            # This helps detect cases where cookies are loaded but session is invalid
+            try:
+                content = await page.content()
+                # Check if page contains login prompt or restricted content message
+                if 'ログインしてください' in content or 'ログインが必要です' in content:
+                    logger.debug("Login check failed: page contains login prompt")
+                    return False
+                
+                # For pedigree/kettou pages, check if full pedigree data is available
+                if 'kettou' in current_url:
+                    # Count pedigree links - should have 14 for full 3-generation pedigree
+                    from bs4 import BeautifulSoup
+                    soup = BeautifulSoup(content, 'html.parser')
+                    pedigree_links = soup.select("table.kettou.sandai a.umalink_click")
+                    if len(pedigree_links) < 6:
+                        logger.debug(f"Login check: pedigree links={len(pedigree_links)} (expected >=6 for logged in)")
+                        # This might indicate not logged in, but don't fail completely
+            except Exception as content_check_err:
+                logger.debug(f"Content check error (non-fatal): {content_check_err}")
+            
+            logger.debug(f"Login check passed: on page {current_url}")
             return True
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Login check error: {e}")
             return False
 
     @staticmethod
-    async def ensure_logged_in(context, login_id: str, password: str, cookie_file: str = 'cookies.json', save_cookies: bool = True, test_url: str = 'https://s.keibabook.co.jp/') -> bool:
-        """Ensure the context is logged in. Try load cookies first; if not valid, perform login."""
+    async def ensure_logged_in(context, login_id: str, password: str, cookie_file: str = 'cookies.json', save_cookies: bool = True, test_url: str = 'https://s.keibabook.co.jp/', page=None) -> bool:
+        """
+        Ensure the context is logged in. Try load cookies first; if not valid, perform login.
+        
+        Args:
+            context: Playwright browser context
+            login_id: Login ID
+            password: Password
+            cookie_file: Cookie file path
+            save_cookies: Whether to save cookies after login
+            test_url: URL to test login status
+            page: Optional - if provided, use this page instead of creating a new one.
+                  The page will NOT be closed, allowing the caller to continue using it.
+        
+        Returns:
+            bool: True if logged in successfully
+        """
         # Try to load cookies into context
         loaded = await KeibaBookLogin.load_cookies_to_context(context, cookie_file)
-        page = await context.new_page()
+        
+        # Use provided page or create a new one
+        created_page = False
+        if page is None:
+            page = await context.new_page()
+            created_page = True
+        
         try:
             if loaded:
                 logger.debug("Cookies loaded; verifying login state...")
                 if await KeibaBookLogin.is_logged_in(page, test_url):
                     logger.info("Logged in via cookies")
-                    await page.close()
+                    # Only close page if we created it
+                    if created_page:
+                        await page.close()
                     return True
+                else:
+                    logger.warning("Cookies loaded but login verification failed - will re-login")
 
             # If we reach here, proceed to explicit login
             logger.info("Performing login via credentials...")
             success = await KeibaBookLogin.login(page, login_id, password, cookie_file=cookie_file, save_cookies=save_cookies)
-            await page.close()
+            
+            # After login, navigate to test_url to ensure the page is in the right state
+            if success and test_url:
+                try:
+                    await page.goto(test_url, wait_until='domcontentloaded', timeout=15000)
+                    logger.info(f"Navigated to {test_url} after login")
+                except Exception as nav_err:
+                    logger.warning(f"Failed to navigate to test_url after login: {nav_err}")
+            
+            # Only close page if we created it
+            if created_page:
+                await page.close()
             return success
         except Exception as e:
             logger.error(f"Error during ensure_logged_in: {e}")
-            try:
-                await page.close()
-            except Exception:
-                pass
+            if created_page:
+                try:
+                    await page.close()
+                except Exception:
+                    pass
             return False

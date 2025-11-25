@@ -254,7 +254,11 @@ async def test_keibabook_scraper_scrape_method():
     # Bypass direct HTML parsing for horse_table in this unit test (mock the result)
     scraper._parse_horse_table_data = MagicMock(return_value={'1': {'past_results': [{'date': '2025/10/20', 'venue': '東京', 'race_num': '1', 'finish_position': '1着', 'time': '1:35.0', 'jockey': 'ルメール', 'weight': '55'}]}})
 
-    with patch('src.scrapers.keibabook.async_playwright') as mock_async_playwright:
+    with patch('src.scrapers.keibabook.async_playwright') as mock_async_playwright, \
+         patch('src.utils.login.KeibaBookLogin.ensure_logged_in', new_callable=AsyncMock) as mock_login:
+        # Mock login to always return True
+        mock_login.return_value = True
+        
         mock_playwright_context = AsyncMock()
         mock_browser = AsyncMock()
         mock_context = AsyncMock()
@@ -267,6 +271,8 @@ async def test_keibabook_scraper_scrape_method():
         mock_browser.new_page.return_value = mock_page
         # 初回のページ.content() に対しても mock_html が返るように設定
         mock_page.content = AsyncMock(return_value=mock_html)
+        # Mock page.url to avoid the "already on page" check triggering incorrectly
+        mock_page.url = "about:blank"
 
         # scraper._fetch_page_content のモック設定を with ブロックの前に移動
         original_fetch = scraper._fetch_page_content

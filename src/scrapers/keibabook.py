@@ -677,14 +677,26 @@ class KeibaBookScraper:
                 page.set_default_timeout(timeout_ms)
 
             # ログイン確保: コンテキストに cookie をロードした上でログイン済みでなければログインを実行
+            # 重要: pageを渡して、ログイン処理後も同じページを使い続ける（ページを閉じない）
             from src.utils.login import KeibaBookLogin
             cookie_file = self.settings.get('cookie_file', 'cookies.json')
             login_id = self.settings.get('login_id')
             password = self.settings.get('login_password')
             url = self.shutuba_url
-            login_ok = await KeibaBookLogin.ensure_logged_in(context, login_id, password, cookie_file=cookie_file, save_cookies=True, test_url=url)
+            
+            # pageを渡すことで、ensure_logged_in内でページが閉じられず、
+            # ログイン状態が適用されたページをそのまま使える
+            login_ok = await KeibaBookLogin.ensure_logged_in(
+                context, login_id, password, 
+                cookie_file=cookie_file, 
+                save_cookies=True, 
+                test_url=url,
+                page=page  # ← これが重要！ページを渡して再利用
+            )
             if not login_ok:
                 logger.warning("ログインに失敗しました。無料範囲のデータのみ取得されます。")
+            else:
+                logger.info("ログイン確認成功。プレミアムデータを取得します。")
             
             # 重複チェック（DBマネージャーが設定されている場合）
             if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
@@ -697,7 +709,23 @@ class KeibaBookScraper:
             await self.rate_limiter.wait()
             
             # ログイン後に出馬表URLに遷移してコンテンツを取得
-            html_content = await self._fetch_page_content(page, url)
+            # 注: ensure_logged_in()で既にURLに遷移している場合があるが、
+            # 確実性のため再度遷移する（Cookieが適用された状態で）
+            current_url = page.url
+            if url in current_url or current_url in url:
+                # 既に対象ページにいる場合は、コンテンツのみ取得
+                logger.debug(f"既に対象ページにいます: {current_url}")
+                html_content = await page.content()
+                self._last_fetches.append({
+                    'requested_url': url,
+                    'actual_url': current_url,
+                    'status': 'cached',
+                    'goto_ms': 0,
+                    'content_ms': 0,
+                    'total_ms': 0
+                })
+            else:
+                html_content = await self._fetch_page_content(page, url)
             
             # URL取得をログに記録
             if self.db_manager:
