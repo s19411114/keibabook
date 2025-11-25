@@ -19,11 +19,17 @@
 # WSL (Ubuntu) を起動
 wsl
 
-# プロジェクトディレクトリに移動
-cd /mnt/c/GeminiCLI/TEST/keibabook
+# プロジェクトディレクトリに移動（推奨: WSL のホームにコピーして実行）
+# 推奨手順（WSL 内で高速 I/O を利用）:
+# 1) ホスト(C:)上のプロジェクトを WSL HOME にコピー
+cp -r /mnt/c/GeminiCLI/TEST/keibabook ~/keibabook
+cd ~/keibabook
 
-# Docker起動
-./docker-start.sh
+# 2) そのまま Docker 起動（このときコンテナは WSL 内のパスをマウントします）
+HOST_PROJECT_DIR=$(pwd) docker-compose up --build
+
+# 省略: 用意したサポートスクリプトを利用
+./scripts/docker-start-wsl.sh
 
 ### 認証情報（環境変数）
 このリポジトリでは認証情報は `config/settings.yml` に平文保存しないでください。代わりに以下の方法を推奨します。

@@ -5,8 +5,10 @@ services:
     build: .
     container_name: keibabook-dev
     volumes:
-      # プロジェクトディレクトリをマウント
-      - .:/app
+      # ホストのプロジェクトディレクトリをマウント（デフォルト: 現在のディレクトリ）
+      # 開発中に高速な I/O を利用するには WSL のホームのパスを指定してください。
+      # 例: HOST_PROJECT_DIR=/home/<user>/keibabook docker-compose up
+      - ${HOST_PROJECT_DIR:-.}:/app
       # venvは除外 (Dockerは独自のPython環境を使用)
       - /app/venv
       # __pycache__も除外

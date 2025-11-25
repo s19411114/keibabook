@@ -11,6 +11,7 @@
 
 - WSL2（Ubuntu） を有効にしておくこと (Docker Desktop の WSL 統合を利用)
 - Docker Desktop がインストール済み
+- 推奨: プロジェクトは WSL のホーム（`/home/<user>/keibabook`）にコピーして起動することで、ファイルI/OとPlaywrightの安定性が改善します。
 ### 前提
 - WSL2（Ubuntu） を有効にしておくこと (Docker Desktop の WSL 統合を利用)
 - Docker Desktop がインストール済み
