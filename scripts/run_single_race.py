@@ -25,7 +25,7 @@ def build_race_id(date_str, venue_name, race_num):
     return f"{date_str}{code}{int(race_num):02d}"
 
 
-async def main(venue, race_num, rate_limit=1.5, full=False, headful=False, perf=False, skip_dup=False, skip_debug_files=False):
+async def main(venue, race_num, rate_limit=1.5, full=False, headful=False, perf=False, skip_dup=False, skip_debug_files=False, race_id=None, shutuba_url=None):
     settings = load_settings()
     if rate_limit:
         settings['rate_limit_base'] = float(rate_limit)
@@ -41,8 +41,10 @@ async def main(venue, race_num, rate_limit=1.5, full=False, headful=False, perf=
         settings['skip_pedigree'] = True
         settings['skip_past_results'] = True
 
+    # Allow explicit race_id override (useful for testing specific past/future races)
     date_str = datetime.date.today().strftime('%Y%m%d')
-    race_id = build_race_id(date_str, venue, race_num)
+    if race_id is None:
+        race_id = build_race_id(date_str, venue, race_num)
     norm = VenueManager.normalize_venue_name(venue) or venue
     race_key = f"{date_str}_{VenueManager.get_venue_code(norm) or 'unknown'}{race_num}R"
 
@@ -56,7 +58,12 @@ async def main(venue, race_num, rate_limit=1.5, full=False, headful=False, perf=
     if skip_dup:
         settings['skip_duplicate_check'] = True
     settings['skip_debug_files'] = bool(skip_debug_files)
-    scraper = KeibaBookScraper({**settings, 'race_id': race_id, 'race_key': race_key, 'race_type': race_type, 'shutuba_url': f'https://s.keibabook.co.jp/{base}/syutuba/{race_id}', 'output_dir': str(out_dir)}, db_manager=dbm)
+    # Respect explicit shutuba_url override
+    if shutuba_url:
+        url = shutuba_url
+    else:
+        url = f'https://s.keibabook.co.jp/{base}/syutuba/{race_id}'
+    scraper = KeibaBookScraper({**settings, 'race_id': race_id, 'race_key': race_key, 'race_type': race_type, 'shutuba_url': url, 'output_dir': str(out_dir)}, db_manager=dbm)
 
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
@@ -80,6 +87,8 @@ if __name__ == '__main__':
     parser.add_argument('--venue', required=True)
     parser.add_argument('--race', required=True, type=int)
     parser.add_argument('--rate', default=1.5, type=float)
+    parser.add_argument('--race-id', default=None, help='Explicit race_id (YYYYMMDDVVNN) to use')
+    parser.add_argument('--shutuba-url', default=None, help='Explicit shutuba URL to use')
     parser.add_argument('--full', action='store_true')
     parser.add_argument('--headful', action='store_true')
     parser.add_argument('--perf', action='store_true', help='Enable per-step perf logs')
@@ -87,4 +96,4 @@ if __name__ == '__main__':
     parser.add_argument('--skip-debug-files', action='store_true', help='Skip writing debug HTML and JSON files')
     args = parser.parse_args()
     # enable perf logging if requested
-    asyncio.run(main(args.venue, args.race, rate_limit=args.rate, full=args.full, headful=args.headful, perf=args.perf if hasattr(args, 'perf') else False, skip_dup=args.skip_dup, skip_debug_files=args.skip_debug_files))
+    asyncio.run(main(args.venue, args.race, rate_limit=args.rate, full=args.full, headful=args.headful, perf=args.perf if hasattr(args, 'perf') else False, skip_dup=args.skip_dup, skip_debug_files=args.skip_debug_files, race_id=args.race_id, shutuba_url=args.shutuba_url))
