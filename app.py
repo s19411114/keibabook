@@ -15,6 +15,18 @@ from src.scrapers.keibabook import KeibaBookScraper
 import src.scrapers.jra_schedule
 importlib.reload(src.scrapers.jra_schedule)
 from src.scrapers.jra_schedule import JRAScheduleFetcher
+import src.scrapers.netkeiba_calendar
+importlib.reload(src.scrapers.netkeiba_calendar)
+from src.scrapers.netkeiba_calendar import NetkeibaCalendarFetcher
+import src.scrapers.nar_schedule
+importlib.reload(src.scrapers.nar_schedule)
+from src.scrapers.nar_schedule import NARScheduleFetcher
+import src.scrapers.keiba_schedule
+importlib.reload(src.scrapers.keiba_schedule)
+from src.scrapers.keiba_schedule import KeibaGovScheduleFetcher
+import src.scrapers.keiba_today
+importlib.reload(src.scrapers.keiba_today)
+from src.scrapers.keiba_today import KeibaTodayFetcher
 
 from src.scrapers.jra_odds import JRAOddsFetcher
 from src.utils.db_manager import CSVDBManager
@@ -23,6 +35,8 @@ from src.utils.horse_ranker import HorseRanker
 from src.utils.upset_detector import UpsetDetector
 from src.utils.logger import get_logger
 from src.utils.venue_manager import VenueManager
+from src.utils.schedule_utils import get_next_race_number
+from src.utils.output import save_per_race_json
 
 logger = get_logger(__name__)
 
@@ -186,7 +200,25 @@ with col_status:
     if st.session_state.scraping_in_progress:
         st.warning("🔄 処理中...")
     else:
-        st.success("✅ 待機中")
+        # Login status: check cookie file existence and expiry
+        cookie_file = settings.get('cookie_file', 'cookies.json')
+        from src.utils.login import KeibaBookLogin
+        if KeibaBookLogin.cookie_file_expired(cookie_file):
+            st.error("🔐 未ログイン または Cookie 期限切れ")
+            if st.button("ログインを実行", key="ui_login"):
+                with st.spinner("ログイン中..."):
+                    # Launch headless login to ensure cookie is valid
+                    from playwright.sync_api import sync_playwright
+                    try:
+                        with sync_playwright() as p:
+                            browser = p.chromium.launch(headless=True)
+                            context = browser.new_context()
+                            result = KeibaBookLogin.ensure_logged_in(context, settings.get('login_id'), settings.get('login_password'), cookie_file=cookie_file, save_cookies=True)
+                            st.success("ログイン（自動）プロセスを実行しました。結果の反映を待ってください。")
+                    except Exception as e:
+                        st.error(f"ログインエラー: {e}")
+        else:
+            st.success("✅ クッキー有効 - ログイン済み")
 
 st.markdown("---")
 
@@ -222,7 +254,33 @@ with col1:
             # タイムアウト対策: spinnerを表示しつつ、失敗してもエラーにしない
             try:
                 with st.spinner(f"{selected_date}のスケジュールを確認中..."):
-                    schedule = await JRAScheduleFetcher.fetch_schedule_for_date(selected_date)
+                    if race_type == 'nar':
+                        # Try today-first source
+                        if selected_date == today:
+                            schedule = await KeibaTodayFetcher.fetch_today_schedule(selected_date)
+                        else:
+                            schedule = await NARScheduleFetcher.fetch_schedule_for_date(selected_date)
+                        if not schedule:
+                            # fallback to netkeiba NAR then keiba.gov
+                            schedule = await NARScheduleFetcher.fetch_schedule_for_date(selected_date)
+                            if not schedule:
+                                schedule = await KeibaGovScheduleFetcher.fetch_schedule_for_date(selected_date)
+                    else:
+                        # CENTRAL (JRA): Try Netkeiba calendar first (less load on paid sources)
+                        if selected_date == today:
+                            schedule = await KeibaTodayFetcher.fetch_today_schedule(selected_date)
+                            # If keiba.go.jp today is not available, try Netkeiba calendar
+                            if not schedule:
+                                schedule = await NetkeibaCalendarFetcher.fetch_schedule_for_date(selected_date)
+                        else:
+                            schedule = await NetkeibaCalendarFetcher.fetch_schedule_for_date(selected_date)
+                            if not schedule:
+                                schedule = await JRAScheduleFetcher.fetch_schedule_for_date(selected_date)
+                        if not schedule:
+                            # fallback to JRA monthly or keiba.gov
+                            schedule = await JRAScheduleFetcher.fetch_schedule_for_date(selected_date)
+                            if not schedule:
+                                schedule = await KeibaGovScheduleFetcher.fetch_schedule_for_date(selected_date)
                     st.session_state.jra_schedule = schedule
                     st.session_state.last_fetched_date = selected_date
             except Exception as e:
@@ -290,9 +348,20 @@ with col3:
             start_minutes = 9 * 60 + 50 # 9:50開始基準
             current_minutes = now.hour * 60 + now.minute
             diff_minutes = current_minutes - start_minutes
-            if diff_minutes > 0:
-                estimated_race = int(diff_minutes / 30) + 1
-                default_race_num = max(1, min(12, estimated_race))
+                if diff_minutes > 0:
+                    estimated_race = int(diff_minutes / 30) + 1
+                    default_race_num = max(1, min(12, estimated_race))
+                # If schedule exists, prefer precise next race timing
+                try:
+                    from src.utils.schedule_utils import get_next_race_number
+                    # use buffer from UI if auto selection enabled
+                    buffer_minutes = next_race_buffer_minutes if 'next_race_buffer_minutes' in locals() and auto_next_select else 1
+                    next_r = get_next_race_number(st.session_state.jra_schedule, selected_venue_name, now, buffer_minutes=buffer_minutes)
+                    if next_r:
+                        default_race_num = next_r
+                        logger.info(f"Next race detected from schedule: {selected_venue_name} {next_r}R")
+                except Exception as e:
+                    logger.warning(f"Next race selection via schedule failed: {e}")
         elif 17 <= now.hour:
             # 今日だけど17時以降 -> 最終レース終わってるので手動選択待ち (または翌日誘導済み)
             default_race_num = 12 
@@ -355,9 +424,118 @@ with st.sidebar:
         # 重複チェック設定
         use_duplicate_check = st.checkbox("重複チェックを有効化", value=True)
         headless_mode = st.checkbox("ヘッドレスモード", value=settings.get('playwright_headless', False))
+        # 次レース自動選択の設定
+        st.subheader("🔁 次レース自動選択設定")
+        auto_next_select = st.checkbox("次レースを自動選択する", value=True)
+        next_race_buffer_minutes = st.number_input("自動選択バッファ（分）", min_value=0, max_value=60, value=settings.get('next_race_buffer_minutes', 1))
+        auto_prepare = st.checkbox("自動で次レース準備を行う (Auto Prepare)", value=False, help="有効にすると、UIが期間内であれば次レースの準備を行います（現在は手動Prepareボタン推奨）")
 
 # メインコンテンツ
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📥 スクレイピング", "📊 データ確認", "🏇 トラックバイアス", "🎯 レコメンド", "📝 ログ"])
+tab_home, tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏠 Home", "📥 スクレイピング", "📊 データ確認", "🏇 トラックバイアス", "🎯 レコメンド", "📝 ログ"])
+
+with tab_home:
+    st.header("🏠 ホーム")
+    st.markdown("簡単な起動状態とショートカット、ログダウンロード")
+    col_a, col_b = st.columns([3, 1])
+    with col_a:
+        st.write("アプリURL: ")
+        st.markdown(f"[Open KeibaBook Streamlit](http://localhost:8501)")
+        if st.button("ログファイルを表示 (streamlit.log)"):
+            logs_path = Path('streamlit.log')
+            if logs_path.exists():
+                try:
+                    with open(logs_path, 'r', encoding='utf-8', errors='ignore') as lf:
+                        lines = lf.readlines()
+                    st.text_area("ログ (最後の 500 行)", '\n'.join(lines[-500:]), height=400)
+                    st.download_button("Download streamlit.log", data='\n'.join(lines[-500:]), file_name='streamlit.log')
+                except Exception as e:
+                    st.error(f"ログ読み込みエラー: {e}")
+            else:
+                st.warning("ログファイルが見つかりません (streamlit.log)")
+        st.markdown('---')
+        if st.button('🔮 今すぐ予想を準備 (Prepare Now)', key='prepare_now'):
+            if st.session_state.scraping_in_progress:
+                st.warning('既に処理中です。完了までお待ちください。')
+            else:
+                # Run quick prepare pipeline for next race
+                st.session_state.scraping_in_progress = True
+                with st.spinner('予想準備中...'): 
+                    try:
+                        # Determine target race
+                        from src.utils.schedule_utils import get_next_race_number
+                        # Use session schedule if available
+                        next_r = None
+                        try:
+                            next_r = get_next_race_number(st.session_state.jra_schedule, selected_venue_name, datetime.datetime.now(), buffer_minutes=next_race_buffer_minutes if 'next_race_buffer_minutes' in locals() and auto_next_select else 1)
+                        except Exception:
+                            next_r = None
+                        target_race_num = next_r or selected_race_num
+
+                        venue_code = VenueManager.get_venue_code(selected_venue_name) or '00'
+                        target_race_id = f"{date_str}{venue_code}{int(target_race_num):02d}"
+                        target_race_key = f"{date_str}_{VenueManager.get_venue_code(selected_venue_name) or 'unknown'}{target_race_num}R"
+                        if race_type == 'nar':
+                            target_url = f"https://s.keibabook.co.jp/chihou/syutuba/{target_race_id}"
+                        else:
+                            target_url = f"https://s.keibabook.co.jp/cyuou/syutuba/{target_race_id}"
+
+                        # Run scraping
+                        scraper = KeibaBookScraper({**settings, 'race_id': target_race_id, 'race_key': target_race_key, 'shutuba_url': target_url, 'output_dir': settings.get('output_dir', 'data')}, db_manager=st.session_state.db_manager if use_duplicate_check else None)
+                        scraped_data = asyncio.run(scraper.scrape())
+
+                        # Fetch odds if JRA
+                        if race_type == 'jra':
+                            jra_odds = asyncio.run(JRAOddsFetcher.fetch_realtime_odds(selected_venue_name, int(target_race_num)))
+                            if jra_odds and scraped_data:
+                                for horse in scraped_data.get('horses', []):
+                                    hn = horse.get('horse_num')
+                                    if hn in jra_odds:
+                                        horse['current_odds'] = jra_odds[hn]
+
+                        # Save per-race JSON
+                        output_dir = Path(settings.get('output_dir', 'data'))
+                        per_file = save_per_race_json(output_dir, target_race_id, target_race_key, scraped_data)
+
+                        # Run lightweight analysis (recommender / ranker / upset)
+                        recommender = HorseRecommender(st.session_state.db_manager)
+                        ranker = HorseRanker()
+                        upset_detector = UpsetDetector()
+                        recommended = recommender.find_undervalued_horses(scraped_data, threshold_rank=0.7, min_odds=10.0)
+                        ranked = ranker.rank_horses(scraped_data)
+                        upset = upset_detector.detect_upset_horses(scraped_data)
+
+                        # Display quick results
+                        st.success('予想準備完了')
+                        if ranked:
+                            st.markdown('### Top predictions')
+                            for h in ranked[:5]:
+                                st.write(f"{h.get('predicted_rank', '?')}位 - {h.get('horse_num')}番 {h.get('horse_name')} (スコア: {h.get('rank_score', 0):.1f})")
+
+                        if per_file and per_file.exists():
+                            st.markdown(f"✅ 保存: {per_file}")
+                            st.download_button('JSON ダウンロード', data=json.dumps(scraped_data, ensure_ascii=False, indent=2), file_name=per_file.name)
+                    except Exception as e:
+                        st.error(f'予想準備に失敗しました: {e}')
+                    finally:
+                        st.session_state.scraping_in_progress = False
+    with col_b:
+        st.write('ショートカット:')
+        st.markdown('- **KeibaBook Start**: 起動 & ログを表示する PowerShell を開きます。')
+        if st.button("スクレイパーログを表示 (scraper_log.txt)"):
+            s_path = Path('scraper_log.txt')
+            if s_path.exists():
+                try:
+                    with open(s_path, 'r', encoding='utf-8', errors='ignore') as sf:
+                        s_lines = sf.readlines()
+                    st.text_area("スクレイパーログ (最後の 500 行)", '\n'.join(s_lines[-500:]), height=400)
+                    st.download_button("Download scraper_log.txt", data='\n'.join(s_lines[-500:]), file_name='scraper_log.txt')
+                except Exception as e:
+                    st.error(f"ログ読み込みエラー: {e}")
+            else:
+                st.warning('スクレイパーログが見つかりません (scraper_log.txt)')
+        st.markdown('- Tip: デスクトップのショートカットをタスクバーにピン留めできます。')
+        st.markdown('動作に問題があれば `KeibaBook Console` を使ってログを確認してください。')
+
 
 with tab1:
     st.header("データ取得実行")
@@ -523,6 +701,49 @@ with tab1:
             
             # ページをリロードして結果を表示
             st.rerun()
+
+    # --- 小型の 12ボタン UI (1R単位の取得) ---
+    st.markdown("---")
+    st.caption("🎯 ワンクリックで1R取得（その会場の1〜12R）")
+    cols_small = st.columns(12)
+    output_dir = Path(settings.get('output_dir', 'data'))
+    venue_code_for_id = VenueManager.get_venue_code(selected_venue_name) or 'unknown'
+    date_code = date_str
+    for i in range(1, 13):
+        with cols_small[i-1]:
+            tiny_race_id = f"{date_code}{venue_code_for_id}{i:02d}"
+            tiny_race_key = f"{date_code}_{venue_code_for_id}{i}R"
+            per_dir = output_dir / str(tiny_race_id)
+            per_f = per_dir / f"{tiny_race_key}_1R.json"
+            saved = per_f.exists()
+            label = f"{i} {'🟢' if saved else '⚪'}"
+            if st.button(label, key=f"quick_{tiny_race_id}"):
+                if st.session_state.scraping_in_progress:
+                    st.warning("既にスクレイピング中です。完了までお待ちください。")
+                else:
+                    st.session_state.scraping_in_progress = True
+                    async def run_single():
+                        db_manager = st.session_state.db_manager if use_duplicate_check else None
+                        # Build shutuba URL for JRA or NAR
+                        if race_type == 'nar':
+                            url = f"https://s.keibabook.co.jp/chihou/syutuba/{tiny_race_id}"
+                        else:
+                            url = f"https://s.keibabook.co.jp/cyuou/syutuba/{tiny_race_id}"
+                        scraper = KeibaBookScraper({**settings, 'race_id': tiny_race_id, 'race_key': tiny_race_key, 'shutuba_url': url, 'output_dir': str(output_dir)}, db_manager=db_manager)
+                        with st.spinner(f"{tiny_race_key} の取得中..."):
+                            try:
+                                scraped = await scraper.scrape()
+                                if scraped:
+                                    saved_path = save_per_race_json(output_dir, tiny_race_id, tiny_race_key, scraped)
+                                    st.success(f"保存完了: {saved_path}")
+                                    st.download_button("JSON をダウンロード", data=json.dumps(scraped, ensure_ascii=False, indent=2), file_name=saved_path.name)
+                                else:
+                                    st.warning("データが取得できませんでした。")
+                            except Exception as e:
+                                st.error(f"取得中にエラーが発生しました: {e}")
+                            finally:
+                                st.session_state.scraping_in_progress = False
+                    asyncio.run(run_single())
 
 with tab2:
     st.header("📊 データ確認")

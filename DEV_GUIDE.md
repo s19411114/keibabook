@@ -30,6 +30,7 @@ chmod +x docker-start.sh  # 初回のみ
 ### コンテナ中心の運用と venv
 
 - **重要**: Docker を使う場合、コンテナ内で全ての依存が動作するため、**ホスト上の `venv` は不要**です。`venv` は `LEGACY_VENV.md` に保管された手順として残しますが、通常は削除または無視して構いません。
+- VS Code の推奨拡張: `Remote - WSL`、`Remote - Containers`、`Python`、`Pylance` などを使うと WSL 上の環境をシームレスに使えます。プロジェクトの初回起動時に拡張をインストールしてください。
 - 開発時は WSL（Ubuntu）のホームにプロジェクトを置いて `docker-compose up` することを強く推奨します。これにより、ファイルI/O と Playwright の安定性が改善されます。
 
 ### 認証の取り扱い
@@ -63,6 +64,8 @@ git push
 	1. ローカル環境（Docker あるいは venv）で一度ログイン（`LOGIN_ID`/`LOGIN_PASSWORD` を指定）し、Cookie を `cookies.json` に保存する。
 	2. `COOKIE_FILE` 環境変数でそのファイルを指定することで、以後はログインを繰り返さずにスクレイプできます。
 	3. Cookie の有効期限が切れた場合は、同じ手順で再ログインしてください。
+
+ - 開発者向けの改善: `src/utils/login.py` に `KeibaBookLogin.ensure_logged_in(context, login_id, login_password, cookie_file)` を導入しており、コンテキストに cookie を読み込んでログイン状態を検証し、必要な場合は自動ログインして cookie を更新します。スクレイパーはこのメソッドを利用することでログイン処理の冗長化を避けられます。
 
 - もし、追跡済みの Cookie をリポジトリ履歴から完全に消したい場合は、`git filter-repo` などのツールで履歴を消すことができます（履歴改変はチームで合意を取ってから実行してください）。
 

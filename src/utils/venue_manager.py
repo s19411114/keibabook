@@ -33,6 +33,15 @@ class VenueManager:
     
     # 全会場
     ALL_VENUES = {**MINAMI_KANTO_VENUES, **OTHER_VENUES}
+    # Numeric codes for venues (JRA/NAR mapping) used in race_id formation
+    NUMERIC_CODES = {
+        # JRA
+        "札幌": "01", "函館": "02", "福島": "03", "新潟": "04", "東京": "05",
+        "中山": "06", "中京": "07", "京都": "08", "阪神": "09", "小倉": "10",
+        # NAR
+        "門別": "36", "盛岡": "10", "水沢": "11", "浦和": "18", "船橋": "19", "大井": "20", "川崎": "21",
+        "金沢": "22", "笠松": "23", "名古屋": "24", "園田": "27", "姫路": "28", "高知": "31", "佐賀": "32"
+    }
     
     @classmethod
     def get_venue_code(cls, venue_name: str) -> Optional[str]:
@@ -45,7 +54,33 @@ class VenueManager:
         Returns:
             会場コード（見つからない場合はNone）
         """
-        return cls.ALL_VENUES.get(venue_name)
+        norm = cls.normalize_venue_name(venue_name) or venue_name
+        return cls.ALL_VENUES.get(norm)
+
+    @classmethod
+    def normalize_venue_name(cls, venue_name: str) -> Optional[str]:
+        """Normalize a variety of venue name strings to a canonical short name.
+
+        e.g., '浦和競馬場浦和記念' -> '浦和', '開催日程' -> None
+        """
+        if not venue_name:
+            return None
+        # Remove common suffixes/prefixes
+        name = venue_name.strip()
+        # If it's generic schedule or ambiguous, return None
+        if '開催日' in name or '開催日程' in name:
+            return None
+        # Remove '競馬場' or '競馬' suffix to reduce to short name
+        name = name.replace('競馬場', '').replace('競馬', '')
+        name = name.replace('場', '') if name.endswith('場') else name
+        # Common patterns like '浦和記念' include the venue twice; find known short name
+        for short_name in cls.ALL_VENUES.keys():
+            if short_name in name:
+                return short_name
+        # As last resort, return trimmed name if it's listed
+        if name in cls.ALL_VENUES:
+            return name
+        return None
     
     @classmethod
     def is_minami_kanto(cls, venue_name: str) -> bool:
@@ -115,4 +150,9 @@ class VenueManager:
             return f"{base_url}/point/{race_id}"
         else:
             return f"{base_url}/{page_type}/{race_id}"
+
+    @classmethod
+    def get_venue_numeric_code(cls, venue_name: str) -> Optional[str]:
+        """Return numeric venue code (e.g., '18' for 浦和) or None."""
+        return cls.NUMERIC_CODES.get(venue_name)
 

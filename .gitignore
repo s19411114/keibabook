@@ -65,6 +65,10 @@ cookies.json
 # Temporary files
 tmp/
 temp/
+# Shell /tmp files created by scripts
+/tmp/bench_*
+/tmp/pp_*
+/tmp/playwright_test.py
 
 # Debug files
 debug_*.html
@@ -94,6 +98,9 @@ backup_*/
 noisy_list.txt
 out
 tall -e .
+# Bench scripts / project temp
+scripts/cleanup_temp.sh
+bench_playwright.py
 
 # Docker
 .dockerignore

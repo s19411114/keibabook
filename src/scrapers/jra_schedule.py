@@ -3,6 +3,7 @@ from playwright.async_api import async_playwright
 import datetime
 import re
 from bs4 import BeautifulSoup
+from src.utils.venue_manager import VenueManager
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -70,8 +71,13 @@ class JRAScheduleFetcher:
                 # 重複排除
                 found_venues = list(set(found_venues))
                 
-                # 結果形式に変換
-                result = [{"venue": v} for v in found_venues]
+                # 結果形式に変換 (normalize venue names)
+                normed = []
+                for v in found_venues:
+                    norm = VenueManager.normalize_venue_name(v) or v
+                    if norm and norm not in normed:
+                        normed.append(norm)
+                result = [{"venue": v} for v in normed]
                 logger.info(f"取得された開催会場: {found_venues}")
                 
                 return result

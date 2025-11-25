@@ -29,7 +29,11 @@ class KeibaBookScraper:
         self.db_manager = db_manager
         self.result_parser = ResultPageParser()  # 結果ページパーサー
         self.local_parser = LocalRacingParser()  # 地方競馬専用パーサー
-        self.rate_limiter = RateLimiter()  # レート制御
+        self.rate_limiter = RateLimiter(self.settings.get('rate_limit_base'))  # レート制御
+        # record fetch details for debugging and perf analysis
+        self._last_fetches = []
+        self._comments_concurrency = int(self.settings.get('comments_concurrency', 1))
+        self._parallel_page_fetch = bool(self.settings.get('parallel_page_fetch', False))
         
         # 競馬種別に応じたベースURL設定
         if self.race_type == 'nar':
@@ -39,7 +43,7 @@ class KeibaBookScraper:
             # 中央競馬の場合
             self.base_url_pattern = "https://s.keibabook.co.jp/cyuou"
 
-    async def _fetch_page_content(self, page, url, retry_count=3, retry_delay=2):
+    async def _fetch_page_content(self, page, url, retry_count=3, retry_delay=2, wait_until=None):
         """
         ページコンテンツを取得（リトライ機能付き）
         
@@ -54,9 +58,43 @@ class KeibaBookScraper:
         """
         for attempt in range(retry_count):
             try:
-                await page.goto(url, wait_until="domcontentloaded", timeout=self.settings.get("playwright_timeout", 30000))
+                t_start = time.perf_counter()
+                wu = wait_until if wait_until else self.settings.get('playwright_wait_until', 'domcontentloaded')
+                response = await page.goto(url, wait_until=wu, timeout=self.settings.get("playwright_timeout", 30000))
+                t_goto = time.perf_counter()
+                status = None
+                try:
+                    if response:
+                        status = response.status
+                except Exception:
+                    status = None
+                if status:
+                    logger.debug(f"HTTP status for {url}: {status}")
+                # If server returns Too Many Requests (429) escalate backoff
+                if status == 429:
+                    # exponential wait (increase with attempt)
+                    wait_seconds = min(60 * (attempt + 1), 300)
+                    logger.warning(f"429 Too Many Requests detected for {url}: waiting {wait_seconds}s before retrying")
+                    await asyncio.sleep(wait_seconds)
+                    continue
                 content = await page.content()
+                t_content = time.perf_counter()
                 logger.info(f"ページ取得成功: {url}")
+                # Save debug fetch detail
+                try:
+                    actual_url = response.url if response else getattr(page, 'url', None)
+                except Exception:
+                    actual_url = None
+                self._last_fetches.append({
+                    'requested_url': url,
+                    'actual_url': actual_url,
+                    'status': status,
+                    'goto_ms': (t_goto - t_start) * 1000,
+                    'content_ms': (t_content - t_goto) * 1000,
+                    'total_ms': (t_content - t_start) * 1000
+                })
+                if self.settings.get('perf'):
+                    logger.info(f"PERF page_fetch: {url} goto_ms={(t_goto - t_start)*1000:.0f} content_ms={(t_content - t_goto)*1000:.0f} total_ms={(t_content - t_start)*1000:.0f}")
                 return content
             except Exception as e:
                 if attempt < retry_count - 1:
@@ -550,115 +588,101 @@ class KeibaBookScraper:
             logger.error(f"ポイントページ取得エラー: {e}")
             return None
     
-    async def _scrape_horse_comments(self, page, horses, base_url):
+    async def _scrape_horse_comments(self, page, horses, base_url, context=None):
         """
         個別馬のコメントを取得（地方競馬専用、穴馬のヒント）
-        
+
         Args:
             page: Playwrightのページオブジェクト
-            horses: 馬のリスト
-            base_url: ベースURL
+            horses: list of horses dicts
+            base_url: base URL for local racing
         """
-        if self.race_type != 'nar':
-            return
-        
-        logger.info("個別馬のコメント取得を開始...")
-        
-        for horse in horses:
+        # Default: sequential fetch to avoid hitting site too fast
+        import asyncio
+        concurrency = max(1, int(self._comments_concurrency))
+        semaphore = asyncio.Semaphore(concurrency)
+
+        async def fetch_comment(horse):
             horse_num = horse.get('horse_num')
             if not horse_num:
-                continue
-            
-            try:
-                # 個別馬の詳細ページURL（実際のURL構造に応じて調整が必要）
-                # 馬名リンクがあればそれを使用、なければ推測
-                horse_link = horse.get('horse_name_link', '')
-                if horse_link:
-                    horse_detail_url = f"https://s.keibabook.co.jp{horse_link}"
-                else:
-                    # URLがなければスキップ（実際のURL構造に応じて調整）
-                    continue
-                
-                # 重複チェック（個別馬ページは重複が多いため、コメントのみチェック）
-                comment_key = f"{horse_detail_url}_comment"
-                if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(comment_key):
-                    logger.debug(f"馬{horse_num}のコメントは既取得")
-                    continue
-                
-                # レート制御（個別馬ページは多数あるため、少し長めに待機）
-                await self.rate_limiter.wait()
-                
-                # 個別馬ページを取得
-                horse_html_content = await self._fetch_page_content(page, horse_detail_url)
-                
-                # コメントをパース
-                comment = self.local_parser.parse_horse_comment(horse_html_content, horse_num)
-                
-                if comment:
-                    horse['individual_comment'] = comment
-                    logger.debug(f"馬{horse_num}のコメント取得: {comment[:50]}...")
-                    
-                    # URL取得をログに記録
-                    if self.db_manager:
-                        self.db_manager.log_url(comment_key, self.settings['race_id'], 'horse_comment', 'success')
-                else:
-                    horse['individual_comment'] = ""
-                
-            except Exception as e:
-                logger.warning(f"馬{horse_num}のコメント取得エラー: {e}")
+                return
+            horse_link = horse.get('horse_name_link', '')
+            if not horse_link:
                 horse['individual_comment'] = ""
-        
+                return
+            horse_detail_url = f"https://s.keibabook.co.jp{horse_link}"
+            comment_key = f"{horse_detail_url}_comment"
+            if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(comment_key):
+                logger.debug(f"馬{horse_num}のコメントは既取得")
+                horse['individual_comment'] = ""
+                return
+            async with semaphore:
+                try:
+                    await self.rate_limiter.wait()
+                    # If concurrency > 1 and a context is provided, use a dedicated page per task to avoid page navigation collision
+                    task_page = page
+                    created_task_page = False
+                    if concurrency > 1 and context is not None:
+                        task_page = await context.new_page()
+                        created_task_page = True
+                    horse_html_content = await self._fetch_page_content(task_page, horse_detail_url)
+                    comment = self.local_parser.parse_horse_comment(horse_html_content, horse_num)
+                    if comment:
+                        horse['individual_comment'] = comment
+                        logger.debug(f"馬{horse_num}のコメント取得: {comment[:50]}...")
+                        if self.db_manager:
+                            self.db_manager.log_url(comment_key, self.settings['race_id'], 'horse_comment', 'success')
+                    else:
+                        horse['individual_comment'] = ""
+                except Exception as e:
+                    logger.warning(f"馬{horse_num}のコメント取得エラー: {e}")
+                    horse['individual_comment'] = ""
+                finally:
+                    if 'created_task_page' in locals() and created_task_page:
+                        try:
+                            await task_page.close()
+                        except Exception:
+                            pass
+
+        # If concurrency == 1, run sequentially to maintain original behavior
+        if concurrency <= 1:
+            for h in horses:
+                await fetch_comment(h)
+        else:
+            tasks = [fetch_comment(h) for h in horses]
+            if tasks:
+                await asyncio.gather(*tasks)
+
         logger.info("個別馬のコメント取得完了")
 
-    async def scrape(self):
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=self.settings.get("playwright_headless", True))
+    async def scrape(self, context=None, page=None):
+        # If a page/context is provided, use it to avoid launching a new browser.
+        created_browser = False
+        if page is None or context is None:
+            created_browser = True
+            from playwright.async_api import async_playwright
+            self._playwright = await async_playwright().__aenter__()
+            browser = await self._playwright.chromium.launch(headless=self.settings.get("playwright_headless", True))
             context = await browser.new_context()
             page = await context.new_page()
             try:
+                perf_enabled = self.settings.get('perf', False)
+                if perf_enabled:
+                    overall_start = time.perf_counter()
                 # タイムアウト設定（任意）
                 timeout_ms = self.settings.get("playwright_timeout")
                 if timeout_ms:
                     page.set_default_timeout(timeout_ms)
 
-                # Cookieを読み込む（存在する場合）
+                # ログイン確保: コンテキストに cookie をロードした上でログイン済みでなければログインを実行
+                from src.utils.login import KeibaBookLogin
                 cookie_file = self.settings.get('cookie_file', 'cookies.json')
-                if os.path.exists(cookie_file):
-                    try:
-                        with open(cookie_file, 'r', encoding='utf-8') as f:
-                            cookies = json.load(f)
-                        await context.add_cookies(cookies)
-                        logger.info(f"Cookieを読み込みました: {cookie_file}")
-                    except Exception as e:
-                        logger.warning(f"Cookie読み込みエラー: {e}")
-                
-                # ログイン確認: まず対象URLにアクセスしてログイン状態を確認
+                login_id = self.settings.get('login_id')
+                password = self.settings.get('login_password')
                 url = self.shutuba_url
-                await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms or 30000)
-                
-                # ログイン状態をチェック（HTMLに「ログインしていない」があるか）
-                content = await page.content()
-                if "ログインしていない" in content or "ログイン" in await page.title():
-                    logger.warning("ログインが必要です。自動ログインを実行します...")
-                    
-                    # 自動ログイン
-                    login_id = self.settings.get('login_id')
-                    password = self.settings.get('login_password')
-                    
-                    if login_id and password:
-                        from src.utils.login import KeibaBookLogin
-                        login_success = await KeibaBookLogin.login(page, login_id, password, cookie_file)
-                        
-                        if login_success:
-                            logger.info("自動ログイン成功！")
-                            # ログイン後、再度対象URLへ
-                            await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms or 30000)
-                        else:
-                            logger.error("自動ログイン失敗。無料範囲のデータのみ取得されます。")
-                    else:
-                        logger.error("ログイン情報が設定されていません（login_id, login_password）")
-                else:
-                    logger.info("ログイン済み")
+                login_ok = await KeibaBookLogin.ensure_logged_in(context, login_id, password, cookie_file=cookie_file, save_cookies=True, test_url=url)
+                if not login_ok:
+                    logger.warning("ログインに失敗しました。無料範囲のデータのみ取得されます。")
                 
                 # 重複チェック（DBマネージャーが設定されている場合）
                 if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
@@ -688,8 +712,10 @@ class KeibaBookScraper:
                         html_text = str(html_content)
                 except Exception:
                     html_text = str(html_content)
-                with open("debug_page.html", "w", encoding="utf-8") as f:
-                    f.write(html_text)
+                race_key = self.settings.get('race_key', 'unknown')
+                if not self.settings.get('skip_debug_files', False):
+                    with open(f"debug_page_{race_key}.html", "w", encoding="utf-8") as f:
+                        f.write(html_text)
                 # ------------------------------------
 
                 race_data = self._parse_race_data(html_content)
@@ -705,7 +731,7 @@ class KeibaBookScraper:
                     training_url = None
                 
                 # 調教データ取得（地方競馬ではスキップ）
-                if training_url:
+                if training_url and not self.settings.get('skip_training', False):
                     # レート制御
                     await self.rate_limiter.wait()
                     
@@ -714,8 +740,9 @@ class KeibaBookScraper:
                         training_html_content = await self._fetch_page_content(page, training_url)
                         if self.db_manager:
                             self.db_manager.log_url(training_url, self.settings['race_id'], 'training', 'success')
-                        with open("debug_training.html", "w", encoding="utf-8") as f:
-                            f.write(training_html_content)
+                        if not self.settings.get('skip_debug_files', False):
+                            with open(f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
+                                f.write(training_html_content)
                     else:
                         logger.info(f"スキップ（既取得）: {training_url}")
                         training_html_content = ""
@@ -740,12 +767,13 @@ class KeibaBookScraper:
                 await self.rate_limiter.wait()
                 
                 # 重複チェック
-                if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(pedigree_url)):
+                if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(pedigree_url)) and not self.settings.get('skip_pedigree', False):
                     pedigree_html_content = await self._fetch_page_content(page, pedigree_url)
                     if self.db_manager:
                         self.db_manager.log_url(pedigree_url, self.settings['race_id'], 'pedigree', 'success')
-                    with open("debug_pedigree.html", "w", encoding="utf-8") as f:
-                        f.write(pedigree_html_content)
+                    if not self.settings.get('skip_debug_files', False):
+                        with open(f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
+                            f.write(pedigree_html_content)
                 else:
                     logger.info(f"スキップ（既取得）: {pedigree_url}")
                     pedigree_html_content = ""
@@ -761,7 +789,7 @@ class KeibaBookScraper:
                         horse['pedigree_data'] = {}
 
                 # 厩舎の話データを取得してマージ（地方競馬ではスキップ）
-                if self.race_type != 'nar':
+                if self.race_type != 'nar' and not self.settings.get('skip_stable_comment', False):
                     stable_comment_url = f"{base_url}/danwa/0/{self.settings['race_id']}"
                     
                     # レート制御
@@ -772,8 +800,9 @@ class KeibaBookScraper:
                         stable_comment_html_content = await self._fetch_page_content(page, stable_comment_url)
                         if self.db_manager:
                             self.db_manager.log_url(stable_comment_url, self.settings['race_id'], 'stable_comment', 'success')
-                        with open("debug_stable_comment.html", "w", encoding="utf-8") as f:
-                            f.write(stable_comment_html_content)
+                        if not self.settings.get('skip_debug_files', False):
+                            with open(f"debug_stable_comment_{race_key}.html", "w", encoding="utf-8") as f:
+                                f.write(stable_comment_html_content)
                     else:
                         logger.info(f"スキップ（既取得）: {stable_comment_url}")
                         stable_comment_html_content = ""
@@ -791,7 +820,7 @@ class KeibaBookScraper:
                         horse['stable_comment'] = ""
 
                 # 前走コメントデータを取得してマージ（地方競馬ではスキップ）
-                if self.race_type != 'nar':
+                if self.race_type != 'nar' and not self.settings.get('skip_previous_race_comment', False):
                     previous_race_comment_url = f"{base_url}/syoin/{self.settings['race_id']}"
                     
                     # レート制御
@@ -802,8 +831,9 @@ class KeibaBookScraper:
                         previous_race_comment_url_content = await self._fetch_page_content(page, previous_race_comment_url)
                         if self.db_manager:
                             self.db_manager.log_url(previous_race_comment_url, self.settings['race_id'], 'previous_race_comment', 'success')
-                        with open("debug_previous_race_comment.html", "w", encoding="utf-8") as f:
-                            f.write(previous_race_comment_url_content)
+                        if not self.settings.get('skip_debug_files', False):
+                            with open(f"debug_previous_race_comment_{race_key}.html", "w", encoding="utf-8") as f:
+                                f.write(previous_race_comment_url_content)
                     else:
                         logger.info(f"スキップ（既取得）: {previous_race_comment_url}")
                         previous_race_comment_url_content = ""
@@ -821,8 +851,11 @@ class KeibaBookScraper:
                         horse['previous_race_comment'] = ""
 
                 # 馬柱（能力表）データを取得（出馬表ページから）- 簡易情報として
-                # 個別馬ページへの遷移は行わない（被りが多いため）
-                horse_table_data = self._parse_horse_table_data(html_content)
+                if self.settings.get('skip_past_results', False):
+                    horse_table_data = {}
+                else:
+                    # 個別馬ページへの遷移は行わない（被りが多いため）
+                    horse_table_data = self._parse_horse_table_data(html_content)
                 for horse in race_data.get('horses', []):
                     horse_num = horse.get('horse_num')
                     if horse_num in horse_table_data:
@@ -838,6 +871,7 @@ class KeibaBookScraper:
                         race_data['point_info'] = point_data
                     
                     # 個別馬のコメントを取得（穴馬のヒント）
+                    # Keep sequential by default (comments_concurrency defaults to 1)
                     await self._scrape_horse_comments(page, race_data.get('horses', []), base_url)
 
                 # 結果ページから詳細情報を取得（レース終了後のみ）
@@ -866,6 +900,25 @@ class KeibaBookScraper:
                 #                 horse['odds'] = result_horse.get('odds')
                 #                 horse['popularity'] = result_horse.get('popularity')
 
+                if perf_enabled:
+                    overall_end = time.perf_counter()
+                    logger.info(f"PERF total_race_scrape_ms={(overall_end - overall_start)*1000:.0f} for {self.settings.get('race_id')}")
+                # Save debug fetch summary
+                if not self.settings.get('skip_debug_files', False):
+                    try:
+                        with open(f"debug_fetches_{race_key}.json", "w", encoding="utf-8") as f:
+                            import json
+                            json.dump(self._last_fetches, f, ensure_ascii=False, indent=2)
+                    except Exception:
+                        pass
                 return race_data
             finally:
-                await browser.close()
+                if created_browser:
+                    try:
+                        await browser.close()
+                    except Exception:
+                        pass
+                    try:
+                        await self._playwright.__aexit__(None, None, None)
+                    except Exception:
+                        pass

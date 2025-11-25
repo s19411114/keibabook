@@ -27,6 +27,70 @@ cd /mnt/c/GeminiCLI/TEST/keibabook
 docker-compose exec app bash
 ```
 
+### 🏁 ワンクリック起動スクリプト（推奨）
+
+このリポジトリには起動を自動化するスクリプトを用意しています。PowerShell（Windows）とシェル（WSL/macOS/Linux）版があります。
+
+WSL / Linux / macOS:
+```bash
+chmod +x scripts/start_dev.sh
+scripts/start_dev.sh --open
+```
+
+Windows PowerShell:
+```powershell
+.\\scripts\start_dev.ps1 -Open
+```
+
+どちらも以下を実行します:
+- ホストの作業ディレクトリを WSL へ同期（WSL 環境で実行した場合）
+- `docker compose up -d --build` を実行
+- `streamlit run app.py` をコンテナ内で起動し、ブラウザを自動で開く（`--open` を渡した場合）
+
+注: デバッグ時にコンテナで `bash` が必要なら、`docker-compose.streamlit.yml` を使わず通常の `docker compose` を使ってください。自動で起動する `docker-compose.streamlit.yml` を使うと、コンテナはデフォルトで `streamlit` を実行するため `bash` に入れません。
+
+### 🖱 Windows: デスクトップショートカット作成 & タスクバー固定
+簡単に起動したい場合は、PowerShell スクリプトでデスクトップショートカットを自動生成できます。生成したショートカットを右クリック → [タスクバーにピン留め] すると、1クリックで起動できるようになります。
+
+1. PowerShell を開き、リポジトリのルートで以下を実行します:
+
+```powershell
+.
+\scripts\create_shortcut.ps1
+```
+
+2. デスクトップに `KeibaBook Start` ショートカットが作成されます。右クリックして「タスクバーにピン留め」を選んでください。
+
+3. ショートカットを使うと、内部で `start_dev.ps1` が呼ばれ、WSL の Docker 上で `docker compose up -d` → `streamlit run app.py` が実行されます（`--open` オプションは `start_dev.ps1` の `-Open` を渡してください）。
+
+注: Windows の操作で WSL を経由する場合、WSL のパスに同期が必要です（スクリプトが自動で同期します）。Pin を自動で作成することは OS 権限に依存するため、手動でピン留めしてください。
+
+Tip: デスクトップに複数のショートカットがあると混乱する場合は、1つだけ（例: 🐎 KeibaBook Start）を残し、それをタスクバーにピン留めすると見た目・心理的な安心感が増します。ショートカット名に馬の絵文字（🐎）を含めると一目で分かって便利です。
+
+### 📌 カスタムアイコンの使い方
+- ショートカットのアイコンは `scripts/set_shortcut_icon.ps1` を使って変更できます。好みの `ico` ファイルをダウンロードして `scripts/keiba.ico` に置くか、任意のパスを指定して次を実行してください:
+
+```powershell
+.
+\scripts\set_shortcut_icon.ps1 -ShortcutName "🐎 KeibaBook Start" -IconPath "C:\path\to\your\keiba.ico"
+```
+
+- アイコンの推奨サイズ: 256x256, 64x64, 32x32 を含む ICO ファイルを用意してください（Windows が適切にスケーリングします）。
+
+Tip: Docker を示すクジラアイコン（Docker Desktop）を使う場合は `docker.ico` を用意して `KeibaBook Start` に適用できます。
+
+### 🖼 アイコンをWebからダウンロードして適用する
+`set_shortcut_icon_from_url.ps1` スクリプトを使うと、指定した URL から ICO をダウンロードしてデスクトップショートカットに適用できます。例:
+
+```powershell
+.
+.\scripts\set_shortcut_icon_from_url.ps1 -ShortcutName '🐎 KeibaBook Start' -IconUrl 'https://example.com/horse.ico'
+```
+
+注:
+- ダウンロードしたファイルが `.ico` でない場合は Windows のショートカット アイコンとして使えない場合があります。`.png` / `.svg` を使う場合は別途 ICO に変換してください（オンライン変換ツールか ImageMagick など）。
+- リポジトリの `assets/` にダウンロードしたアイコンが保存されます。
+
 ### 🧭 旧来の仮想環境（Legacy: 必要ならこちら）
 
 Docker を推奨するため、`venv` を使う旧来の方法を `LEGACY_VENV.md` に残しています。通常は Docker（WSL 上での実行を推奨）を使ってください。
@@ -98,12 +162,19 @@ keibabook/
 会話履歴から判断すると、以下が最近の作業内容です:
 
 ### ✅ 完了
-- JRAスケジュール取得の修正（AttributeError解決）
-- ログイン認証の修正
-- 日付・レース番号の自動推定機能
 
 ### 🔄 進行中・未解決
-- （ここに現在の課題を記載してください）
+Schedule sources (priority):
+- For JRA (中央競馬): `Netkeiba` calendar is preferred to avoid unnecessary load on KeibaBook (paid site). If Netkeiba fails, fall back to `JRA` official calendar, then `keiba.go.jp` Today.
+- For NAR (地方競馬): `NAR`/Netkeiba schedule fetchers are used; if unavailable, fallback to `keiba.go.jp`.
+
+Schedule caching policy:
+- Schedules (race times/venues) are cached per session in Streamlit to avoid repeated page requests; this is safe because schedules don't change frequently.
+- Real-time data (like odds) are not cached by default (to prevent stale odds). Odds retrieval is done per-request and can be implemented with a short cache TTL if necessary.
+
+Next race auto-selection:
+- Next-race auto-selection is configurable in the Streamlit UI under "Developer Settings".
+- Default buffer is 1 minute, which means the UI will treat a race starting within 1 minute as the "next" race.
 
 ---
 
@@ -146,6 +217,32 @@ playwright install chromium
 # または強制再インストール
 playwright install --force chromium
 ```
+
+### 🔎 Minimal odds monitor（簡易オッズ監視）
+軽量で安全な方法で指定した会場のレースオッズを監視します。デフォルトは `浦和`（地方・南関東）で、開始 10 分前と 4 分前の 2 回のスナップショットを取得します。
+
+- 保存先: `data/odds/<race_id>/<timestamp>.json`
+- 変更差分: 前回スナップショットとの単純な単勝オッズ差分（%）を記録
+- 使い方（例: 浦和の 10 分と 4 分前をモニタ）:
+
+```bash
+python scripts/cli_minimal_odds.py --tracks 浦和 --offsets 10,4
+```
+
+- ヘッドフルでブラウザを立ち上げる（UIで確認したい場合）:
+
+```bash
+python scripts/cli_minimal_odds.py --tracks 浦和 --offsets 10,4 --headful
+```
+
+- 実行前に動作確認のみ行う（スケジュールに従って何が実行されるかを表示）:
+
+```bash
+python scripts/cli_minimal_odds.py --tracks 浦和 --offsets 10,4 --dry-run
+```
+
+上記は最小限の監視フローを提供します。最初は浦和 12 レースのみを対象にしてください。中央（JRA）を監視する場合は `--tracks 東京,中山,中京` のように指定して下さい（最大で 3 会場・36 レース程度）。
+
 
 ### ログインエラー
 - `cookies.json`が正しく保存されているか確認

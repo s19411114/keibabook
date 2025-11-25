@@ -8,12 +8,11 @@ async def fetch_schedule():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         
-        # Try to load cookies if available
+        # Ensure login: try load cookies or perform login if needed
         cookie_file = 'cookies.json'
-        if os.path.exists(cookie_file):
-            with open(cookie_file, 'r') as f:
-                cookies = json.load(f)
-            await page.context.add_cookies(cookies)
+        from src.utils.login import KeibaBookLogin
+        # Attempt to ensure login using default test URL
+        await KeibaBookLogin.ensure_logged_in(page.context, os.environ.get('LOGIN_ID'), os.environ.get('LOGIN_PASSWORD'), cookie_file=cookie_file, save_cookies=True)
             
         url = "https://s.keibabook.co.jp/"
         print(f"Fetching {url}...")
