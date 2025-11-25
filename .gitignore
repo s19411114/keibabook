@@ -40,7 +40,9 @@ shutuba_normalized/
 logs/
 
 # IDE
-.vscode/
+# Track workspace settings for WSL/Docker workflow; allow `.vscode/settings.json`
+.vscode/*
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo

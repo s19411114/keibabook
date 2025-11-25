@@ -1,4 +1,20 @@
 {
+  "python.terminal.activateEnvironment": false,
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "python.analysis.diagnosticMode": "openFilesOnly",
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true,
+    "**/data/**": true,
+    "**/venv/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/data": true
+  }
+}
+{
     "python-envs.defaultEnvManager": "ms-python.python:system",
     "python-envs.pythonProjects": []
 }

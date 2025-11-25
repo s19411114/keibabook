@@ -27,6 +27,11 @@ chmod +x docker-start.sh  # 初回のみ
 ./docker-start.sh
 ```
 
+### コンテナ中心の運用と venv
+
+- **重要**: Docker を使う場合、コンテナ内で全ての依存が動作するため、**ホスト上の `venv` は不要**です。`venv` は `LEGACY_VENV.md` に保管された手順として残しますが、通常は削除または無視して構いません。
+- 開発時は WSL（Ubuntu）のホームにプロジェクトを置いて `docker-compose up` することを強く推奨します。これにより、ファイルI/O と Playwright の安定性が改善されます。
+
 ### 認証の取り扱い
 このプロジェクトでは `config/settings.yml` にパスワードを平文で残さない方針です。代わりに環境変数で `LOGIN_ID` と `LOGIN_PASSWORD` を渡してください（Docker では `.env` ファイルを使うか、`docker-compose` の `environment` を通して渡します）。
 

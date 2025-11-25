@@ -29,7 +29,7 @@ docker-compose exec app bash
 
 ### 🧭 旧来の仮想環境（Legacy: 必要ならこちら）
 
-Dockerを使わない場合に備え、従来の仮想環境手順は `LEGACY_VENV.md` にまとめています。通常は Docker を使ってください。
+Docker を推奨するため、`venv` を使う旧来の方法を `LEGACY_VENV.md` に残しています。通常は Docker（WSL 上での実行を推奨）を使ってください。
 
 > 詳細手順は `DEV_GUIDE.md` を参照してください。
 
