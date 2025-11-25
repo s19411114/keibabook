@@ -43,6 +43,7 @@ logs/
 # Track workspace settings for WSL/Docker workflow; allow `.vscode/settings.json`
 .vscode/*
 !.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
