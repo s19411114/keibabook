@@ -5,14 +5,16 @@ services:
     build: .
     container_name: keibabook-dev
     volumes:
-      # ホストのプロジェクトディレクトリをマウント（デフォルト: 現在のディレクトリ）
+      # ホストのプロジェクトディレクトリをマウント（delegatedで書き込みパフォーマンス向上）
       # 開発中に高速な I/O を利用するには WSL のホームのパスを指定してください。
       # 例: HOST_PROJECT_DIR=/home/<user>/keibabook docker-compose up
-      - ${HOST_PROJECT_DIR:-.}:/app
+      - ${HOST_PROJECT_DIR:-.}:/app:delegated
       # venvは除外 (Dockerは独自のPython環境を使用)
       - /app/venv
       # __pycache__も除外
       - /app/__pycache__
+      # dataフォルダはDockerボリュームに（I/O高速化）
+      - keibabook_data:/app/data
     ports:
       # Streamlit用ポート
       - "8501:8501"
@@ -28,5 +30,13 @@ services:
       - LOGIN_PASSWORD=${LOGIN_PASSWORD:-}
     stdin_open: true
     tty: true
+    # リソース制限（オプション）
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     # コンテナ起動時にbashを実行
     command: bash
+
+volumes:
+  keibabook_data:

@@ -1,25 +1,19 @@
-FROM python:3.12-slim
+# Playwright公式イメージを使用（Chromiumプリインストール済み）
+# これにより初回起動が大幅に高速化される
+FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 
 WORKDIR /app
 
-# システム依存関係のインストール
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    wget \
-    gnupg \
-    && rm -rf /var/lib/apt/lists/*
-
-# Python依存関係のインストール
+# Python依存関係のインストール（キャッシュ活用のため先にコピー）
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Playwright (ブラウザ自動化) のインストール
-RUN playwright install chromium
-RUN playwright install-deps chromium
-
 # アプリケーションコードをコピー
 COPY . .
+
+# 環境変数設定
+ENV PYTHONUNBUFFERED=1
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # デフォルトコマンド (bashシェルを起動)
 CMD ["bash"]

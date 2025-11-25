@@ -155,7 +155,6 @@ if __name__ == '__main__':
     parser.add_argument('--full', action='store_true', help='Full fetch mode: retrieve all fields (training, comments, pedigree, points)')
     parser.add_argument('--no-summary', action='store_true', help='Do not write summary JSON')
     parser.add_argument('--perf', action='store_true', help='Enable per-step perf logs')
-    parser.add_argument('--perf', action='store_true', help='Enable per-step perf logs')
     args = parser.parse_args()
     print('Parsed args:', args)
     asyncio.run(main(target_venue=args.venue, fast=args.fast, headful=args.headful, race_num=args.race, rate_limit=args.rate, full=args.full, no_summary=args.no_summary, perf=args.perf))

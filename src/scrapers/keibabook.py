@@ -72,8 +72,8 @@ class KeibaBookScraper:
                     logger.debug(f"HTTP status for {url}: {status}")
                 # If server returns Too Many Requests (429) escalate backoff
                 if status == 429:
-                    # exponential wait (increase with attempt)
-                    wait_seconds = min(60 * (attempt + 1), 300)
+                    # exponential wait (increase with attempt) - capped at 30s to avoid long waits
+                    wait_seconds = min(10 * (attempt + 1), 30)
                     logger.warning(f"429 Too Many Requests detected for {url}: waiting {wait_seconds}s before retrying")
                     await asyncio.sleep(wait_seconds)
                     continue
