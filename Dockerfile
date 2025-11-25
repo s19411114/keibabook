@@ -1,6 +1,6 @@
 # Playwright公式イメージを使用（Chromiumプリインストール済み）
 # これにより初回起動が大幅に高速化される
-FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
 

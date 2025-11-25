@@ -105,6 +105,16 @@ class KeibaBookScraper:
                     raise
 
     def _parse_race_data(self, html_content):
+        """
+        出馬表ページから全データを取得
+        
+        取得データ:
+        - レース情報: レース名、グレード、距離、コース条件
+        - 馬情報: 枠番、馬番、予想印、馬名、年齢、騎手、斤量、短評/見解、オッズ、人気
+        - 展開予想: ペース、隊列予想（逃げ/好位/中位/後方）、展開コメント
+        - 全体コメント: レース全体の予想コメント
+        """
+        import re
         soup = BeautifulSoup(html_content, 'html.parser')
         race_data = {}
 
@@ -114,12 +124,19 @@ class KeibaBookScraper:
             race_data['race_name'] = racemei_p_elements[0].get_text(strip=True)
             race_data['race_grade'] = racemei_p_elements[1].get_text(strip=True)
 
-        # 距離
+        # 距離・コース条件（例: "2000m (ダート・左) 晴・良"）
         racetitle_sub_p_elements = soup.select(".racetitle_sub p")
         if len(racetitle_sub_p_elements) > 1:
-            distance_text = racetitle_sub_p_elements[1].get_text(strip=True)
-            # "1150m (ダート・右) 曇・良" のような形式から距離を抽出
-            race_data['distance'] = distance_text.split(' ')[0]
+            full_condition = racetitle_sub_p_elements[1].get_text(strip=True)
+            race_data['full_condition'] = full_condition
+            # 距離を抽出
+            distance_match = re.search(r'(\d+m)', full_condition)
+            race_data['distance'] = distance_match.group(1) if distance_match else full_condition.split(' ')[0]
+            # コース条件を抽出（ダート/芝、左右、天候・馬場）
+            course_match = re.search(r'\((.*?)\)', full_condition)
+            race_data['course'] = course_match.group(1) if course_match else ''
+            weather_match = re.search(r'\)\s*(.+)$', full_condition)
+            race_data['weather_track'] = weather_match.group(1) if weather_match else ''
 
         # 出馬表
         horses = []
@@ -130,38 +147,138 @@ class KeibaBookScraper:
                 horse_name_elem = row.select_one(".kbamei a")
                 jockey_elem = row.select_one(".kisyu a")
                 
+                if not (horse_num_elem and horse_name_elem):
+                    continue
+                
+                horse_data = {}
+                
+                # 枠番
+                waku_elem = row.select_one(".waku p")
+                horse_data['waku'] = waku_elem.get_text(strip=True) if waku_elem else ""
+                
+                # 馬番
+                horse_data['horse_num'] = horse_num_elem.get_text(strip=True)
+                
                 # 予想印 (tmyoso)
                 mark_elem = row.select_one(".tmyoso")
-                mark = mark_elem.get_text(strip=True) if mark_elem else ""
+                if mark_elem:
+                    # ★マークと数字印を両方取得
+                    myuma_mark = mark_elem.select_one(".myumamark")
+                    yoso_show = mark_elem.select_one(".js-yoso-show")
+                    star_mark = myuma_mark.get_text(strip=True) if myuma_mark else ""
+                    num_mark = yoso_show.get_text(strip=True) if yoso_show else ""
+                    horse_data['prediction_mark'] = f"{star_mark}{num_mark}".strip()
+                else:
+                    horse_data['prediction_mark'] = ""
                 
-                # オッズ・人気 (lh1クラスなどにある場合が多いが、構造が複雑なためテキストから抽出)
-                # 例: 436(+20)188.315人気 -> 188.3, 15人気
-                odds_pop_elem = row.select_one(".lh1")
-                odds = ""
-                popularity = ""
-                if odds_pop_elem:
-                    text = odds_pop_elem.get_text(strip=True)
-                    # 簡易的な抽出（正規表現などが望ましいが、まずはテキスト全体を保存）
-                    # "人気"で分割してみる
-                    if "人気" in text:
-                        parts = text.split("人気")
-                        if len(parts) > 0:
-                            # 直前の数値をオッズ、その前を人気と推定
-                            # ここでは単純にテキスト全体を保存しておく
-                            pass
-                    odds = text # 一旦そのまま保存
-
-                if horse_num_elem and horse_name_elem and jockey_elem:
-                    horse_name_link = horse_name_elem['href'] if horse_name_elem.has_attr('href') else ""
-                    horses.append({
-                        'horse_num': horse_num_elem.get_text(strip=True),
-                        'horse_name': horse_name_elem.get_text(strip=True),
-                        'jockey': jockey_elem.get_text(strip=True),
-                        'horse_name_link': horse_name_link,
-                        'prediction_mark': mark,
-                        'odds_text': odds # 後で加工できるようにテキスト全体を保存
-                    })
+                # 馬名とリンク
+                horse_data['horse_name'] = horse_name_elem.get_text(strip=True)
+                horse_data['horse_name_link'] = horse_name_elem['href'] if horse_name_elem.has_attr('href') else ""
+                
+                # 騎手情報（年齢、騎手名、斤量が含まれる）
+                kisyu_p = row.select_one(".kisyu")
+                if kisyu_p:
+                    kisyu_text = kisyu_p.get_text(separator=' ', strip=True)
+                    # "牡7 藤本現 56" のような形式をパース
+                    # 年齢: 牡7, 牝5, セ8 など
+                    age_match = re.search(r'([牡牝セ騸])(\d+)', kisyu_text)
+                    horse_data['sex'] = age_match.group(1) if age_match else ""
+                    horse_data['age'] = age_match.group(2) if age_match else ""
+                    
+                    # 騎手名
+                    horse_data['jockey'] = jockey_elem.get_text(strip=True) if jockey_elem else ""
+                    
+                    # 斤量: 数字のみ（2桁数字）
+                    weight_match = re.search(r'\s(\d{2}(?:\.\d)?)\s*$', kisyu_text)
+                    if not weight_match:
+                        weight_match = re.search(r'(\d{2}(?:\.\d)?)', kisyu_text.split(horse_data['jockey'])[-1] if horse_data['jockey'] else "")
+                    horse_data['weight'] = weight_match.group(1) if weight_match else ""
+                else:
+                    horse_data['jockey'] = jockey_elem.get_text(strip=True) if jockey_elem else ""
+                    horse_data['sex'] = ""
+                    horse_data['age'] = ""
+                    horse_data['weight'] = ""
+                
+                # 短評/見解 (tanpyo)
+                tanpyo_elem = row.select_one(".tanpyo")
+                if tanpyo_elem:
+                    horse_data['comment'] = tanpyo_elem.get_text(strip=True)
+                else:
+                    horse_data['comment'] = ""
+                
+                # オッズ・人気（最後のtdセル）
+                all_tds = row.find_all('td')
+                if all_tds:
+                    last_td = all_tds[-1]
+                    td_ps = last_td.find_all('p')
+                    if len(td_ps) >= 2:
+                        # オッズ: 160.0, 人気: 10人気
+                        odds_text = td_ps[1].get_text(strip=True) if len(td_ps) > 1 else ""
+                        pop_text = td_ps[2].get_text(strip=True) if len(td_ps) > 2 else ""
+                        
+                        # オッズを数値に変換
+                        odds_match = re.search(r'([\d.]+)', odds_text)
+                        horse_data['odds'] = float(odds_match.group(1)) if odds_match else None
+                        
+                        # 人気を数値に変換
+                        pop_match = re.search(r'(\d+)', pop_text)
+                        horse_data['popularity'] = int(pop_match.group(1)) if pop_match else None
+                    else:
+                        horse_data['odds'] = None
+                        horse_data['popularity'] = None
+                
+                # 旧フィールド互換性
+                horse_data['odds_text'] = f"{horse_data.get('odds', '')} {horse_data.get('popularity', '')}人気" if horse_data.get('odds') else ""
+                
+                horses.append(horse_data)
+        
         race_data['horses'] = horses
+        
+        # 展開予想セクション
+        boxsections = soup.select(".boxsection")
+        for section in boxsections:
+            title_elem = section.select_one(".title")
+            if not title_elem:
+                continue
+            title = title_elem.get_text(strip=True)
+            
+            if title == "展開":
+                # ペース
+                pace_elem = section.select_one("p:not(.title)")
+                if pace_elem and "ペース" in pace_elem.get_text():
+                    race_data['pace'] = pace_elem.get_text(strip=True).replace("ペース", "").strip()
+                
+                # 隊列予想（逃げ/好位/中位/後方）
+                formation = {}
+                table = section.select_one("table")
+                if table:
+                    for row in table.find_all('tr'):
+                        ths = row.find_all('th')
+                        tds = row.find_all('td')
+                        for i, th in enumerate(ths):
+                            if i < len(tds):
+                                position = th.get_text(strip=True)
+                                horses_text = tds[i].get_text(strip=True)
+                                formation[position] = horses_text
+                race_data['formation'] = formation
+                
+                # 展開コメント（テーブルの後のp要素）
+                all_ps = section.find_all('p')
+                for p in all_ps:
+                    text = p.get_text(strip=True)
+                    if text and "ペース" not in text and len(text) > 30:
+                        race_data['formation_comment'] = text
+                        break
+            else:
+                # 展開以外のセクション（レース全体コメント）
+                ps = section.find_all('p')
+                for p in ps:
+                    text = p.get_text(strip=True)
+                    if text and len(text) > 50:  # 長めのテキストはコメント
+                        if 'race_comment' not in race_data:
+                            race_data['race_comment'] = text
+                        break
+        
         return race_data
 
     def _parse_training_data(self, html_content):
