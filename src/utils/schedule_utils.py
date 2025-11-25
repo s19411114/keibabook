@@ -20,7 +20,8 @@ def get_next_race_number(schedule: List[Dict], venue_name: str, now: datetime.da
     for v in schedule:
         sched_name = v.get('venue')
         normalized_sched = VenueManager.normalize_venue_name(sched_name) or sched_name
-        if normalized_sched == normalized_target:
+        # Allow for flexible matching: exact match or substring match
+        if normalized_sched == normalized_target or (normalized_sched and normalized_target and (normalized_sched in normalized_target or normalized_target in normalized_sched)):
             races = v.get('races', [])
             # parse time string HH:MM into today datetime; compare
             for r in sorted(races, key=lambda x: x.get('race_num', 0)):

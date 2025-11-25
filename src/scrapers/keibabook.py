@@ -658,6 +658,7 @@ class KeibaBookScraper:
     async def scrape(self, context=None, page=None):
         # If a page/context is provided, use it to avoid launching a new browser.
         created_browser = False
+        browser = None
         if page is None or context is None:
             created_browser = True
             from playwright.async_api import async_playwright
@@ -665,260 +666,262 @@ class KeibaBookScraper:
             browser = await self._playwright.chromium.launch(headless=self.settings.get("playwright_headless", True))
             context = await browser.new_context()
             page = await context.new_page()
-            try:
-                perf_enabled = self.settings.get('perf', False)
-                if perf_enabled:
-                    overall_start = time.perf_counter()
-                # タイムアウト設定（任意）
-                timeout_ms = self.settings.get("playwright_timeout")
-                if timeout_ms:
-                    page.set_default_timeout(timeout_ms)
+        
+        try:
+            perf_enabled = self.settings.get('perf', False)
+            if perf_enabled:
+                overall_start = time.perf_counter()
+            # タイムアウト設定（任意）
+            timeout_ms = self.settings.get("playwright_timeout")
+            if timeout_ms:
+                page.set_default_timeout(timeout_ms)
 
-                # ログイン確保: コンテキストに cookie をロードした上でログイン済みでなければログインを実行
-                from src.utils.login import KeibaBookLogin
-                cookie_file = self.settings.get('cookie_file', 'cookies.json')
-                login_id = self.settings.get('login_id')
-                password = self.settings.get('login_password')
-                url = self.shutuba_url
-                login_ok = await KeibaBookLogin.ensure_logged_in(context, login_id, password, cookie_file=cookie_file, save_cookies=True, test_url=url)
-                if not login_ok:
-                    logger.warning("ログインに失敗しました。無料範囲のデータのみ取得されます。")
-                
-                # 重複チェック（DBマネージャーが設定されている場合）
-                if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
-                    logger.info(f"スキップ（既取得）: {url}")
-                    # 既存データを返すか、空データを返すかは要件次第
-                    # ここでは空データを返す（差分取得が必要な場合は別途実装）
-                    return {}
-                
-                # レート制御: サイト負担を軽減
+            # ログイン確保: コンテキストに cookie をロードした上でログイン済みでなければログインを実行
+            from src.utils.login import KeibaBookLogin
+            cookie_file = self.settings.get('cookie_file', 'cookies.json')
+            login_id = self.settings.get('login_id')
+            password = self.settings.get('login_password')
+            url = self.shutuba_url
+            login_ok = await KeibaBookLogin.ensure_logged_in(context, login_id, password, cookie_file=cookie_file, save_cookies=True, test_url=url)
+            if not login_ok:
+                logger.warning("ログインに失敗しました。無料範囲のデータのみ取得されます。")
+            
+            # 重複チェック（DBマネージャーが設定されている場合）
+            if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
+                logger.info(f"スキップ（既取得）: {url}")
+                # 既存データを返すか、空データを返すかは要件次第
+                # ここでは空データを返す（差分取得が必要な場合は別途実装）
+                return {}
+            
+            # レート制御: サイト負担を軽減
+            await self.rate_limiter.wait()
+            
+            # ログイン後に出馬表URLに遷移してコンテンツを取得
+            html_content = await self._fetch_page_content(page, url)
+            
+            # URL取得をログに記録
+            if self.db_manager:
+                self.db_manager.log_url(url, self.settings['race_id'], 'shutuba', 'success')
+            
+            # --- デバッグ用にHTMLをファイルに保存 ---
+            # Debug: ensure what's written is a str to avoid mock coroutine issues
+            try:
+                if isinstance(html_content, (bytes, bytearray)):
+                    html_text = html_content.decode('utf-8', errors='replace')
+                elif isinstance(html_content, str):
+                    html_text = html_content
+                else:
+                    # Fallback for mocked objects: convert to str
+                    html_text = str(html_content)
+            except Exception:
+                html_text = str(html_content)
+            race_key = self.settings.get('race_key', 'unknown')
+            if not self.settings.get('skip_debug_files', False):
+                with open(f"debug_page_{race_key}.html", "w", encoding="utf-8") as f:
+                    f.write(html_text)
+            # ------------------------------------
+
+            race_data = self._parse_race_data(html_content)
+
+            # 地方競馬の場合は最小限のデータのみ取得（馬柱、出馬表、血統）
+            # 中央競馬の場合は全データを取得
+            
+            # 調教データを取得してマージ（地方競馬ではスキップ）
+            if self.race_type != 'nar':
+                base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
+                training_url = f"{base_url}/cyokyo/0/{self.settings['race_id']}"
+            else:
+                training_url = None
+            
+            # 調教データ取得（地方競馬ではスキップ）
+            if training_url and not self.settings.get('skip_training', False):
+                # レート制御
                 await self.rate_limiter.wait()
                 
-                html_content = await page.content()
+                # 重複チェック
+                if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(training_url)):
+                    training_html_content = await self._fetch_page_content(page, training_url)
+                    if self.db_manager:
+                        self.db_manager.log_url(training_url, self.settings['race_id'], 'training', 'success')
+                    if not self.settings.get('skip_debug_files', False):
+                        with open(f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
+                            f.write(training_html_content)
+                else:
+                    logger.info(f"スキップ（既取得）: {training_url}")
+                    training_html_content = ""
                 
-                # URL取得をログに記録
+                parsed_training_data = self._parse_training_data(training_html_content) if training_html_content else {}
+            else:
+                parsed_training_data = {}
+                logger.info("地方競馬のため調教データをスキップ")
+
+            for horse in race_data.get('horses', []):
+                horse_num = horse.get('horse_num')
+                if horse_num in parsed_training_data:
+                    horse['training_data'] = parsed_training_data[horse_num]
+                else:
+                    horse['training_data'] = {}
+
+            # 血統データを取得してマージ（馬柱、出馬表、血統は必須）
+            base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
+            pedigree_url = f"{base_url}/kettou/{self.settings['race_id']}"
+            
+            # レート制御
+            await self.rate_limiter.wait()
+            
+            # 重複チェック
+            if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(pedigree_url)) and not self.settings.get('skip_pedigree', False):
+                pedigree_html_content = await self._fetch_page_content(page, pedigree_url)
                 if self.db_manager:
-                    self.db_manager.log_url(url, self.settings['race_id'], 'shutuba', 'success')
-                
-                # --- デバッグ用にHTMLをファイルに保存 ---
-                # Debug: ensure what's written is a str to avoid mock coroutine issues
-                try:
-                    if isinstance(html_content, (bytes, bytearray)):
-                        html_text = html_content.decode('utf-8', errors='replace')
-                    elif isinstance(html_content, str):
-                        html_text = html_content
-                    else:
-                        # Fallback for mocked objects: convert to str
-                        html_text = str(html_content)
-                except Exception:
-                    html_text = str(html_content)
-                race_key = self.settings.get('race_key', 'unknown')
+                    self.db_manager.log_url(pedigree_url, self.settings['race_id'], 'pedigree', 'success')
                 if not self.settings.get('skip_debug_files', False):
-                    with open(f"debug_page_{race_key}.html", "w", encoding="utf-8") as f:
-                        f.write(html_text)
-                # ------------------------------------
+                    with open(f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
+                        f.write(pedigree_html_content)
+            else:
+                logger.info(f"スキップ（既取得）: {pedigree_url}")
+                pedigree_html_content = ""
+            
+            parsed_pedigree_data = self._parse_pedigree_data(pedigree_html_content) if pedigree_html_content else []
 
-                race_data = self._parse_race_data(html_content)
-
-                # 地方競馬の場合は最小限のデータのみ取得（馬柱、出馬表、血統）
-                # 中央競馬の場合は全データを取得
-                
-                # 調教データを取得してマージ（地方競馬ではスキップ）
-                if self.race_type != 'nar':
-                    base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
-                    training_url = f"{base_url}/cyokyo/0/{self.settings['race_id']}"
+            # 血統データをインデックスでマッチング（血統ページには馬番がないため）
+            horses = race_data.get('horses', [])
+            for idx, horse in enumerate(horses):
+                if idx < len(parsed_pedigree_data):
+                    horse['pedigree_data'] = parsed_pedigree_data[idx]
                 else:
-                    training_url = None
-                
-                # 調教データ取得（地方競馬ではスキップ）
-                if training_url and not self.settings.get('skip_training', False):
-                    # レート制御
-                    await self.rate_limiter.wait()
-                    
-                    # 重複チェック
-                    if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(training_url)):
-                        training_html_content = await self._fetch_page_content(page, training_url)
-                        if self.db_manager:
-                            self.db_manager.log_url(training_url, self.settings['race_id'], 'training', 'success')
-                        if not self.settings.get('skip_debug_files', False):
-                            with open(f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
-                                f.write(training_html_content)
-                    else:
-                        logger.info(f"スキップ（既取得）: {training_url}")
-                        training_html_content = ""
-                    
-                    parsed_training_data = self._parse_training_data(training_html_content) if training_html_content else {}
-                else:
-                    parsed_training_data = {}
-                    logger.info("地方競馬のため調教データをスキップ")
+                    horse['pedigree_data'] = {}
 
-                for horse in race_data.get('horses', []):
-                    horse_num = horse.get('horse_num')
-                    if horse_num in parsed_training_data:
-                        horse['training_data'] = parsed_training_data[horse_num]
-                    else:
-                        horse['training_data'] = {}
-
-                # 血統データを取得してマージ（馬柱、出馬表、血統は必須）
-                base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
-                pedigree_url = f"{base_url}/kettou/{self.settings['race_id']}"
+            # 厩舎の話データを取得してマージ（地方競馬ではスキップ）
+            if self.race_type != 'nar' and not self.settings.get('skip_stable_comment', False):
+                stable_comment_url = f"{base_url}/danwa/0/{self.settings['race_id']}"
                 
                 # レート制御
                 await self.rate_limiter.wait()
                 
                 # 重複チェック
-                if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(pedigree_url)) and not self.settings.get('skip_pedigree', False):
-                    pedigree_html_content = await self._fetch_page_content(page, pedigree_url)
+                if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(stable_comment_url)):
+                    stable_comment_html_content = await self._fetch_page_content(page, stable_comment_url)
                     if self.db_manager:
-                        self.db_manager.log_url(pedigree_url, self.settings['race_id'], 'pedigree', 'success')
+                        self.db_manager.log_url(stable_comment_url, self.settings['race_id'], 'stable_comment', 'success')
                     if not self.settings.get('skip_debug_files', False):
-                        with open(f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
-                            f.write(pedigree_html_content)
+                        with open(f"debug_stable_comment_{race_key}.html", "w", encoding="utf-8") as f:
+                            f.write(stable_comment_html_content)
                 else:
-                    logger.info(f"スキップ（既取得）: {pedigree_url}")
-                    pedigree_html_content = ""
+                    logger.info(f"スキップ（既取得）: {stable_comment_url}")
+                    stable_comment_html_content = ""
                 
-                parsed_pedigree_data = self._parse_pedigree_data(pedigree_html_content) if pedigree_html_content else []
+                parsed_stable_comment_data = self._parse_stable_comment_data(stable_comment_html_content) if stable_comment_html_content else {}
+            else:
+                parsed_stable_comment_data = {}
+                logger.info("地方競馬のため厩舎コメントをスキップ")
 
-                # 血統データをインデックスでマッチング（血統ページには馬番がないため）
-                horses = race_data.get('horses', [])
-                for idx, horse in enumerate(horses):
-                    if idx < len(parsed_pedigree_data):
-                        horse['pedigree_data'] = parsed_pedigree_data[idx]
-                    else:
-                        horse['pedigree_data'] = {}
-
-                # 厩舎の話データを取得してマージ（地方競馬ではスキップ）
-                if self.race_type != 'nar' and not self.settings.get('skip_stable_comment', False):
-                    stable_comment_url = f"{base_url}/danwa/0/{self.settings['race_id']}"
-                    
-                    # レート制御
-                    await self.rate_limiter.wait()
-                    
-                    # 重複チェック
-                    if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(stable_comment_url)):
-                        stable_comment_html_content = await self._fetch_page_content(page, stable_comment_url)
-                        if self.db_manager:
-                            self.db_manager.log_url(stable_comment_url, self.settings['race_id'], 'stable_comment', 'success')
-                        if not self.settings.get('skip_debug_files', False):
-                            with open(f"debug_stable_comment_{race_key}.html", "w", encoding="utf-8") as f:
-                                f.write(stable_comment_html_content)
-                    else:
-                        logger.info(f"スキップ（既取得）: {stable_comment_url}")
-                        stable_comment_html_content = ""
-                    
-                    parsed_stable_comment_data = self._parse_stable_comment_data(stable_comment_html_content) if stable_comment_html_content else {}
+            for horse in race_data.get('horses', []):
+                horse_num = horse.get('horse_num')
+                if horse_num in parsed_stable_comment_data:
+                    horse['stable_comment'] = parsed_stable_comment_data[horse_num]
                 else:
-                    parsed_stable_comment_data = {}
-                    logger.info("地方競馬のため厩舎コメントをスキップ")
+                    horse['stable_comment'] = ""
 
-                for horse in race_data.get('horses', []):
-                    horse_num = horse.get('horse_num')
-                    if horse_num in parsed_stable_comment_data:
-                        horse['stable_comment'] = parsed_stable_comment_data[horse_num]
-                    else:
-                        horse['stable_comment'] = ""
-
-                # 前走コメントデータを取得してマージ（地方競馬ではスキップ）
-                if self.race_type != 'nar' and not self.settings.get('skip_previous_race_comment', False):
-                    previous_race_comment_url = f"{base_url}/syoin/{self.settings['race_id']}"
-                    
-                    # レート制御
-                    await self.rate_limiter.wait()
-                    
-                    # 重複チェック
-                    if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(previous_race_comment_url)):
-                        previous_race_comment_url_content = await self._fetch_page_content(page, previous_race_comment_url)
-                        if self.db_manager:
-                            self.db_manager.log_url(previous_race_comment_url, self.settings['race_id'], 'previous_race_comment', 'success')
-                        if not self.settings.get('skip_debug_files', False):
-                            with open(f"debug_previous_race_comment_{race_key}.html", "w", encoding="utf-8") as f:
-                                f.write(previous_race_comment_url_content)
-                    else:
-                        logger.info(f"スキップ（既取得）: {previous_race_comment_url}")
-                        previous_race_comment_url_content = ""
-                    
-                    parsed_previous_race_comment_data = self._parse_previous_race_comment_data(previous_race_comment_url_content) if previous_race_comment_url_content else {}
-                else:
-                    parsed_previous_race_comment_data = {}
-                    logger.info("地方競馬のため前走コメントをスキップ")
-
-                for horse in race_data.get('horses', []):
-                    horse_num = horse.get('horse_num')
-                    if horse_num in parsed_previous_race_comment_data:
-                        horse['previous_race_comment'] = parsed_previous_race_comment_data[horse_num]
-                    else:
-                        horse['previous_race_comment'] = ""
-
-                # 馬柱（能力表）データを取得（出馬表ページから）- 簡易情報として
-                if self.settings.get('skip_past_results', False):
-                    horse_table_data = {}
-                else:
-                    # 個別馬ページへの遷移は行わない（被りが多いため）
-                    horse_table_data = self._parse_horse_table_data(html_content)
-                for horse in race_data.get('horses', []):
-                    horse_num = horse.get('horse_num')
-                    if horse_num in horse_table_data:
-                        horse['past_results'] = horse_table_data[horse_num].get('past_results', [])
-                    else:
-                        horse['past_results'] = []
+            # 前走コメントデータを取得してマージ（地方競馬ではスキップ）
+            if self.race_type != 'nar' and not self.settings.get('skip_previous_race_comment', False):
+                previous_race_comment_url = f"{base_url}/syoin/{self.settings['race_id']}"
                 
-                # 地方競馬の場合、ポイント情報と個別馬コメントを取得
-                if self.race_type == 'nar':
-                    # ポイントページを取得
-                    point_data = await self._scrape_point_page(page, base_url)
-                    if point_data:
-                        race_data['point_info'] = point_data
-                    
-                    # 個別馬のコメントを取得（穴馬のヒント）
-                    # Keep sequential by default (comments_concurrency defaults to 1)
-                    await self._scrape_horse_comments(page, race_data.get('horses', []), base_url)
+                # レート制御
+                await self.rate_limiter.wait()
+                
+                # 重複チェック
+                if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(previous_race_comment_url)):
+                    previous_race_comment_url_content = await self._fetch_page_content(page, previous_race_comment_url)
+                    if self.db_manager:
+                        self.db_manager.log_url(previous_race_comment_url, self.settings['race_id'], 'previous_race_comment', 'success')
+                    if not self.settings.get('skip_debug_files', False):
+                        with open(f"debug_previous_race_comment_{race_key}.html", "w", encoding="utf-8") as f:
+                            f.write(previous_race_comment_url_content)
+                else:
+                    logger.info(f"スキップ（既取得）: {previous_race_comment_url}")
+                    previous_race_comment_url_content = ""
+                
+                parsed_previous_race_comment_data = self._parse_previous_race_comment_data(previous_race_comment_url_content) if previous_race_comment_url_content else {}
+            else:
+                parsed_previous_race_comment_data = {}
+                logger.info("地方競馬のため前走コメントをスキップ")
 
-                # 結果ページから詳細情報を取得（レース終了後のみ）
-                # 現時点では予想用データ収集が目的のため、結果ページはスキップ
-                # レース終了後、過去データを蓄積する際に結果ページから詳細情報を取得
-                # if self.seiseki_url:
-                #     result_data = await self._scrape_result_page(page, base_url)
-                #     if result_data:
-                #         # 結果ページのデータをマージ
-                #         race_data['result_info'] = result_data.get('race_info', {})
-                #         race_data['result_horses'] = result_data.get('horses', [])
-                #         race_data['payouts'] = result_data.get('payouts', {})
-                #         
-                #         # 結果ページの馬データを出馬表の馬データにマージ
-                #         result_horses_dict = {h.get('horse_num'): h for h in result_data.get('horses', [])}
-                #         for horse in race_data.get('horses', []):
-                #             horse_num = horse.get('horse_num')
-                #             if horse_num in result_horses_dict:
-                #                 result_horse = result_horses_dict[horse_num]
-                #                 # 結果ページの詳細情報をマージ
-                #                 horse['result_rank'] = result_horse.get('rank')
-                #                 horse['result_time'] = result_horse.get('time')
-                #                 horse['result_margin'] = result_horse.get('margin')
-                #                 horse['result_passing'] = result_horse.get('passing')
-                #                 horse['result_last_3f'] = result_horse.get('last_3f')
-                #                 horse['odds'] = result_horse.get('odds')
-                #                 horse['popularity'] = result_horse.get('popularity')
+            for horse in race_data.get('horses', []):
+                horse_num = horse.get('horse_num')
+                if horse_num in parsed_previous_race_comment_data:
+                    horse['previous_race_comment'] = parsed_previous_race_comment_data[horse_num]
+                else:
+                    horse['previous_race_comment'] = ""
 
-                if perf_enabled:
-                    overall_end = time.perf_counter()
-                    logger.info(f"PERF total_race_scrape_ms={(overall_end - overall_start)*1000:.0f} for {self.settings.get('race_id')}")
-                # Save debug fetch summary
-                if not self.settings.get('skip_debug_files', False):
-                    try:
-                        with open(f"debug_fetches_{race_key}.json", "w", encoding="utf-8") as f:
-                            import json
-                            json.dump(self._last_fetches, f, ensure_ascii=False, indent=2)
-                    except Exception:
-                        pass
-                return race_data
-            finally:
-                if created_browser:
-                    try:
-                        await browser.close()
-                    except Exception:
-                        pass
-                    try:
-                        await self._playwright.__aexit__(None, None, None)
-                    except Exception:
-                        pass
+            # 馬柱（能力表）データを取得（出馬表ページから）- 簡易情報として
+            if self.settings.get('skip_past_results', False):
+                horse_table_data = {}
+            else:
+                # 個別馬ページへの遷移は行わない（被りが多いため）
+                horse_table_data = self._parse_horse_table_data(html_content)
+            for horse in race_data.get('horses', []):
+                horse_num = horse.get('horse_num')
+                if horse_num in horse_table_data:
+                    horse['past_results'] = horse_table_data[horse_num].get('past_results', [])
+                else:
+                    horse['past_results'] = []
+            
+            # 地方競馬の場合、ポイント情報と個別馬コメントを取得
+            if self.race_type == 'nar':
+                # ポイントページを取得
+                point_data = await self._scrape_point_page(page, base_url)
+                if point_data:
+                    race_data['point_info'] = point_data
+                
+                # 個別馬のコメントを取得（穴馬のヒント）
+                # Keep sequential by default (comments_concurrency defaults to 1)
+                await self._scrape_horse_comments(page, race_data.get('horses', []), base_url)
+
+            # 結果ページから詳細情報を取得（レース終了後のみ）
+            # 現時点では予想用データ収集が目的のため、結果ページはスキップ
+            # レース終了後、過去データを蓄積する際に結果ページから詳細情報を取得
+            # if self.seiseki_url:
+            #     result_data = await self._scrape_result_page(page, base_url)
+            #     if result_data:
+            #         # 結果ページのデータをマージ
+            #         race_data['result_info'] = result_data.get('race_info', {})
+            #         race_data['result_horses'] = result_data.get('horses', [])
+            #         race_data['payouts'] = result_data.get('payouts', {})
+            #         
+            #         # 結果ページの馬データを出馬表の馬データにマージ
+            #         result_horses_dict = {h.get('horse_num'): h for h in result_data.get('horses', [])}
+            #         for horse in race_data.get('horses', []):
+            #             horse_num = horse.get('horse_num')
+            #             if horse_num in result_horses_dict:
+            #                 result_horse = result_horses_dict[horse_num]
+            #                 # 結果ページの詳細情報をマージ
+            #                 horse['result_rank'] = result_horse.get('rank')
+            #                 horse['result_time'] = result_horse.get('time')
+            #                 horse['result_margin'] = result_horse.get('margin')
+            #                 horse['result_passing'] = result_horse.get('passing')
+            #                 horse['result_last_3f'] = result_horse.get('last_3f')
+            #                 horse['odds'] = result_horse.get('odds')
+            #                 horse['popularity'] = result_horse.get('popularity')
+
+            if perf_enabled:
+                overall_end = time.perf_counter()
+                logger.info(f"PERF total_race_scrape_ms={(overall_end - overall_start)*1000:.0f} for {self.settings.get('race_id')}")
+            # Save debug fetch summary
+            if not self.settings.get('skip_debug_files', False):
+                try:
+                    with open(f"debug_fetches_{race_key}.json", "w", encoding="utf-8") as f:
+                        import json
+                        json.dump(self._last_fetches, f, ensure_ascii=False, indent=2)
+                except Exception:
+                    pass
+            return race_data
+        finally:
+            if created_browser and browser:
+                try:
+                    await browser.close()
+                except Exception:
+                    pass
+                try:
+                    await self._playwright.__aexit__(None, None, None)
+                except Exception:
+                    pass
