@@ -182,6 +182,95 @@ class CSVDBManager:
             logger.warning(f"レースID取得エラー: {e}")
             return []
     
+    def is_race_fetched(self, race_id: str) -> bool:
+        """
+        指定されたレースIDのデータが取得済みかチェック
+        
+        Args:
+            race_id: レースID
+            
+        Returns:
+            取得済みの場合True
+        """
+        if not self.url_log_path.exists():
+            return False
+        
+        try:
+            df = pd.read_csv(self.url_log_path, encoding='utf-8-sig')
+            # 出馬表ページが取得されていれば取得済みと判断
+            return ((df['race_id'] == race_id) & (df['page_type'] == 'shutuba') & (df['status'] == 'success')).any()
+        except Exception as e:
+            logger.warning(f"レース取得状況確認エラー: {e}")
+            return False
+    
+    def get_fetched_races_for_date(self, date_str: str, race_type: str = 'jra') -> Dict[str, List[int]]:
+        """
+        指定日付の取得済みレース情報を取得
+        
+        Args:
+            date_str: 日付文字列（YYYYMMDD形式）
+            race_type: 'jra' or 'nar'
+            
+        Returns:
+            会場ごとの取得済みレース番号の辞書
+            例: {"東京": [1, 2, 3], "中山": [1]}
+        """
+        result = {}
+        
+        if not self.url_log_path.exists():
+            return result
+        
+        try:
+            df = pd.read_csv(self.url_log_path, encoding='utf-8-sig')
+            # 出馬表ページで成功したもののみ
+            success_df = df[(df['page_type'] == 'shutuba') & (df['status'] == 'success')]
+            
+            for _, row in success_df.iterrows():
+                race_id = str(row['race_id'])
+                # race_idから日付を抽出（先頭8文字）
+                if len(race_id) >= 8 and race_id[:8] == date_str:
+                    # race_idから会場コードとレース番号を抽出
+                    # フォーマット: YYYYMMDDVVNN （日付8桁 + 会場2桁 + レース番号2桁）
+                    if len(race_id) >= 12:
+                        venue_code = race_id[8:10]
+                        race_num = int(race_id[10:12])
+                        
+                        # 会場コードを会場名に変換
+                        venue_name = self._venue_code_to_name(venue_code, race_type)
+                        
+                        if venue_name not in result:
+                            result[venue_name] = []
+                        if race_num not in result[venue_name]:
+                            result[venue_name].append(race_num)
+            
+            # ソート
+            for venue in result:
+                result[venue].sort()
+            
+            return result
+        except Exception as e:
+            logger.warning(f"取得済みレース情報取得エラー: {e}")
+            return result
+    
+    def _venue_code_to_name(self, code: str, race_type: str) -> str:
+        """会場コードを会場名に変換"""
+        jra_codes = {
+            "01": "札幌", "02": "函館", "03": "福島", "04": "新潟",
+            "05": "東京", "06": "中山", "07": "中京", "08": "京都",
+            "09": "阪神", "10": "小倉"
+        }
+        nar_codes = {
+            "36": "大井", "37": "川崎", "38": "船橋", "39": "浦和",
+            "40": "金沢", "41": "名古屋", "42": "園田", "43": "姫路",
+            "44": "福山", "45": "高知", "46": "佐賀", "47": "荒尾",
+            "48": "水沢", "49": "盛岡", "50": "門別", "51": "帯広"
+        }
+        
+        if race_type == 'nar':
+            return nar_codes.get(code, code)
+        else:
+            return jra_codes.get(code, code)
+    
     def export_for_ai(self, race_id: str, output_dir: str = "data/json") -> Optional[str]:
         """
         AI用にJSON形式でエクスポート

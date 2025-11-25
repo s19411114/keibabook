@@ -1,7 +1,32 @@
 """
 レースデータエクスポーター
-- 全データ（血統、出馬表、調教、厩舎の話、ポイント、展開予想）を
+- 全データ（血統、出馬表、調教、厩舎の話、ポイント、展開予想、CPU予想、結果）を
   AI分析用に1つのテキストファイルにまとめる
+
+取得項目一覧:
+【共通】
+- 出馬表: 枠番、馬番、馬名、騎手、斤量、オッズ、人気、予想印、短評/見解
+- 血統: 三代血統（父/母/父父/父母/母父/母母/3代前8頭）
+- 調教: 短評、タイム、併せ馬
+- 厩舎の話
+- 前走コメント
+- 展開予想: ペース、隊列（逃げ/好位/中位/後方）、展開コメント
+
+【中央競馬専用】
+- CPU予想: レーティング、スピード指数、調教印、血統印
+- ギリギリ情報（重賞）: 馬体重変動、パドック評価、直前コメント
+- 特集ページ（重賞）: 傾向分析、血統傾向、本命・対抗・穴馬
+- AI指数
+
+【地方競馬専用】
+- ポイント: 大穴馬、激走馬、AI血統予想、パワー馬場向き馬
+- 個別馬コメント（穴馬のヒント）
+
+【レース後】
+- レース結果: 着順、タイム、着差、通過順位、上がり3F
+- ラップタイム（トラックバイアス分析用）
+- レース後コメント、次走へのメモ
+- 払戻情報
 """
 import json
 from datetime import datetime
@@ -49,6 +74,83 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
     if race_data.get('race_comment'):
         lines.append(f"- 全体分析: {race_data.get('race_comment')}")
     lines.append("")
+    
+    # ===== 中央競馬専用: CPU予想 =====
+    cpu_data = race_data.get('cpu_prediction', {})
+    if cpu_data and cpu_data.get('horses'):
+        lines.append("## CPU予想（最重要）")
+        lines.append("| 馬番 | 馬名 | レーティング | スピード指数 | 調教印 | 血統印 | CPU指数 |")
+        lines.append("|------|------|--------------|--------------|--------|--------|---------|")
+        for h in cpu_data.get('horses', []):
+            lines.append(f"| {h.get('horse_num', '')} | {h.get('horse_name', '')} | {h.get('rating', '')} | {h.get('speed_index', '')} | {h.get('training_mark', '')} | {h.get('pedigree_mark', '')} | {h.get('cpu_index', '')} |")
+        if cpu_data.get('summary', {}).get('comment'):
+            lines.append(f"\n**サマリー**: {cpu_data['summary']['comment']}")
+        lines.append("")
+    
+    # ===== 中央競馬専用: ギリギリ情報（重賞） =====
+    girigiri_data = race_data.get('girigiri_info', {})
+    if girigiri_data:
+        lines.append("## ギリギリ情報（直前情報）")
+        if girigiri_data.get('overall_comment'):
+            lines.append(f"- 全体コメント: {girigiri_data['overall_comment']}")
+        if girigiri_data.get('paddock_comment'):
+            lines.append(f"- パドック: {girigiri_data['paddock_comment']}")
+        if girigiri_data.get('last_update'):
+            lines.append(f"- 最終更新: {girigiri_data['last_update']}")
+        for h in girigiri_data.get('horses', []):
+            lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}: 体重{h.get('weight_change', '')} パドック{h.get('paddock_eval', '')} {h.get('girigiri_comment', '')}")
+        lines.append("")
+    
+    # ===== 中央競馬専用: 特集ページ（重賞） =====
+    feature_data = race_data.get('special_feature', {})
+    if feature_data and feature_data.get('title'):
+        lines.append(f"## 特集: {feature_data.get('title', '')}")
+        for analysis in feature_data.get('analysis', []):
+            lines.append(f"### {analysis.get('title', '')}")
+            lines.append(f"{analysis.get('content', '')}")
+            lines.append("")
+        if feature_data.get('trends'):
+            lines.append("### 傾向データ")
+            for k, v in feature_data['trends'].items():
+                lines.append(f"- {k}: {v}")
+        picks = feature_data.get('picks', {})
+        if any(picks.values()):
+            lines.append("### 注目馬")
+            if picks.get('honmei'):
+                lines.append(f"- **本命**: {', '.join(picks['honmei'])}")
+            if picks.get('taikou'):
+                lines.append(f"- **対抗**: {', '.join(picks['taikou'])}")
+            if picks.get('anaba'):
+                lines.append(f"- **穴馬**: {', '.join(picks['anaba'])}")
+        if feature_data.get('pedigree_trends'):
+            lines.append("### 血統傾向")
+            for trend in feature_data['pedigree_trends']:
+                lines.append(f"- {trend}")
+        if feature_data.get('course_analysis'):
+            lines.append(f"### コース分析\n{feature_data['course_analysis']}")
+        lines.append("")
+    
+    # ===== 地方競馬専用: ポイント情報 =====
+    point_data = race_data.get('point_info', {})
+    if point_data:
+        lines.append("## ポイント情報（地方競馬）")
+        if point_data.get('big_upset_horses'):
+            lines.append("### 今日大穴空けた馬たち")
+            for h in point_data['big_upset_horses']:
+                lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}: {h.get('reason', '')} (オッズ{h.get('odds', '')})")
+        if point_data.get('strong_run_hints'):
+            lines.append("### 激走した馬たちのヒント")
+            for h in point_data['strong_run_hints']:
+                lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}: {h.get('reason', '')}")
+        if point_data.get('ai_pedigree_picks'):
+            lines.append("### 血統からAIが予想した馬")
+            for h in point_data['ai_pedigree_picks']:
+                lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}: {h.get('reason', '')}")
+        if point_data.get('power_track_horses'):
+            lines.append("### パワー馬場向きの馬")
+            for h in point_data['power_track_horses']:
+                lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}: {h.get('reason', '')} (オッズ{h.get('odds', '')})")
+        lines.append("")
     
     # 出馬表（詳細）
     lines.append("## 出馬表")
@@ -154,8 +256,81 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             for result in past[:5]:  # 直近5走
                 lines.append(f"  - {result}")
         
+        # CPU予想データ（中央競馬）
+        if h.get('rating') or h.get('speed_index') or h.get('cpu_index'):
+            lines.append("")
+            lines.append("#### CPU予想")
+            if h.get('rating'):
+                lines.append(f"- レーティング: {h['rating']}")
+            if h.get('speed_index'):
+                lines.append(f"- スピード指数: {h['speed_index']}")
+            if h.get('cpu_training_mark'):
+                lines.append(f"- 調教印: {h['cpu_training_mark']}")
+            if h.get('cpu_pedigree_mark'):
+                lines.append(f"- 血統印: {h['cpu_pedigree_mark']}")
+            if h.get('cpu_index'):
+                lines.append(f"- CPU指数: {h['cpu_index']}")
+        
+        # レース結果（レース後のみ）
+        if h.get('result_rank'):
+            lines.append("")
+            lines.append("#### レース結果")
+            lines.append(f"- 着順: {h['result_rank']}")
+            if h.get('result_time'):
+                lines.append(f"- タイム: {h['result_time']}")
+            if h.get('result_margin'):
+                lines.append(f"- 着差: {h['result_margin']}")
+            if h.get('result_passing'):
+                lines.append(f"- 通過順位: {h['result_passing']}")
+            if h.get('result_last_3f'):
+                lines.append(f"- 上がり3F: {h['result_last_3f']}")
+            if h.get('result_comment'):
+                lines.append(f"- レース後コメント: {h['result_comment']}")
+            if h.get('next_race_memo'):
+                lines.append(f"- **次走メモ**: {h['next_race_memo']}")
+        
         lines.append("")
         lines.append("-" * 40)
+        lines.append("")
+    
+    # ===== レース結果セクション（レース後のみ） =====
+    result_data = race_data.get('result', {})
+    if result_data:
+        lines.append("## レース結果")
+        
+        # ラップタイム（トラックバイアス分析用）
+        lap_times = race_data.get('lap_times', [])
+        if lap_times:
+            lines.append("### ラップタイム")
+            lines.append(f"- {' - '.join(lap_times)}")
+        
+        # コーナー通過順位
+        corner_positions = race_data.get('corner_positions', {})
+        if corner_positions:
+            lines.append("### コーナー通過順位")
+            for corner, positions in corner_positions.items():
+                lines.append(f"- {corner}: {positions}")
+        
+        # レース回顧
+        if race_data.get('race_review'):
+            lines.append("### レース回顧")
+            lines.append(f"{race_data['race_review']}")
+        
+        # 払戻
+        payouts = race_data.get('payouts', {})
+        if payouts:
+            lines.append("### 払戻")
+            for payout_type, value in payouts.items():
+                if isinstance(value, dict):
+                    lines.append(f"- {payout_type}: {value.get('value', '')} ({value.get('horse', '')})")
+                elif isinstance(value, list):
+                    for v in value:
+                        if isinstance(v, dict):
+                            lines.append(f"- {payout_type}: {v.get('value', '')} ({v.get('horse', '')})")
+                        else:
+                            lines.append(f"- {payout_type}: {v}")
+                else:
+                    lines.append(f"- {payout_type}: {value}")
         lines.append("")
     
     # フッター

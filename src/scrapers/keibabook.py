@@ -7,6 +7,7 @@ from src.utils.logger import get_logger
 from src.utils.rate_limiter import RateLimiter
 from src.scrapers.result_parser import ResultPageParser
 from src.scrapers.local_racing_parser import LocalRacingParser
+from src.scrapers.jra_special_parser import JRASpecialParser
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 
@@ -29,6 +30,7 @@ class KeibaBookScraper:
         self.db_manager = db_manager
         self.result_parser = ResultPageParser()  # 結果ページパーサー
         self.local_parser = LocalRacingParser()  # 地方競馬専用パーサー
+        self.jra_parser = JRASpecialParser()  # 中央競馬専用パーサー（CPU予想等）
         self.rate_limiter = RateLimiter(self.settings.get('rate_limit_base'))  # レート制御
         # record fetch details for debugging and perf analysis
         self._last_fetches = []
@@ -1011,7 +1013,89 @@ class KeibaBookScraper:
                 else:
                     horse['past_results'] = []
             
-            # 地方競馬の場合、ポイント情報と個別馬コメントを取得
+            # ===== 中央競馬専用ページの取得 =====
+            if self.race_type == 'jra':
+                # CPU予想ページを取得（最重要ページ：レーティング、スピード指数、印）
+                if not self.settings.get('skip_cpu_prediction', False):
+                    cpu_url = f"{base_url}/cpu/{self.settings['race_id']}"
+                    
+                    await self.rate_limiter.wait()
+                    
+                    if not (not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(cpu_url)):
+                        try:
+                            cpu_html = await self._fetch_page_content(page, cpu_url)
+                            if self.db_manager:
+                                self.db_manager.log_url(cpu_url, self.settings['race_id'], 'cpu_prediction', 'success')
+                            if not self.settings.get('skip_debug_files', False):
+                                with open(f"debug_cpu_{race_key}.html", "w", encoding="utf-8") as f:
+                                    f.write(cpu_html)
+                            
+                            cpu_data = self.jra_parser.parse_cpu_prediction(cpu_html)
+                            race_data['cpu_prediction'] = cpu_data
+                            
+                            # CPU予想データを各馬にマージ
+                            cpu_horses_dict = {h.get('horse_num'): h for h in cpu_data.get('horses', [])}
+                            for horse in race_data.get('horses', []):
+                                horse_num = horse.get('horse_num')
+                                if horse_num in cpu_horses_dict:
+                                    cpu_horse = cpu_horses_dict[horse_num]
+                                    horse['rating'] = cpu_horse.get('rating')
+                                    horse['speed_index'] = cpu_horse.get('speed_index')
+                                    horse['cpu_training_mark'] = cpu_horse.get('training_mark')
+                                    horse['cpu_pedigree_mark'] = cpu_horse.get('pedigree_mark')
+                                    horse['cpu_index'] = cpu_horse.get('cpu_index')
+                            
+                            logger.info(f"CPU予想取得成功: {len(cpu_data.get('horses', []))}頭")
+                        except Exception as e:
+                            logger.warning(f"CPU予想取得エラー: {e}")
+                    else:
+                        logger.info(f"スキップ（既取得）: {cpu_url}")
+                
+                # 重賞の場合、ギリギリ情報と特集ページを取得
+                is_graded = any(g in race_data.get('race_grade', '') for g in ['GI', 'GII', 'GIII', 'G1', 'G2', 'G3', '重賞'])
+                
+                if is_graded and not self.settings.get('skip_special_pages', False):
+                    # ギリギリ情報（直前情報）
+                    girigiri_url = f"{base_url}/girigiri/{self.settings['race_id']}"
+                    
+                    await self.rate_limiter.wait()
+                    
+                    try:
+                        girigiri_html = await self._fetch_page_content(page, girigiri_url)
+                        if self.db_manager:
+                            self.db_manager.log_url(girigiri_url, self.settings['race_id'], 'girigiri', 'success')
+                        if not self.settings.get('skip_debug_files', False):
+                            with open(f"debug_girigiri_{race_key}.html", "w", encoding="utf-8") as f:
+                                f.write(girigiri_html)
+                        
+                        girigiri_data = self.jra_parser.parse_girigiri_info(girigiri_html)
+                        race_data['girigiri_info'] = girigiri_data
+                        logger.info(f"ギリギリ情報取得成功")
+                    except Exception as e:
+                        logger.warning(f"ギリギリ情報取得エラー（重賞以外は正常）: {e}")
+                    
+                    # 特集ページ
+                    feature_url = f"{base_url}/tokusyu/{self.settings['race_id']}"
+                    
+                    await self.rate_limiter.wait()
+                    
+                    try:
+                        feature_html = await self._fetch_page_content(page, feature_url)
+                        if self.db_manager:
+                            self.db_manager.log_url(feature_url, self.settings['race_id'], 'feature', 'success')
+                        if not self.settings.get('skip_debug_files', False):
+                            with open(f"debug_feature_{race_key}.html", "w", encoding="utf-8") as f:
+                                f.write(feature_html)
+                        
+                        feature_data = self.jra_parser.parse_special_feature(feature_html)
+                        race_data['special_feature'] = feature_data
+                        logger.info(f"特集ページ取得成功: {feature_data.get('title', '')}")
+                    except Exception as e:
+                        logger.warning(f"特集ページ取得エラー（重賞以外は正常）: {e}")
+                
+                # AI指数は出馬表ページから既に取得済み（parse_race_dataで処理）
+            
+            # ===== 地方競馬専用ページの取得 =====
             if self.race_type == 'nar':
                 # ポイントページを取得
                 point_data = await self._scrape_point_page(page, base_url)
@@ -1021,32 +1105,51 @@ class KeibaBookScraper:
                 # 個別馬のコメントを取得（穴馬のヒント）
                 # Keep sequential by default (comments_concurrency defaults to 1)
                 await self._scrape_horse_comments(page, race_data.get('horses', []), base_url)
-
-            # 結果ページから詳細情報を取得（レース終了後のみ）
-            # 現時点では予想用データ収集が目的のため、結果ページはスキップ
-            # レース終了後、過去データを蓄積する際に結果ページから詳細情報を取得
-            # if self.seiseki_url:
-            #     result_data = await self._scrape_result_page(page, base_url)
-            #     if result_data:
-            #         # 結果ページのデータをマージ
-            #         race_data['result_info'] = result_data.get('race_info', {})
-            #         race_data['result_horses'] = result_data.get('horses', [])
-            #         race_data['payouts'] = result_data.get('payouts', {})
-            #         
-            #         # 結果ページの馬データを出馬表の馬データにマージ
-            #         result_horses_dict = {h.get('horse_num'): h for h in result_data.get('horses', [])}
-            #         for horse in race_data.get('horses', []):
-            #             horse_num = horse.get('horse_num')
-            #             if horse_num in result_horses_dict:
-            #                 result_horse = result_horses_dict[horse_num]
-            #                 # 結果ページの詳細情報をマージ
-            #                 horse['result_rank'] = result_horse.get('rank')
-            #                 horse['result_time'] = result_horse.get('time')
-            #                 horse['result_margin'] = result_horse.get('margin')
-            #                 horse['result_passing'] = result_horse.get('passing')
-            #                 horse['result_last_3f'] = result_horse.get('last_3f')
-            #                 horse['odds'] = result_horse.get('odds')
-            #                 horse['popularity'] = result_horse.get('popularity')
+            
+            # ===== レース結果ページの取得（レース終了後のみ） =====
+            if self.settings.get('fetch_result', False) and self.seiseki_url:
+                result_url = self.seiseki_url
+                if not result_url:
+                    # 結果ページURLを構築
+                    result_url = f"{base_url}/seiseki/{self.settings['race_id']}"
+                
+                await self.rate_limiter.wait()
+                
+                try:
+                    result_html = await self._fetch_page_content(page, result_url)
+                    if self.db_manager:
+                        self.db_manager.log_url(result_url, self.settings['race_id'], 'result', 'success')
+                    if not self.settings.get('skip_debug_files', False):
+                        with open(f"debug_result_{race_key}.html", "w", encoding="utf-8") as f:
+                            f.write(result_html)
+                    
+                    result_data = self.result_parser.parse_result_page(result_html)
+                    race_data['result'] = result_data
+                    
+                    # ラップタイム（トラックバイアス分析用）
+                    race_data['lap_times'] = result_data.get('lap_times', [])
+                    race_data['corner_positions'] = result_data.get('corner_positions', {})
+                    race_data['payouts'] = result_data.get('payouts', {})
+                    race_data['race_review'] = result_data.get('race_comment', '')
+                    
+                    # 結果データを各馬にマージ
+                    result_horses_dict = {h.get('horse_num'): h for h in result_data.get('horses', [])}
+                    for horse in race_data.get('horses', []):
+                        horse_num = horse.get('horse_num')
+                        if horse_num in result_horses_dict:
+                            rh = result_horses_dict[horse_num]
+                            horse['result_rank'] = rh.get('rank')
+                            horse['result_rank_num'] = rh.get('rank_num')
+                            horse['result_time'] = rh.get('time')
+                            horse['result_margin'] = rh.get('margin')
+                            horse['result_passing'] = rh.get('passing')
+                            horse['result_last_3f'] = rh.get('last_3f')
+                            horse['result_comment'] = rh.get('race_comment', '')
+                            horse['next_race_memo'] = rh.get('next_race_memo', '')
+                    
+                    logger.info(f"レース結果取得成功: {len(result_data.get('horses', []))}頭")
+                except Exception as e:
+                    logger.warning(f"レース結果取得エラー（レース未終了の場合は正常）: {e}")
 
             if perf_enabled:
                 overall_end = time.perf_counter()

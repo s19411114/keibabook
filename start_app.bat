@@ -1,21 +1,31 @@
 @echo off
 chcp 65001 > nul
+echo ============================================
 echo 🐎 競馬ブックスクレイパーを起動しています...
+echo ============================================
 echo.
 
-:: WSLでStreamlitを起動 (新しいウィンドウで実行)
-start "KeibaBook Scraper Log" wsl bash -c "cd /mnt/c/GeminiCLI/TEST/keibabook && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.enableCORS false --server.headless true"
+:: 現在のディレクトリをプロジェクトルートに変更
+cd /d "%~dp0"
 
-:: 起動待ち (5秒)
-echo サーバーの立ち上がりを待っています...
-timeout /t 5 > nul
+:: Docker Composeでアプリを起動
+echo Docker Compose を起動中...
+docker-compose up -d
+
+:: Streamlitが起動するまで待機
+echo Streamlit の起動を待機中（15秒）...
+timeout /t 15 /nobreak > nul
 
 :: ブラウザを開く
 echo ブラウザを開きます...
 start http://localhost:8501
 
 echo.
-echo ✅ 起動しました！
-echo 画面が開かない場合は http://localhost:8501 にアクセスしてください。
+echo ============================================
+echo ✅ 起動完了！ブラウザでアプリが開きます。
+echo.
+echo 終了するには:
+echo   docker-compose down
+echo ============================================
 echo.
 pause

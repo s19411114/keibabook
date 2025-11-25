@@ -348,20 +348,20 @@ with col3:
             start_minutes = 9 * 60 + 50 # 9:50開始基準
             current_minutes = now.hour * 60 + now.minute
             diff_minutes = current_minutes - start_minutes
-                if diff_minutes > 0:
-                    estimated_race = int(diff_minutes / 30) + 1
-                    default_race_num = max(1, min(12, estimated_race))
-                # If schedule exists, prefer precise next race timing
-                try:
-                    from src.utils.schedule_utils import get_next_race_number
-                    # use buffer from UI if auto selection enabled
-                    buffer_minutes = next_race_buffer_minutes if 'next_race_buffer_minutes' in locals() and auto_next_select else 1
-                    next_r = get_next_race_number(st.session_state.jra_schedule, selected_venue_name, now, buffer_minutes=buffer_minutes)
-                    if next_r:
-                        default_race_num = next_r
-                        logger.info(f"Next race detected from schedule: {selected_venue_name} {next_r}R")
-                except Exception as e:
-                    logger.warning(f"Next race selection via schedule failed: {e}")
+            if diff_minutes > 0:
+                estimated_race = int(diff_minutes / 30) + 1
+                default_race_num = max(1, min(12, estimated_race))
+            # If schedule exists, prefer precise next race timing
+            try:
+                from src.utils.schedule_utils import get_next_race_number
+                # use buffer from UI if auto selection enabled
+                buffer_minutes = next_race_buffer_minutes if 'next_race_buffer_minutes' in locals() and auto_next_select else 1
+                next_r = get_next_race_number(st.session_state.jra_schedule, selected_venue_name, now, buffer_minutes=buffer_minutes)
+                if next_r:
+                    default_race_num = next_r
+                    logger.info(f"Next race detected from schedule: {selected_venue_name} {next_r}R")
+            except Exception as e:
+                logger.warning(f"Next race selection via schedule failed: {e}")
         elif 17 <= now.hour:
             # 今日だけど17時以降 -> 最終レース終わってるので手動選択待ち (または翌日誘導済み)
             default_race_num = 12 
@@ -369,11 +369,33 @@ with col3:
         # 明日以降なら1Rから
         default_race_num = 1
     
-    selected_race_num = st.number_input("レース番号", min_value=1, max_value=12, value=default_race_num)
+    # 取得状況を取得 (グリーンドット表示用)
+    venue_code = VENUE_CODES.get(selected_venue_name, "00")
+    fetch_status = st.session_state.db_manager.get_race_fetch_status(date_str, venue_code)
+    
+    # レース番号を選択肢として表示（グリーンドット付き）
+    race_options = []
+    for r in range(1, 13):
+        if fetch_status.get(r, False):
+            race_options.append(f"🟢 {r}R")
+        else:
+            race_options.append(f"⚪ {r}R")
+    
+    # デフォルト選択のインデックス
+    default_index = default_race_num - 1
+    
+    selected_race_display = st.selectbox(
+        "レース番号", 
+        race_options,
+        index=default_index,
+        help="🟢=取得済み、⚪=未取得"
+    )
+    
+    # 選択されたレース番号を抽出
+    selected_race_num = int(selected_race_display.split()[1].replace("R", ""))
 
 with col4:
-    # ID自動生成
-    venue_code = VENUE_CODES.get(selected_venue_name, "00")
+    # ID自動生成 (venue_codeはcol3で既に取得済み)
     generated_race_id = f"{date_str}{venue_code}{selected_race_num:02d}"
     
     # URL生成
