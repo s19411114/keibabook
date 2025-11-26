@@ -111,8 +111,9 @@ class KeibaBookScraper:
         出馬表ページから全データを取得
         
         取得データ:
-        - レース情報: レース名、グレード、距離、コース条件
-        - 馬情報: 枠番、馬番、予想印、馬名、年齢、騎手、斤量、短評/見解、オッズ、人気
+        - レース情報: レース名、グレード、距離、コース条件（天候・馬場含む）
+        - レース条件テキスト: クラス、斤量条件、賞金など（そのまま文字列として保存）
+        - 馬情報: 枠番、馬番、予想印（個別予想家印含む）、馬名、年齢、騎手、斤量、短評/見解、オッズ、人気
         - 展開予想: ペース、隊列予想（逃げ/好位/中位/後方）、展開コメント
         - 全体コメント: レース全体の予想コメント
         """
@@ -139,6 +140,20 @@ class KeibaBookScraper:
             race_data['course'] = course_match.group(1) if course_match else ''
             weather_match = re.search(r'\)\s*(.+)$', full_condition)
             race_data['weather_track'] = weather_match.group(1) if weather_match else ''
+        
+        # レース条件テキスト（クラス、斤量条件、特別指定など）- そのまま文字列保存
+        if len(racetitle_sub_p_elements) > 0:
+            race_data['race_class'] = racetitle_sub_p_elements[0].get_text(strip=True)
+        
+        # 追加条件要素を探す（.racebaseなど）- 賞金含む
+        racebase = soup.select_one(".racebase")
+        if racebase:
+            race_data['race_base_info'] = racebase.get_text(strip=True)
+        
+        # 発走時刻
+        time_elem = soup.select_one(".racetitle_sub .time, .starttime")
+        if time_elem:
+            race_data['start_time'] = time_elem.get_text(strip=True)
 
         # 出馬表
         horses = []
@@ -161,7 +176,7 @@ class KeibaBookScraper:
                 # 馬番
                 horse_data['horse_num'] = horse_num_elem.get_text(strip=True)
                 
-                # 予想印 (tmyoso)
+                # 予想印 (tmyoso) - 総合印
                 mark_elem = row.select_one(".tmyoso")
                 if mark_elem:
                     # ★マークと数字印を両方取得
@@ -170,8 +185,26 @@ class KeibaBookScraper:
                     star_mark = myuma_mark.get_text(strip=True) if myuma_mark else ""
                     num_mark = yoso_show.get_text(strip=True) if yoso_show else ""
                     horse_data['prediction_mark'] = f"{star_mark}{num_mark}".strip()
+                    
+                    # 個別予想家印を取得（js-yoso-detail内）
+                    yoso_detail = mark_elem.select_one(".js-yoso-detail, .yoso-detail")
+                    if yoso_detail:
+                        individual_marks = {}
+                        mark_rows = yoso_detail.select("tr, li, .yoso-item")
+                        for mrow in mark_rows:
+                            name_elem = mrow.select_one("th, .yoso-name, .name")
+                            mark_cell = mrow.select_one("td, .yoso-mark, .mark")
+                            if name_elem and mark_cell:
+                                predictor_name = name_elem.get_text(strip=True)
+                                predictor_mark = mark_cell.get_text(strip=True)
+                                if predictor_name and predictor_mark:
+                                    individual_marks[predictor_name] = predictor_mark
+                        horse_data['individual_marks'] = individual_marks
+                    else:
+                        horse_data['individual_marks'] = {}
                 else:
                     horse_data['prediction_mark'] = ""
+                    horse_data['individual_marks'] = {}
                 
                 # 馬名とリンク
                 horse_data['horse_name'] = horse_name_elem.get_text(strip=True)
@@ -182,7 +215,6 @@ class KeibaBookScraper:
                 if kisyu_p:
                     kisyu_text = kisyu_p.get_text(separator=' ', strip=True)
                     # "牡7 藤本現 56" のような形式をパース
-                    # 年齢: 牡7, 牝5, セ8 など
                     age_match = re.search(r'([牡牝セ騸])(\d+)', kisyu_text)
                     horse_data['sex'] = age_match.group(1) if age_match else ""
                     horse_data['age'] = age_match.group(2) if age_match else ""
@@ -214,15 +246,12 @@ class KeibaBookScraper:
                     last_td = all_tds[-1]
                     td_ps = last_td.find_all('p')
                     if len(td_ps) >= 2:
-                        # オッズ: 160.0, 人気: 10人気
                         odds_text = td_ps[1].get_text(strip=True) if len(td_ps) > 1 else ""
                         pop_text = td_ps[2].get_text(strip=True) if len(td_ps) > 2 else ""
                         
-                        # オッズを数値に変換
                         odds_match = re.search(r'([\d.]+)', odds_text)
                         horse_data['odds'] = float(odds_match.group(1)) if odds_match else None
                         
-                        # 人気を数値に変換
                         pop_match = re.search(r'(\d+)', pop_text)
                         horse_data['popularity'] = int(pop_match.group(1)) if pop_match else None
                     else:

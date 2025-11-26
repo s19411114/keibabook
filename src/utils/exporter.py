@@ -59,6 +59,12 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
     lines.append(f"- 距離・コース: {race_data.get('full_condition', race_data.get('distance', ''))}")
     lines.append(f"- コース: {race_data.get('course', '')}")
     lines.append(f"- 天候・馬場: {race_data.get('weather_track', '')}")
+    if race_data.get('race_class'):
+        lines.append(f"- クラス条件: {race_data.get('race_class', '')}")
+    if race_data.get('race_base_info'):
+        lines.append(f"- 詳細情報: {race_data.get('race_base_info', '')}")
+    if race_data.get('start_time'):
+        lines.append(f"- 発走時刻: {race_data.get('start_time', '')}")
     lines.append("")
     
     # 展開予想
@@ -179,6 +185,13 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
         lines.append(f"- 騎手: {jockey}")
         if odds is not None:
             lines.append(f"- オッズ: {odds}倍 ({pop}人気)" if pop else f"- オッズ: {odds}倍")
+        
+        # 個別予想家印（広瀬、吉田、安中、CPU穴など）
+        individual_marks = h.get('individual_marks', {})
+        if individual_marks:
+            mark_strs = [f"{name}:{m}" for name, m in individual_marks.items() if m]
+            if mark_strs:
+                lines.append(f"- **予想家印**: {', '.join(mark_strs)}")
         
         # 短評/見解
         comment = h.get('comment', '')

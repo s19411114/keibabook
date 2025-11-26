@@ -43,7 +43,7 @@ Write-Host "Starting Streamlit in container (detached)..."
 try {
     # Use Start-Process to launch the Streamlit command detached so the script returns control
     $dockerArgs = 'compose exec -T app bash -lc "streamlit run app.py --server.port=8501"'
-    Start-Process -FilePath 'docker' -ArgumentList $dockerArgs -NoNewWindow -WindowStyle Hidden
+    Start-Process -FilePath 'docker' -ArgumentList $dockerArgs -WindowStyle Hidden
 } catch {
     Write-Host "Failed to start Streamlit detached, attempting foreground..."
     docker compose exec -T app bash -lc 'streamlit run app.py --server.port=8501'
