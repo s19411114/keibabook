@@ -911,7 +911,6 @@ class KeibaBookScraper:
             # レース発走時刻の天気予報を取得（後でrace_dataに追加）
             venue_name = self.settings.get('venue', '')
             weather_fetcher = WeatherFetcher() if venue_name else None
-            weather_info = {}
             
             # ===== 前レース結果のバッチ取得（次レース取得前に実行） =====
             if self.settings.get('fetch_previous_results', False):

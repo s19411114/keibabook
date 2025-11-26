@@ -80,7 +80,10 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             # 現在の天気の場合
             weather_time = weather_info.get('time', weather_info.get('timestamp', '')[:16] if weather_info.get('timestamp') else '')
             lines.append(f"- **気温**: {weather_info.get('temperature')}℃ (体感: {weather_info.get('feels_like', '')}℃) [{weather_time}時点]")
-        lines.append(f"- **天気詳細**: {weather_info.get('weather', '')} (湿度: {weather_info.get('humidity', '')}%)")
+        # 天気詳細（湿度がある場合のみ表示）
+        humidity = weather_info.get('humidity')
+        humidity_str = f" (湿度: {humidity}%)" if humidity is not None else ""
+        lines.append(f"- **天気詳細**: {weather_info.get('weather', '')}{humidity_str}")
         if weather_info.get('wind_speed'):
             lines.append(f"- **風速**: {weather_info.get('wind_speed')}m/s")
     lines.append("")

@@ -203,6 +203,49 @@ class CSVDBManager:
             logger.warning(f"レース取得状況確認エラー: {e}")
             return False
     
+    def get_race_fetch_status(self, date_str: str, venue_code: str) -> Dict[int, bool]:
+        """
+        指定日付・会場の各レース番号の取得状況を返す
+        
+        Args:
+            date_str: 日付文字列（YYYYMMDD形式）
+            venue_code: 会場コード（2桁）
+            
+        Returns:
+            {レース番号: 取得済みかどうか} の辞書
+            例: {1: True, 2: True, 3: False, ...}
+        """
+        result = {r: False for r in range(1, 13)}  # 1R〜12Rをデフォルトで未取得
+        
+        if not self.url_log_path.exists():
+            return result
+        
+        try:
+            df = pd.read_csv(self.url_log_path, encoding='utf-8-sig')
+            # 出馬表ページで成功したもののみ
+            success_df = df[(df['page_type'] == 'shutuba') & (df['status'] == 'success')]
+            
+            for _, row in success_df.iterrows():
+                race_id = str(row['race_id'])
+                # race_idから日付、会場コード、レース番号を抽出
+                # フォーマット: YYYYMMDDVVNN （日付8桁 + 会場2桁 + レース番号2桁）
+                if len(race_id) >= 12:
+                    rid_date = race_id[:8]
+                    rid_venue = race_id[8:10]
+                    try:
+                        rid_race_num = int(race_id[10:12])
+                    except ValueError:
+                        continue
+                    
+                    if rid_date == date_str and rid_venue == venue_code:
+                        if 1 <= rid_race_num <= 12:
+                            result[rid_race_num] = True
+            
+            return result
+        except Exception as e:
+            logger.warning(f"レース取得状況確認エラー: {e}")
+            return result
+    
     def get_fetched_races_for_date(self, date_str: str, race_type: str = 'jra') -> Dict[str, List[int]]:
         """
         指定日付の取得済みレース情報を取得
@@ -327,7 +370,7 @@ class CSVDBManager:
             race_id: レースID
             result_data: パースされた結果データ
         """
-        result_path = self.db_path / "results.csv"
+        result_path = self.db_dir / "results.csv"
         
         try:
             # 既存データを読み込み
