@@ -318,4 +318,53 @@ class CSVDBManager:
         except Exception as e:
             logger.error(f"JSONエクスポートエラー: {e}")
             return None
+    
+    def save_result_data(self, race_id: str, result_data: dict):
+        """
+        レース結果データをCSVに保存
+        
+        Args:
+            race_id: レースID
+            result_data: パースされた結果データ
+        """
+        result_path = self.db_path / "results.csv"
+        
+        try:
+            # 既存データを読み込み
+            if result_path.exists():
+                df = pd.read_csv(result_path, encoding='utf-8-sig')
+            else:
+                df = pd.DataFrame()
+            
+            # 新しいデータを追加
+            new_rows = []
+            for horse in result_data.get('horses', []):
+                new_rows.append({
+                    'race_id': race_id,
+                    'horse_num': horse.get('horse_num', ''),
+                    'horse_name': horse.get('horse_name', ''),
+                    'rank': horse.get('rank', ''),
+                    'rank_num': horse.get('rank_num'),
+                    'time': horse.get('time', ''),
+                    'margin': horse.get('margin', ''),
+                    'passing': horse.get('passing', ''),
+                    'last_3f': horse.get('last_3f', ''),
+                    'weight': horse.get('weight', ''),
+                    'weight_change': horse.get('weight_change', ''),
+                    'race_comment': horse.get('race_comment', ''),
+                    'next_race_memo': horse.get('next_race_memo', ''),
+                    'saved_at': pd.Timestamp.now().isoformat()
+                })
+            
+            if new_rows:
+                new_df = pd.DataFrame(new_rows)
+                # 既存のrace_idを削除（更新のため）
+                if not df.empty:
+                    df = df[df['race_id'] != race_id]
+                df = pd.concat([df, new_df], ignore_index=True)
+                df.to_csv(result_path, index=False, encoding='utf-8-sig')
+                logger.debug(f"結果データ保存: {race_id} ({len(new_rows)}頭)")
+        
+        except Exception as e:
+            logger.error(f"結果データ保存エラー: {e}")
 

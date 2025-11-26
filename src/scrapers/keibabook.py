@@ -8,6 +8,7 @@ from src.utils.rate_limiter import RateLimiter
 from src.scrapers.result_parser import ResultPageParser
 from src.scrapers.local_racing_parser import LocalRacingParser
 from src.scrapers.jra_special_parser import JRASpecialParser
+from src.utils.weather import WeatherFetcher, WeatherDB
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 
@@ -803,6 +804,66 @@ class KeibaBookScraper:
 
         logger.info("個別馬のコメント取得完了")
 
+    async def _fetch_previous_race_results(self, page):
+        """
+        前レースの結果をバッチ取得してDBに保存
+        次のレースを取得する前に実行される
+        """
+        race_id = self.settings.get('race_id', '')
+        if not race_id or len(race_id) < 12:
+            return
+        
+        try:
+            # race_idから情報を抽出（例: 202511260301 = 20251126 + 03 + 01）
+            date_str = race_id[:8]
+            venue_code = race_id[8:10]
+            current_race_num = int(race_id[10:12])
+            
+            # 前レース番号（1R以下は取得しない）
+            if current_race_num <= 1:
+                return
+            
+            # 前レースの結果URLリストを構築
+            base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
+            race_type_path = 'chihou' if self.race_type == 'nar' else 'cyuou'
+            
+            # 終了した前レースの結果を取得（最大3レース遡る）
+            fetch_count = min(3, current_race_num - 1)
+            
+            for i in range(1, fetch_count + 1):
+                prev_race_num = current_race_num - i
+                prev_race_id = f"{date_str}{venue_code}{prev_race_num:02d}"
+                result_url = f"https://s.keibabook.co.jp/{race_type_path}/seiseki/{prev_race_id}"
+                
+                # 既に取得済みならスキップ
+                if self.db_manager and self.db_manager.is_url_fetched(result_url):
+                    logger.debug(f"前レース結果スキップ（既取得）: {prev_race_num}R")
+                    continue
+                
+                await self.rate_limiter.wait()
+                
+                try:
+                    result_html = await self._fetch_page_content(page, result_url, retry_count=2)
+                    
+                    if self.db_manager:
+                        self.db_manager.log_url(result_url, prev_race_id, 'result', 'success')
+                    
+                    result_data = self.result_parser.parse_result_page(result_html)
+                    
+                    # 結果をDBに保存
+                    if self.db_manager and result_data.get('horses'):
+                        # 簡易保存（詳細はdb_managerの実装による）
+                        self.db_manager.save_result_data(prev_race_id, result_data)
+                        logger.info(f"前レース結果取得成功: {prev_race_num}R ({len(result_data.get('horses', []))}頭)")
+                    
+                except Exception as e:
+                    # レースが終了していない場合はエラーになるが、これは正常
+                    logger.debug(f"前レース結果取得スキップ（未終了の可能性）: {prev_race_num}R - {e}")
+                    break  # 未終了レースがあれば、それより前も未終了の可能性が高いので中断
+        
+        except Exception as e:
+            logger.warning(f"前レース結果バッチ取得エラー: {e}")
+
     async def scrape(self, context=None, page=None):
         # If a page/context is provided, use it to avoid launching a new browser.
         created_browser = False
@@ -845,6 +906,16 @@ class KeibaBookScraper:
                 logger.warning("ログインに失敗しました。無料範囲のデータのみ取得されます。")
             else:
                 logger.info("ログイン確認成功。プレミアムデータを取得します。")
+            
+            # ===== 天気情報を取得 =====
+            # レース発走時刻の天気予報を取得（後でrace_dataに追加）
+            venue_name = self.settings.get('venue', '')
+            weather_fetcher = WeatherFetcher() if venue_name else None
+            weather_info = {}
+            
+            # ===== 前レース結果のバッチ取得（次レース取得前に実行） =====
+            if self.settings.get('fetch_previous_results', False):
+                await self._fetch_previous_race_results(page)
             
             # 重複チェック（DBマネージャーが設定されている場合）
             if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
@@ -1191,6 +1262,45 @@ class KeibaBookScraper:
                         json.dump(self._last_fetches, f, ensure_ascii=False, indent=2)
                 except Exception:
                     pass
+            
+            # 天気予報をrace_dataに追加（レース発走時刻の予報を取得）
+            if venue_name and weather_fetcher and not self.settings.get('skip_weather', False):
+                try:
+                    from datetime import datetime
+                    
+                    # レース発走時刻を取得してパース
+                    start_time_str = race_data.get('start_time', '')
+                    race_time = None
+                    if start_time_str:
+                        # "15:30発走" -> "15:30" のような形式をパース
+                        import re
+                        time_match = re.search(r'(\d{1,2}):(\d{2})', start_time_str)
+                        if time_match:
+                            hour = int(time_match.group(1))
+                            minute = int(time_match.group(2))
+                            race_time = datetime.now().replace(hour=hour, minute=minute, second=0, microsecond=0)
+                    
+                    # レース発走時刻の天気予報を取得
+                    if race_time:
+                        forecast = await weather_fetcher.fetch_forecast(venue_name, target_time=race_time)
+                        if "error" not in forecast:
+                            race_data['weather_info'] = forecast
+                            logger.info(f"天気予報取得: {venue_name} レース時刻({start_time_str}) → {forecast.get('temperature')}℃ (予報時刻: {forecast.get('forecast_time', '不明')})")
+                            
+                            # 予報データもDBに保存（履歴用）
+                            weather_db = WeatherDB()
+                            weather_db.save(forecast)
+                        else:
+                            logger.warning(f"天気予報取得失敗: {forecast.get('error')}")
+                    else:
+                        # 発走時刻が取れない場合は現在の天気を取得
+                        current_weather = await weather_fetcher.fetch_weather(venue_name)
+                        if "error" not in current_weather:
+                            race_data['weather_info'] = current_weather
+                            logger.info(f"天気情報取得（現在）: {venue_name} {current_weather.get('temperature')}℃")
+                except Exception as e:
+                    logger.warning(f"天気情報取得エラー（続行）: {e}")
+            
             return race_data
         finally:
             if created_browser and browser:

@@ -65,6 +65,24 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
         lines.append(f"- 詳細情報: {race_data.get('race_base_info', '')}")
     if race_data.get('start_time'):
         lines.append(f"- 発走時刻: {race_data.get('start_time', '')}")
+    
+    # 天気情報（APIから取得した場合）
+    weather_info = race_data.get('weather_info', {})
+    if weather_info and weather_info.get('temperature') is not None:
+        is_forecast = weather_info.get('is_forecast', False)
+        if is_forecast:
+            # 予報の場合はforecast_timeを表示
+            forecast_time = weather_info.get('forecast_time', '')
+            target_time = weather_info.get('target_time', '')
+            time_label = f"予報時刻: {forecast_time}" if forecast_time else ""
+            lines.append(f"- **予想気温**: {weather_info.get('temperature')}℃ (体感: {weather_info.get('feels_like', '')}℃) [{time_label}]")
+        else:
+            # 現在の天気の場合
+            weather_time = weather_info.get('time', weather_info.get('timestamp', '')[:16] if weather_info.get('timestamp') else '')
+            lines.append(f"- **気温**: {weather_info.get('temperature')}℃ (体感: {weather_info.get('feels_like', '')}℃) [{weather_time}時点]")
+        lines.append(f"- **天気詳細**: {weather_info.get('weather', '')} (湿度: {weather_info.get('humidity', '')}%)")
+        if weather_info.get('wind_speed'):
+            lines.append(f"- **風速**: {weather_info.get('wind_speed')}m/s")
     lines.append("")
     
     # 展開予想
