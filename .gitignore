@@ -105,3 +105,4 @@ bench_playwright.py
 # Docker
 .dockerignore
 .venv/
+*.bak
