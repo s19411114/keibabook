@@ -71,15 +71,24 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
     if weather_info and weather_info.get('temperature') is not None:
         is_forecast = weather_info.get('is_forecast', False)
         if is_forecast:
-            # 予報の場合はforecast_timeを表示
+            # 予報の場合: レース時刻と予報時刻を明確に表示
+            target_time_display = weather_info.get('target_time_display', '')
             forecast_time = weather_info.get('forecast_time', '')
-            target_time = weather_info.get('target_time', '')
-            time_label = f"予報時刻: {forecast_time}" if forecast_time else ""
-            lines.append(f"- **予想気温**: {weather_info.get('temperature')}℃ (体感: {weather_info.get('feels_like', '')}℃) [{time_label}]")
+            fetch_time_display = weather_info.get('fetch_time_display', '')
+            diff_minutes = weather_info.get('forecast_diff_minutes', 0)
+            
+            # レース時刻 vs 予報時刻を表示
+            time_info = f"レース時刻: {target_time_display}, 予報時刻: {forecast_time}"
+            if diff_minutes > 0:
+                time_info += f" (誤差: ±{diff_minutes}分)"
+            
+            lines.append(f"- **予想気温**: {weather_info.get('temperature')}℃ (体感: {weather_info.get('feels_like', '')}℃)")
+            lines.append(f"- **取得情報**: {time_info}")
         else:
             # 現在の天気の場合
             weather_time = weather_info.get('time', weather_info.get('timestamp', '')[:16] if weather_info.get('timestamp') else '')
             lines.append(f"- **気温**: {weather_info.get('temperature')}℃ (体感: {weather_info.get('feels_like', '')}℃) [{weather_time}時点]")
+        
         # 天気詳細（湿度がある場合のみ表示）
         humidity = weather_info.get('humidity')
         humidity_str = f" (湿度: {humidity}%)" if humidity is not None else ""
