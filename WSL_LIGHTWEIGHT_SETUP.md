@@ -5,6 +5,7 @@ WSL環境でkeibabook開発時の問題を解決：
 - ✅ venv自動アクティベート防止
 - ✅ VS Codeクラッシュ・フリーズ防止  
 - ✅ パフォーマンス最適化
+- ✅ **WSLネイティブ環境移行済み**: `/home/hiro/projects/keibabook`
 
 ---
 
@@ -45,10 +46,10 @@ autoMemoryReclaim=gradual
 
 ## 🚀 使用方法
 
-### 基本ワークフロー
+### 基本ワークフロー（WSLネイティブ環境）
 ```bash
-# 1. WSL内でディレクトリ移動
-cd /mnt/c/GeminiCLI/TEST/keibabook
+# 1. WSLネイティブディレクトリに移動
+cd /home/hiro/projects/keibabook
 
 # 2. VS Code起動（WSL内から）
 code .
@@ -60,9 +61,13 @@ code .
 source /path/to/venv/bin/activate
 ```
 
-### スクレイピング実行例
+### スクレイピング・UI実行例
 ```bash
-# 単発実行（venv不要、システムPython使用）
+# Streamlit UI起動（推奨）
+python -m streamlit run app.py
+# ブラウザ: http://localhost:8501
+
+# 単発スクレイピング実行
 python scripts/run_single_race.py --venue 浦和 --race 9 --skip-debug-files
 
 # 高速モード
