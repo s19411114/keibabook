@@ -1,5 +1,6 @@
 {
   "python.terminal.activateEnvironment": false,
+  "python.terminal.activateEnvInCurrentTerminal": false,
   "python.defaultInterpreterPath": "/usr/bin/python3",
   "python.analysis.diagnosticMode": "openFilesOnly",
   "files.watcherExclude": {
@@ -12,9 +13,12 @@
     "**/node_modules": true,
     "**/.git": true,
     "**/data": true
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.pythonProjects": [],
+  "python.envFile": "${workspaceFolder}/.env.disabled",
+  "terminal.integrated.env.linux": {
+    "VIRTUAL_ENV": "",
+    "CONDA_ACTIVATE_BASE": "false"
   }
-}
-{
-    "python-envs.defaultEnvManager": "ms-python.python:system",
-    "python-envs.pythonProjects": []
 }

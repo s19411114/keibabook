@@ -1,47 +1,50 @@
 # 🎯 エージェント引き継ぎガイド
 
+## 🚨 最初に読むべきファイル
+
+> **重要**: 作業開始前に必ず [`AGENT_RULES.md`](AGENT_RULES.md) を確認してください。
+
 ## 📋 プロジェクト概要
 
 競馬予想データスクレイピング＆分析アプリケーション（KeibaBook Scraper）
 
 ---
 
-## 🐳 開発環境（概要）
+## 🐍 開発環境
 
-このプロジェクトは Docker Compose を使用します。詳細・手順は `DEV_GUIDE.md` を参照してください。
+**WSL (Ubuntu) + Python venv を使用します。**
+
+### 作業開始
 
 ```bash
-# WSL (推奨)
-./docker-start.sh
-
-# Windows (代替)
-docker-start.bat
+cd ~/keibabook
+source venv/bin/activate
 ```
 
 ### 詳細
 
-詳細は `DOCKER_SETUP.md` と `DEV_GUIDE.md` を参照してください。
+詳細は `DEV_GUIDE.md` を参照してください。
 
 ---
 
 ## ⚠️ 重要な注意事項
 
-### Docker環境について
+### 環境について
 
-1. **venvは使用しない** - Dockerが独自の環境を持っています
-2. **依存関係はrequirements.txt** - 追加後は `docker-compose build`
-3. **ファイル変更は自動同期** - コンテナ内外で即座に反映
+1. **必ず `~/keibabook` で作業** - `/mnt/c/...` は使用しない
+2. **venvをアクティベート** - `source venv/bin/activate`
+3. **Dockerは使用しない**
 
 ### AIエージェントへの指示
 
 ```
-このプロジェクトはDocker環境を使用しています。
+このプロジェクトはWSL + venv環境を使用しています。
 
-- 起動: docker-start.bat または ./docker-start.sh
-- 作業: docker-compose exec app bash でコンテナに入る
-- venvは触らない（Docker独自の環境を使用）
+- 作業ディレクトリ: ~/keibabook
+- Python環境: source venv/bin/activate
+- Dockerは使用しない
 
-詳細は DOCKER_SETUP.md と .agent/workflows/docker.md を参照。
+詳細は AGENT_RULES.md と DEV_GUIDE.md を参照。
 ```
 
 ---
@@ -49,43 +52,24 @@ docker-start.bat
 ## 📁 プロジェクト構造
 
 ```
-keibabook/
-├── Dockerfile              # Docker環境定義
-├── docker-compose.yml      # サービス定義
-├── docker-start.sh         # WSL起動スクリプト
-├── docker-start.bat        # Windows起動スクリプト
-├── DOCKER_SETUP.md         # Docker完全ガイド
-├── src/                    # ソースコード
-│   ├── scrapers/          # スクレイパー
-│   └── utils/             # ユーティリティ
-├── app.py                  # Streamlit UI
-├── requirements.txt        # Python依存関係
-└── .agent/workflows/       # ワークフロー定義
+~/keibabook/
+├── venv/               # Python仮想環境
+├── src/                # ソースコード
+│   ├── scrapers/      # スクレイパー
+│   └── utils/         # ユーティリティ
+├── app.py             # Streamlit UI
+├── requirements.txt   # Python依存関係
+└── config/            # 設定ファイル
 ```
 
 ---
 
 ## 🚀 よく使うコマンド
 
-### コンテナ操作
-
 ```bash
-# 起動
-docker-compose up -d
+# venvアクティベート
+source venv/bin/activate
 
-# コンテナに入る
-docker-compose exec app bash
-
-# 停止
-docker-compose down
-
-# ログ確認
-docker-compose logs -f
-```
-
-### アプリケーション
-
-```bash
 # スクレイピング
 python run_scraper.py
 
@@ -100,33 +84,10 @@ pytest tests/
 
 ## 📚 関連ドキュメント
 
+- [AGENT_RULES.md](AGENT_RULES.md) - AIエージェント向けルール
+- [DEV_GUIDE.md](DEV_GUIDE.md) - 開発手順書
 - [README.md](README.md) - プロジェクト概要
-- [DOCKER_SETUP.md](DOCKER_SETUP.md) - Docker環境詳細
-- [WORKFLOW.md](WORKFLOW.md) - 開発ワークフロー
-- [ARCHITECTURE.md](ARCHITECTURE.md) - システム構成
-- `.agent/workflows/docker.md` - Dockerワークフロー
 
 ---
 
-## 🔧 トラブルシューティング
-
-### ビルドエラー
-
-```bash
-docker-compose build --no-cache
-```
-
-### コンテナ起動エラー
-
-```bash
-docker-compose down -v
-docker-compose up -d
-```
-
-### ポート競合
-
-`docker-compose.yml` の `ports` セクションを編集
-
----
-
-**最終更新**: 2025-11-25
+**最終更新**: 2025-11-27

@@ -1,76 +1,58 @@
 # Developer Guide (Canonical)
 
 この `DEV_GUIDE.md` はこのリポジトリの**公式な開発手順書**です。
-すべての開発者はここに従って作業してください。ドッカー中心のワークフローを採用しています。
+すべての開発者・AIエージェントはここに従って作業してください。
 
-## 1. 目的
-- このドキュメントは、プロジェクトの初回セットアップから開発・テスト・デプロイまでを包括的にまとめたものです。
-- Docker を推奨し、ローカルの `venv` 手順は **互換性・保守用** として `LEGACY_VENV.md` に残しています。
+## 1. 開発環境
 
-## 2. 推奨ワークフロー（Docker / WSL）
+**推奨環境**: WSL2 (Ubuntu) + Python venv
 
-- WSL2（Ubuntu） を有効にしておくこと (Docker Desktop の WSL 統合を利用)
-- Docker Desktop がインストール済み
-- 推奨: プロジェクトは WSL のホーム（`/home/<user>/keibabook`）にコピーして起動することで、ファイルI/OとPlaywrightの安定性が改善します。
-### 前提
-- WSL2（Ubuntu） を有効にしておくこと (Docker Desktop の WSL 統合を利用)
-- Docker Desktop がインストール済み
-- WSL2（Ubuntu） を有効にしておくこと (Docker Desktop の WSL 統合を利用)
-- Docker Desktop がインストール済み
+> ⚠️ **重要**: Dockerは使用しません。WSL上のvenv環境で作業してください。
 
-### 起動（推奨・WSL）
+### 前提条件
+- WSL2 (Ubuntu) がインストール済み
+- Python 3.12以上
+- VS Code + Remote-WSL拡張
+
+## 2. 初回セットアップ
+
+### 2.1 VS Codeで開く
+
+1. VS Codeを起動
+2. **左下の緑アイコン**をクリック → 「Connect to WSL」
+3. 「Open Folder」→ `/home/<user>/keibabook` を選択
+
+> ⚠️ **Windows側のパス (`/mnt/c/...`) は使用しないでください**
+> ファイルI/Oが遅く、Playwrightが不安定になります。
+
+### 2.2 仮想環境のセットアップ
+
 ```bash
-# WSL を起動
-wsl
-cd /mnt/c/GeminiCLI/TEST/keibabook
-chmod +x docker-start.sh  # 初回のみ
-./docker-start.sh
+cd ~/keibabook
+
+# venvが存在しない場合は作成
+python3 -m venv venv
+
+# venvをアクティベート
+source venv/bin/activate
+
+# 依存関係をインストール
+pip install -r requirements.txt
+
+# Playwrightのブラウザをインストール
+playwright install chromium
 ```
 
-### コンテナ中心の運用と venv
+## 3. 作業開始（毎回）
 
-- **重要**: Docker を使う場合、コンテナ内で全ての依存が動作するため、**ホスト上の `venv` は不要**です。`venv` は `LEGACY_VENV.md` に保管された手順として残しますが、通常は削除または無視して構いません。
-- VS Code の推奨拡張: `Remote - WSL`、`Remote - Containers`、`Python`、`Pylance` などを使うと WSL 上の環境をシームレスに使えます。プロジェクトの初回起動時に拡張をインストールしてください。
-- 開発時は WSL（Ubuntu）のホームにプロジェクトを置いて `docker-compose up` することを強く推奨します。これにより、ファイルI/O と Playwright の安定性が改善されます。
-
-### 認証の取り扱い
-このプロジェクトでは `config/settings.yml` にパスワードを平文で残さない方針です。代わりに環境変数で `LOGIN_ID` と `LOGIN_PASSWORD` を渡してください（Docker では `.env` ファイルを使うか、`docker-compose` の `environment` を通して渡します）。
-
-### Windows から起動（代替）
-```powershell
-cd C:\GeminiCLI\TEST\keibabook
-.\docker-start.bat
-```
-
-### コンテナに入る
 ```bash
-docker-compose exec app bash
-```
-## 🔐 Cookie & 認証情報の運用方針
-
-- 本リポジトリではパスワードを `config/settings.yml` に平文保存しない方針です。
-- 開発時の利便性のために `cookies.json` のようなファイルでセッションを保存し再利用することは可能です。だたし、以下の点に注意してください:
-	- Cookie ファイルは **絶対に** リポジトリにコミットしないでください。
-	- `.env` ファイルや環境変数（`LOGIN_ID` / `LOGIN_PASSWORD` / `COOKIE_FILE`）で運用してください。
-	- 既にコミット済みの Cookie ファイルがある場合は、以下のコマンドで追跡を解除してください（チームに一報し、必要なら履歴削除の合意を取ってください）。
-
-```pwsh
-git rm --cached cookies.json cookies_debug.json || true
-git commit -m "chore: remove cookie files from repo and stop tracking"
-git push
+cd ~/keibabook
+source venv/bin/activate
+# プロンプトに (venv) が表示されることを確認
 ```
 
-- Cookie を利用するワークフロー:
-	1. ローカル環境（Docker あるいは venv）で一度ログイン（`LOGIN_ID`/`LOGIN_PASSWORD` を指定）し、Cookie を `cookies.json` に保存する。
-	2. `COOKIE_FILE` 環境変数でそのファイルを指定することで、以後はログインを繰り返さずにスクレイプできます。
-	3. Cookie の有効期限が切れた場合は、同じ手順で再ログインしてください。
+## 4. 主要コマンド
 
- - 開発者向けの改善: `src/utils/login.py` に `KeibaBookLogin.ensure_logged_in(context, login_id, login_password, cookie_file)` を導入しており、コンテキストに cookie を読み込んでログイン状態を検証し、必要な場合は自動ログインして cookie を更新します。スクレイパーはこのメソッドを利用することでログイン処理の冗長化を避けられます。
-
-- もし、追跡済みの Cookie をリポジトリ履歴から完全に消したい場合は、`git filter-repo` などのツールで履歴を消すことができます（履歴改変はチームで合意を取ってから実行してください）。
-
-
-## 3. コンテナ内での主要コマンド
 ```bash
 # スクレイピングを実行
 python run_scraper.py
@@ -82,43 +64,67 @@ streamlit run app.py
 pytest tests/
 ```
 
-## 4. 依存関係の変更
+## 5. 依存関係の変更
+
 1. `requirements.txt` を更新
-2. イメージの再ビルド
+2. パッケージをインストール:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## 6. 🔐 Cookie & 認証情報の運用方針
+
+- 本リポジトリではパスワードを平文保存しない方針です
+- `cookies.json` でセッションを保存・再利用可能
+- Cookie ファイルは **絶対に** リポジトリにコミットしないでください
+- 環境変数 (`LOGIN_ID` / `LOGIN_PASSWORD`) で運用してください
+
+### Cookie を利用するワークフロー:
+
+1. 一度ログインして Cookie を `cookies.json` に保存
+2. `COOKIE_FILE` 環境変数でそのファイルを指定
+3. Cookie の有効期限が切れたら再ログイン
+
+## 7. Git の安全運用
+
 ```bash
-docker-compose build
+# 作業前に必ず確認
+git status
+git log --oneline -5
+
+# 意味のある単位でコミット
+git add .
+git commit -m "feat: 機能追加の説明"
+
+# トラブル時
+git stash  # 一時退避
+git reset --hard <commit>  # 特定コミットに戻す
 ```
 
-## 5. Playwright とブラウザ依存性
-- Dockerfile は `playwright install chromium` と `playwright install-deps` を含んでいます。
-- ローカル（venv）で作業する場合のみ、次を実行してください。
+## 8. トラブルシューティング
+
+### ModuleNotFoundError
+```bash
+pip install -r requirements.txt
+```
+
+### Playwrightブラウザがない
 ```bash
 playwright install chromium
-playwright install-deps
 ```
 
-## 6. LEGACY: 仮想環境 (`venv`)
-- Docker を推奨しますが、ローカルで venv を使用する必要がある場合は `LEGACY_VENV.md` を参照してください。
+### 403/429 エラー
+- レート制限を下げる
+- Cookie を更新
+- 重複チェックを有効にする
 
-## 7. Git の安全運用（簡易）
-- 作業前に必ず `git status` と `git log --oneline -5` を確認
-- 意味のある単位でコミット（`wip` など）
-- トラブル時は `git stash` または `git reset --hard <commit>` を使用
+## 9. ドキュメント構造
 
-## 8. トラブルシューティング（よくある事象）
-- Playwright ブラウザがない: Docker イメージを再ビルド、またはローカルで `playwright install chromium` を実行
-- 403/429 エラー: レートを下げる・Cookie 更新・重複チェックを有効にする
-- データが見つからない: `configs/settings.yml` の `output_dir` と `race_id` 等を確認
-
-## 9. ドキュメント構造と責務
-- `DEV_GUIDE.md` が主要な手順書です（必ず最新版を参照）
-- `DOCKER_SETUP.md`: Docker の詳細手順と環境依存の補足
-- `WORKFLOW.md` / `README.md` / `HANDOVER.md`: 高レベルの手順と要点（詳細は `DEV_GUIDE.md` を参照）
-- `LEGACY_VENV.md`: 旧来の仮想環境手順（保守用）
+- `DEV_GUIDE.md` - 主要な手順書（このファイル）
+- `AGENT_RULES.md` - AIエージェント向けルール
+- `HANDOVER.md` - 引き継ぎ概要
+- `README.md` - プロジェクト概要
 
 ---
 
-このファイルは「一本化された」開発手順書です。必要に応じて更新して下さい。
-
----
-**最終更新**: 2025-11-25
+**最終更新**: 2025-11-27
