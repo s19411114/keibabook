@@ -18,8 +18,8 @@ class RateLimiter:
     LOW_TRAFFIC_HOURS = list(range(0, 6)) + list(range(23, 24))
     
     # 通常の待機時間（秒）- 揺らぎの上限
-    DEFAULT_DELAY = 2.0  # 1-2秒のランダム待機（安全）
-    LOW_TRAFFIC_DELAY = 2.0  # 1-2秒のランダム待機（安全）
+    DEFAULT_DELAY = 1.0  # 0.5-1秒のランダム待機（高速化）
+    LOW_TRAFFIC_DELAY = 1.0  # 0.5-1秒のランダム待機（高速化）
     
     def __init__(self, base_delay: Optional[float] = None):
         """
@@ -46,8 +46,8 @@ class RateLimiter:
             base_delay = self.base_delay
         
         if randomize:
-            # ランダムな待機時間（1秒〜base_delay秒）
-            delay = random.uniform(1.0, base_delay)
+            # ランダムな待機時間（0.5秒〜base_delay秒）
+            delay = random.uniform(0.5, base_delay)
         else:
             delay = base_delay
         

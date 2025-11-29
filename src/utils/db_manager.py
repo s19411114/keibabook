@@ -128,7 +128,11 @@ class CSVDBManager:
         # 既存レコードを更新、なければ追加
         existing = race_df[race_df['race_id'] == race_id]
         if len(existing) > 0:
-            race_df.loc[race_df['race_id'] == race_id, list(race_row.keys())] = list(race_row.values())
+            # 明示的にデータ型を変換してFutureWarning回避
+            for key, value in race_row.items():
+                if value == '':
+                    value = None  # 空文字をNoneに変換
+                race_df.loc[race_df['race_id'] == race_id, key] = value
         else:
             race_row['created_at'] = now
             race_df = pd.concat([race_df, pd.DataFrame([race_row])], ignore_index=True)
@@ -161,10 +165,14 @@ class CSVDBManager:
             # 既存レコードを更新、なければ追加
             existing = horse_df[(horse_df['race_id'] == race_id) & (horse_df['horse_num'] == horse_num)]
             if len(existing) > 0:
-                horse_df.loc[
-                    (horse_df['race_id'] == race_id) & (horse_df['horse_num'] == horse_num),
-                    list(horse_row.keys())
-                ] = list(horse_row.values())
+                # 明示的にデータ型を変換してFutureWarning回避
+                for key, value in horse_row.items():
+                    if value == '':
+                        value = None  # 空文字をNoneに変換
+                    horse_df.loc[
+                        (horse_df['race_id'] == race_id) & (horse_df['horse_num'] == horse_num),
+                        key
+                    ] = value
             else:
                 horse_row['created_at'] = timestamp
                 horse_df = pd.concat([horse_df, pd.DataFrame([horse_row])], ignore_index=True)
