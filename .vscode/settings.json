@@ -27,18 +27,20 @@
     "**/__pycache__": true,
     "**/*.pyc": true
   },
-  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.defaultEnvManager": "none",
   "python-envs.pythonProjects": [],
+  "python.terminal.activateEnvInCurrentTerminal": false,
   "python.envFile": "${workspaceFolder}/.env.disabled",
   "terminal.integrated.env.linux": {
     "VIRTUAL_ENV": "",
     "CONDA_ACTIVATE_BASE": "false",
-    "PYTHONPATH": ""
+    "PYTHONPATH": "",
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   },
   "terminal.integrated.profiles.linux": {
     "bash": {
       "path": "/bin/bash",
-      "args": ["--noprofile", "--norc"]
+      "args": ["--noprofile", "--norc", "-c", "source ${workspaceFolder}/.vscode/bash_profile_override 2>/dev/null || true; exec /bin/bash --noprofile --norc"]
     }
   },
   "terminal.integrated.defaultProfile.linux": "bash",
@@ -46,5 +48,12 @@
   "python.analysis.indexing": false,
   "python.languageServer": "Pylance",
   "extensions.autoUpdate": false,
-  "telemetry.telemetryLevel": "off"
+  "telemetry.telemetryLevel": "off",
+  "python.terminal.executeInFileDir": false,
+  "python.terminal.launchArgs": [],
+  "python.condaPath": "",
+  "python.venvPath": "",
+  "python.poetryPath": "",
+  "terminal.integrated.inheritEnv": false,
+  "python.experiments.enabled": false
 }
