@@ -1,0 +1,22 @@
+# WSL2 Memory and Performance Configuration
+# Copy this to C:\Users\<username>\.wslconfig to apply
+
+[wsl2]
+# Limit memory to prevent system freeze (adjust based on your system)
+memory=4GB
+# Limit processors (adjust based on your system)
+processors=2
+# Enable swap to handle memory spikes
+swap=2GB
+# Disable page reporting for better performance
+pageReporting=false
+# Disable nested virtualization if not needed
+nestedVirtualization=false
+
+# Network settings
+localhostForwarding=true
+
+# Kernel settings for better I/O performance
+[experimental]
+sparseVhd=true
+autoMemoryReclaim=gradual

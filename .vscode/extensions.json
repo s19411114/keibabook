@@ -1,11 +1,15 @@
 {
   "recommendations": [
     "ms-vscode-remote.remote-wsl",
-    "ms-vscode-remote.remote-containers",
     "ms-python.python",
-    "ms-python.vscode-pylance",
-    "github.copilot",
-    "github.copilot-chat"
+    "ms-python.vscode-pylance"
   ],
-  "unwantedRecommendations": []
+  "unwantedRecommendations": [
+    "ms-vscode-remote.remote-containers",
+    "ms-python.autopep8",
+    "ms-python.flake8",
+    "ms-python.mypy-type-checker",
+    "ms-toolsai.jupyter",
+    "ms-python.black-formatter"
+  ]
 }

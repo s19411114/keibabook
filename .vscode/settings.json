@@ -1,24 +1,50 @@
 {
   "python.terminal.activateEnvironment": false,
   "python.terminal.activateEnvInCurrentTerminal": false,
+  "python.autoComplete.activateEnvironment": false,
   "python.defaultInterpreterPath": "/usr/bin/python3",
   "python.analysis.diagnosticMode": "openFilesOnly",
+  "python.analysis.autoImportCompletions": false,
   "files.watcherExclude": {
     "**/node_modules/**": true,
     "**/.git/**": true,
     "**/data/**": true,
-    "**/venv/**": true
+    "**/venv/**": true,
+    "**/.venv/**": true,
+    "**/logs/**": true,
+    "**/debug_*": true,
+    "**/__pycache__/**": true,
+    "**/*.pyc": true
   },
   "search.exclude": {
     "**/node_modules": true,
     "**/.git": true,
-    "**/data": true
+    "**/data": true,
+    "**/venv": true,
+    "**/.venv": true,
+    "**/logs": true,
+    "**/debug_*": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true
   },
   "python-envs.defaultEnvManager": "ms-python.python:venv",
   "python-envs.pythonProjects": [],
   "python.envFile": "${workspaceFolder}/.env.disabled",
   "terminal.integrated.env.linux": {
     "VIRTUAL_ENV": "",
-    "CONDA_ACTIVATE_BASE": "false"
-  }
+    "CONDA_ACTIVATE_BASE": "false",
+    "PYTHONPATH": ""
+  },
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "/bin/bash",
+      "args": ["--noprofile", "--norc"]
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "python.analysis.memory.keepLibraryAst": false,
+  "python.analysis.indexing": false,
+  "python.languageServer": "Pylance",
+  "extensions.autoUpdate": false,
+  "telemetry.telemetryLevel": "off"
 }
