@@ -1,41 +1,29 @@
 """
 Streamlit GUI アプリケーション
 競馬ブックスクレイパーの操作インターフェース
+
+【重要な変更点】
+- Playwright → httpx に移行（Streamlit環境で安定動作）
+- asyncio.run() → 同期版 scrape_sync() を使用
+- スケジュール取得は一時的に無効化（手動選択）
 """
 import streamlit as st
-import asyncio
 import os
 import json
 import datetime
-import importlib
+import time
+import subprocess
+import sys
 from pathlib import Path
 from src.utils.config import load_settings
-from src.scrapers.keibabook import KeibaBookScraper
-# モジュールのリロードを強制 (AttributeError対策)
-import src.scrapers.jra_schedule
-importlib.reload(src.scrapers.jra_schedule)
-from src.scrapers.jra_schedule import JRAScheduleFetcher
-import src.scrapers.netkeiba_calendar
-importlib.reload(src.scrapers.netkeiba_calendar)
-from src.scrapers.netkeiba_calendar import NetkeibaCalendarFetcher
-import src.scrapers.nar_schedule
-importlib.reload(src.scrapers.nar_schedule)
-from src.scrapers.nar_schedule import NARScheduleFetcher
-import src.scrapers.keiba_schedule
-importlib.reload(src.scrapers.keiba_schedule)
-from src.scrapers.keiba_schedule import KeibaGovScheduleFetcher
-import src.scrapers.keiba_today
-importlib.reload(src.scrapers.keiba_today)
-from src.scrapers.keiba_today import KeibaTodayFetcher
+# Playwrightはサブプロセス(scripts/scrape_worker.py)で実行
 
-from src.scrapers.jra_odds import JRAOddsFetcher
 from src.utils.db_manager import CSVDBManager
 from src.utils.recommender import HorseRecommender
 from src.utils.horse_ranker import HorseRanker
 from src.utils.upset_detector import UpsetDetector
 from src.utils.logger import get_logger
 from src.utils.venue_manager import VenueManager
-from src.utils.schedule_utils import get_next_race_number
 from src.utils.output import save_per_race_json
 
 logger = get_logger(__name__)
@@ -47,6 +35,13 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# 設定ファイルの読み込み（最初に実行）
+try:
+    settings = load_settings()
+except Exception as e:
+    st.error(f"設定ファイル読み込みエラー: {e}")
+    settings = {}
 
 # --- カスタムCSS (Premium UI - High Contrast) ---
 st.markdown("""
@@ -87,10 +82,19 @@ st.markdown("""
         padding: 10px 24px;
         font-weight: 600;
         transition: all 0.3s ease;
+        min-height: 40px;  /* 最小高さを統一 */
     }
     .stButton>button:hover {
         background-color: #45a049;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* サイドバーのレース番号ボタン */
+    [data-testid="stSidebar"] .stButton>button {
+        min-height: 36px;
+        padding: 6px 8px;
+        font-size: 13px;
+        white-space: nowrap;
     }
     
     /* 入力フィールド */
@@ -192,580 +196,270 @@ VENUE_CODES = {
     "園田": "27", "姫路": "28", "高知": "31", "佐賀": "32"
 }
 
-# タイトルエリア
-col_title, col_status = st.columns([3, 1])
-with col_title:
-    st.title("🐎 競馬ブックスクレイパー Pro")
-with col_status:
-    if st.session_state.scraping_in_progress:
-        st.warning("🔄 処理中...")
-    else:
-        # Login status: check cookie file existence and expiry
-        cookie_file = settings.get('cookie_file', 'cookies.json')
-        from src.utils.login import KeibaBookLogin
-        if KeibaBookLogin.cookie_file_expired(cookie_file):
-            st.error("🔐 未ログイン または Cookie 期限切れ")
-            if st.button("ログインを実行", key="ui_login"):
-                with st.spinner("ログイン中..."):
-                    # Launch headless login to ensure cookie is valid
-                    from playwright.sync_api import sync_playwright
-                    try:
-                        with sync_playwright() as p:
-                            browser = p.chromium.launch(headless=True)
-                            context = browser.new_context()
-                            result = KeibaBookLogin.ensure_logged_in(context, settings.get('login_id'), settings.get('login_password'), cookie_file=cookie_file, save_cookies=True)
-                            st.success("ログイン（自動）プロセスを実行しました。結果の反映を待ってください。")
-                    except Exception as e:
-                        st.error(f"ログインエラー: {e}")
-        else:
-            st.success("✅ クッキー有効 - ログイン済み")
+# タイトル（シンプルに1行）
+st.markdown("### 🐎 競馬ブックスクレイパー")
 
-st.markdown("---")
-
-# 設定ファイルの読み込み
-try:
-    settings = load_settings()
-except Exception as e:
-    st.error(f"設定ファイル読み込みエラー: {e}")
-    settings = {}
-
-# --- スマートレース選択 (メインエリア上部) ---
-st.subheader("📅 レース選択")
-
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    # 日付選択 (現在時刻に応じてデフォルトを変更)
-    now = datetime.datetime.now()
-    today = datetime.date.today()
+# --- サイドバー: レース選択 + 開発者設定 ---
+with st.sidebar:
+    st.markdown("### 📅 レース選択")
     
-    # 17時以降なら翌日をデフォルトに
-    if now.hour >= 17:
-        default_date = today + datetime.timedelta(days=1)
-    else:
-        default_date = today
-        
-    selected_date = st.date_input("開催日", default_date)
-    date_str = selected_date.strftime("%Y%m%d")
-    
-    # 日付が変わったらスケジュール再取得
-    if st.session_state.last_fetched_date != selected_date:
-        async def update_schedule():
-            # タイムアウト対策: spinnerを表示しつつ、失敗してもエラーにしない
-            try:
-                with st.spinner(f"{selected_date}のスケジュールを確認中..."):
-                    if race_type == 'nar':
-                        # Try today-first source
-                        if selected_date == today:
-                            schedule = await KeibaTodayFetcher.fetch_today_schedule(selected_date)
-                        else:
-                            schedule = await NARScheduleFetcher.fetch_schedule_for_date(selected_date)
-                        if not schedule:
-                            # fallback to netkeiba NAR then keiba.gov
-                            schedule = await NARScheduleFetcher.fetch_schedule_for_date(selected_date)
-                            if not schedule:
-                                schedule = await KeibaGovScheduleFetcher.fetch_schedule_for_date(selected_date)
-                    else:
-                        # CENTRAL (JRA): Try Netkeiba calendar first (less load on paid sources)
-                        if selected_date == today:
-                            schedule = await KeibaTodayFetcher.fetch_today_schedule(selected_date)
-                            # If keiba.go.jp today is not available, try Netkeiba calendar
-                            if not schedule:
-                                schedule = await NetkeibaCalendarFetcher.fetch_schedule_for_date(selected_date)
-                        else:
-                            schedule = await NetkeibaCalendarFetcher.fetch_schedule_for_date(selected_date)
-                            if not schedule:
-                                schedule = await JRAScheduleFetcher.fetch_schedule_for_date(selected_date)
-                        if not schedule:
-                            # fallback to JRA monthly or keiba.gov
-                            schedule = await JRAScheduleFetcher.fetch_schedule_for_date(selected_date)
-                            if not schedule:
-                                schedule = await KeibaGovScheduleFetcher.fetch_schedule_for_date(selected_date)
-                    st.session_state.jra_schedule = schedule
-                    st.session_state.last_fetched_date = selected_date
-            except Exception as e:
-                logger.error(f"スケジュール更新エラー: {e}")
-                st.session_state.jra_schedule = [] # 失敗時は空にして手動選択へ
-        
-        asyncio.run(update_schedule())
-
-with col2:
-    # 競馬種別と会場選択
-    race_type_options = ["中央競馬 (JRA)", "地方競馬 (NAR)"]
+    # 競馬種別
+    race_type_options = ["中央 (JRA)", "地方 (NAR)"]
     race_type_display = st.radio(
-        "競馬種別", 
-        race_type_options, 
+        "種別", race_type_options, 
         index=0 if settings.get('race_type', 'jra') == 'jra' else 1,
         horizontal=True
     )
-    race_type = "jra" if race_type_display == "中央競馬 (JRA)" else "nar"
+    race_type = "jra" if race_type_display == "中央 (JRA)" else "nar"
     
+    # 日付選択
+    now = datetime.datetime.now()
+    today = datetime.date.today()
+    default_date = today + datetime.timedelta(days=1) if now.hour >= 17 else today
+    selected_date = st.date_input("開催日", default_date)
+    date_str = selected_date.strftime("%Y%m%d")
+    
+    # スケジュール（シンプルに空リストを使用）
+    if st.session_state.last_fetched_date != selected_date:
+        st.session_state.jra_schedule = []
+        st.session_state.last_fetched_date = selected_date
+    
+    # 会場選択
     if race_type == "nar":
-        # 南関競馬会場を優先表示
         minami_kanto = VenueManager.get_minami_kanto_venues()
         other_venues = VenueManager.get_other_venues()
-        
-        # 南関競馬 + 区切り + その他会場
-        venue_options = minami_kanto + ["---"] + other_venues
-        
+        venue_options = minami_kanto + ["――"] + other_venues
         default_venue = settings.get('venue', '大井')
         default_index = venue_options.index(default_venue) if default_venue in venue_options else 0
-        
         selected_venue_display = st.selectbox(
-            "会場", 
-            venue_options,
-            index=default_index,
-            format_func=lambda x: "━━━━━━━━━━" if x == "---" else x
+            "会場", venue_options, index=default_index,
+            format_func=lambda x: "─────" if x == "――" else x
         )
-        
-        # 区切り線が選択された場合は最初の会場を選択
-        selected_venue_name = selected_venue_display if selected_venue_display != "---" else minami_kanto[0]
+        selected_venue_name = selected_venue_display if selected_venue_display != "――" else minami_kanto[0]
     else:
-        # JRA会場 (開催中の会場のみ表示)
-        priority_order = ["福島", "東京", "中山", "阪神", "中京", "京都", "新潟", "小倉", "札幌", "函館"]
-        
-        # 取得したスケジュールから会場リストを作成
-        today_venues = list(set([s['venue'] for s in st.session_state.jra_schedule])) if st.session_state.jra_schedule else []
-        
-        if today_venues:
-            # 開催中の会場のみを優先順にソート
-            active_venues = sorted([v for v in today_venues if v in priority_order], key=lambda x: priority_order.index(x))
-            active_venues += [v for v in today_venues if v not in priority_order]
-            
-            selected_venue_name = st.selectbox("会場", active_venues)
-        else:
-            # スケジュール取得失敗時のみ全会場表示
-            st.warning("⚠️ スケジュール取得に失敗しました。手動で会場を選択してください。")
-            selected_venue_name = st.selectbox("会場 (手動選択)", priority_order)
-
-with col3:
-    # レース番号選択 (現在時刻から推定)
-    default_race_num = 1
+        priority_order = ["東京", "中山", "阪神", "京都", "中京", "福島", "新潟", "小倉", "札幌", "函館"]
+        selected_venue_name = st.selectbox("会場", priority_order)
     
-    # 選択日が今日の場合のみ時刻推定を行う
-    if selected_date == today:
-        if 9 <= now.hour <= 16:
-            start_minutes = 9 * 60 + 50 # 9:50開始基準
+    # レース番号 - ワンクリックボタン形式
+    st.markdown("##### 🏇 レース番号")
+    
+    # 初期化
+    if 'selected_race_num' not in st.session_state:
+        # デフォルト: 現在時刻から推測
+        default_race_num = 11  # 重賞は11Rか12Rが多い
+        if selected_date == today and 9 <= now.hour <= 16:
+            start_minutes = 9 * 60 + 50
             current_minutes = now.hour * 60 + now.minute
             diff_minutes = current_minutes - start_minutes
             if diff_minutes > 0:
-                estimated_race = int(diff_minutes / 30) + 1
-                default_race_num = max(1, min(12, estimated_race))
-            # If schedule exists, prefer precise next race timing
-            try:
-                from src.utils.schedule_utils import get_next_race_number
-                # use buffer from UI if auto selection enabled
-                buffer_minutes = next_race_buffer_minutes if 'next_race_buffer_minutes' in locals() and auto_next_select else 1
-                next_r = get_next_race_number(st.session_state.jra_schedule, selected_venue_name, now, buffer_minutes=buffer_minutes)
-                if next_r:
-                    default_race_num = next_r
-                    logger.info(f"Next race detected from schedule: {selected_venue_name} {next_r}R")
-            except Exception as e:
-                logger.warning(f"Next race selection via schedule failed: {e}")
-        elif 17 <= now.hour:
-            # 今日だけど17時以降 -> 最終レース終わってるので手動選択待ち (または翌日誘導済み)
-            default_race_num = 12 
-    else:
-        # 明日以降なら1Rから
-        default_race_num = 1
+                default_race_num = max(1, min(12, int(diff_minutes / 30) + 1))
+        st.session_state.selected_race_num = default_race_num
     
-    # 取得状況を取得 (グリーンドット表示用)
+    # 12個のボタンを3行4列で配置
+    for row in range(3):
+        cols = st.columns(4)
+        for col_idx in range(4):
+            race_num = row * 4 + col_idx + 1
+            with cols[col_idx]:
+                # 選択中のレースは異なるスタイル
+                is_selected = st.session_state.selected_race_num == race_num
+                # ボタンラベルを統一（選択中は●、未選択は○）
+                if is_selected:
+                    btn_label = f"● {race_num}R"
+                else:
+                    btn_label = f"○ {race_num}R"
+                if st.button(btn_label, key=f"race_btn_{race_num}", use_container_width=True):
+                    st.session_state.selected_race_num = race_num
+                    st.rerun()
+    
+    selected_race_num = st.session_state.selected_race_num
+    
+    # ID/URL生成
     venue_code = VENUE_CODES.get(selected_venue_name, "00")
-    fetch_status = st.session_state.db_manager.get_race_fetch_status(date_str, venue_code)
-    
-    # レース番号を選択肢として表示（グリーンドット付き）
-    race_options = []
-    for r in range(1, 13):
-        if fetch_status.get(r, False):
-            race_options.append(f"🟢 {r}R")
-        else:
-            race_options.append(f"⚪ {r}R")
-    
-    # デフォルト選択のインデックス
-    default_index = default_race_num - 1
-    
-    selected_race_display = st.selectbox(
-        "レース番号", 
-        race_options,
-        index=default_index,
-        help="🟢=取得済み、⚪=未取得"
-    )
-    
-    # 選択されたレース番号を抽出
-    selected_race_num = int(selected_race_display.split()[1].replace("R", ""))
-
-with col4:
-    # ID自動生成 (venue_codeはcol3で既に取得済み)
     generated_race_id = f"{date_str}{venue_code}{selected_race_num:02d}"
-    
-    # URL生成
+    generated_race_key = f"{date_str}_{VenueManager.get_venue_code(selected_venue_name) or 'unknown'}{selected_race_num}R"
     if race_type == "nar":
         generated_url = f"https://s.keibabook.co.jp/chihou/syutuba/{generated_race_id}"
     else:
         generated_url = f"https://s.keibabook.co.jp/cyuou/syutuba/{generated_race_id}"
     
-    # URLリンク表示 (ボタン風)
-    st.markdown(f"""
-    <div style="margin-top: 28px;">
-        <a href="{generated_url}" target="_blank" style="
-            background-color: #262730; 
-            color: #4CAF50 !important; 
-            padding: 10px 15px; 
-            border-radius: 5px; 
-            border: 1px solid #4CAF50;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-        ">
-            🔗 出馬表ページを開く
-        </a>
-    </div>
-    """, unsafe_allow_html=True)
-
-# レースキー生成 (内部用)
-generated_race_key = f"{date_str}_{VenueManager.get_venue_code(selected_venue_name) or 'unknown'}{selected_race_num}R"
-
-st.markdown("---")
-
-# --- サイドバー: 開発者設定 (隠蔽) ---
-with st.sidebar:
-    with st.expander("🛠️ 開発者設定 (Developer Settings)"):
-        st.header("⚙️ 詳細設定")
-        
-        # ID/URLの手動オーバーライド
-        st.subheader("🔧 パラメータ手動設定")
-        manual_race_id = st.text_input("レースID (上書き用)", value=generated_race_id)
-        manual_race_key = st.text_input("レースキー (上書き用)", value=generated_race_key)
-        manual_url = st.text_input("URL (上書き用)", value=generated_url)
-        
-        # データベース統計
-        st.subheader("📊 データベース統計")
+    st.markdown("---")
+    st.caption(f"ID: {generated_race_id}")
+    st.markdown(f"[🔗 出馬表]({generated_url})")
+    
+    st.markdown("---")
+    
+    # ================================================================================
+    # ⚠️ ログイン管理セクション - このセクションを削除しないでください
+    # ================================================================================
+    st.markdown("##### 🔐 ログイン管理")
+    cookie_file = settings.get('cookie_file', 'cookies.json')
+    
+    from src.utils.keibabook_auth import KeibaBookAuth
+    is_valid, status_msg = KeibaBookAuth.is_cookie_valid(cookie_file)
+    
+    if is_valid:
+        st.success(f"✅ ログイン済 ({status_msg})")
+        # ログアウトボタン
+        if st.button("🚪 ログアウト", key="logout_btn", help="Cookieを削除してログアウト"):
+            try:
+                import os
+                if os.path.exists(cookie_file):
+                    os.remove(cookie_file)
+                    st.success("✅ ログアウトしました")
+                    st.rerun()
+            except Exception as e:
+                st.error(f"❌ ログアウトエラー: {e}")
+    else:
+        st.warning(f"⚠️ 未ログイン")
+        st.caption(status_msg)
+        if st.button("🔑 ログイン実行", key="sidebar_login", help="ブラウザでログインを実行"):
+            with st.spinner("ログイン中..."):
+                try:
+                    result = subprocess.run(
+                        [sys.executable, "scripts/login_helper.py"],
+                        capture_output=True, text=True, timeout=120
+                    )
+                    if result.returncode == 0:
+                        st.success("✅ ログイン成功！")
+                        st.rerun()
+                    else:
+                        st.error(f"❌ ログイン失敗")
+                        with st.expander("エラー詳細"):
+                            st.code(result.stderr if result.stderr else result.stdout)
+                except Exception as e:
+                    st.error(f"❌ エラー: {e}")
+    # ================================================================================
+    
+    # 開発者設定
+    with st.expander("⚙️ 詳細設定"):
+        manual_race_id = st.text_input("レースID", value=generated_race_id)
+        manual_race_key = st.text_input("レースキー", value=generated_race_key)
+        manual_url = st.text_input("URL", value=generated_url)
+        use_duplicate_check = st.checkbox("重複チェック", value=True)
+        headless_mode = st.checkbox("ヘッドレス", value=settings.get('playwright_headless', False))
         race_ids = st.session_state.db_manager.get_race_ids()
-        st.metric("保存済みレース数", len(race_ids))
-        
-        # 重複チェック設定
-        use_duplicate_check = st.checkbox("重複チェックを有効化", value=True)
-        headless_mode = st.checkbox("ヘッドレスモード", value=settings.get('playwright_headless', False))
-        # 次レース自動選択の設定
-        st.subheader("🔁 次レース自動選択設定")
-        auto_next_select = st.checkbox("次レースを自動選択する", value=True)
-        next_race_buffer_minutes = st.number_input("自動選択バッファ（分）", min_value=0, max_value=60, value=settings.get('next_race_buffer_minutes', 1))
-        auto_prepare = st.checkbox("自動で次レース準備を行う (Auto Prepare)", value=False, help="有効にすると、UIが期間内であれば次レースの準備を行います（現在は手動Prepareボタン推奨）")
+        st.caption(f"保存済: {len(race_ids)}件")
 
-# メインコンテンツ
-tab_home, tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏠 Home", "📥 スクレイピング", "📊 データ確認", "🏇 トラックバイアス", "🎯 レコメンド", "📝 ログ"])
-
-with tab_home:
-    st.header("🏠 ホーム")
-    st.markdown("簡単な起動状態とショートカット、ログダウンロード")
-    col_a, col_b = st.columns([3, 1])
-    with col_a:
-        st.write("アプリURL: ")
-        st.markdown(f"[Open KeibaBook Streamlit](http://localhost:8501)")
-        if st.button("ログファイルを表示 (streamlit.log)"):
-            logs_path = Path('streamlit.log')
-            if logs_path.exists():
-                try:
-                    with open(logs_path, 'r', encoding='utf-8', errors='ignore') as lf:
-                        lines = lf.readlines()
-                    st.text_area("ログ (最後の 500 行)", '\n'.join(lines[-500:]), height=400)
-                    st.download_button("Download streamlit.log", data='\n'.join(lines[-500:]), file_name='streamlit.log')
-                except Exception as e:
-                    st.error(f"ログ読み込みエラー: {e}")
-            else:
-                st.warning("ログファイルが見つかりません (streamlit.log)")
-        st.markdown('---')
-        if st.button('🔮 今すぐ予想を準備 (Prepare Now)', key='prepare_now'):
-            if st.session_state.scraping_in_progress:
-                st.warning('既に処理中です。完了までお待ちください。')
-            else:
-                # Run quick prepare pipeline for next race
-                st.session_state.scraping_in_progress = True
-                with st.spinner('予想準備中...'): 
-                    try:
-                        # Determine target race
-                        from src.utils.schedule_utils import get_next_race_number
-                        # Use session schedule if available
-                        next_r = None
-                        try:
-                            next_r = get_next_race_number(st.session_state.jra_schedule, selected_venue_name, datetime.datetime.now(), buffer_minutes=next_race_buffer_minutes if 'next_race_buffer_minutes' in locals() and auto_next_select else 1)
-                        except Exception:
-                            next_r = None
-                        target_race_num = next_r or selected_race_num
-
-                        venue_code = VenueManager.get_venue_code(selected_venue_name) or '00'
-                        target_race_id = f"{date_str}{venue_code}{int(target_race_num):02d}"
-                        target_race_key = f"{date_str}_{VenueManager.get_venue_code(selected_venue_name) or 'unknown'}{target_race_num}R"
-                        if race_type == 'nar':
-                            target_url = f"https://s.keibabook.co.jp/chihou/syutuba/{target_race_id}"
-                        else:
-                            target_url = f"https://s.keibabook.co.jp/cyuou/syutuba/{target_race_id}"
-
-                        # Run scraping
-                        scraper = KeibaBookScraper({**settings, 'race_id': target_race_id, 'race_key': target_race_key, 'shutuba_url': target_url, 'output_dir': settings.get('output_dir', 'data')}, db_manager=st.session_state.db_manager if use_duplicate_check else None)
-                        scraped_data = asyncio.run(scraper.scrape())
-
-                        # Fetch odds if JRA
-                        if race_type == 'jra':
-                            jra_odds = asyncio.run(JRAOddsFetcher.fetch_realtime_odds(selected_venue_name, int(target_race_num)))
-                            if jra_odds and scraped_data:
-                                for horse in scraped_data.get('horses', []):
-                                    hn = horse.get('horse_num')
-                                    if hn in jra_odds:
-                                        horse['current_odds'] = jra_odds[hn]
-
-                        # Save per-race JSON
-                        output_dir = Path(settings.get('output_dir', 'data'))
-                        per_file = save_per_race_json(output_dir, target_race_id, target_race_key, scraped_data)
-
-                        # Run lightweight analysis (recommender / ranker / upset)
-                        recommender = HorseRecommender(st.session_state.db_manager)
-                        ranker = HorseRanker()
-                        upset_detector = UpsetDetector()
-                        recommended = recommender.find_undervalued_horses(scraped_data, threshold_rank=0.7, min_odds=10.0)
-                        ranked = ranker.rank_horses(scraped_data)
-                        upset = upset_detector.detect_upset_horses(scraped_data)
-
-                        # Display quick results
-                        st.success('予想準備完了')
-                        if ranked:
-                            st.markdown('### Top predictions')
-                            for h in ranked[:5]:
-                                st.write(f"{h.get('predicted_rank', '?')}位 - {h.get('horse_num')}番 {h.get('horse_name')} (スコア: {h.get('rank_score', 0):.1f})")
-
-                        if per_file and per_file.exists():
-                            st.markdown(f"✅ 保存: {per_file}")
-                            st.download_button('JSON ダウンロード', data=json.dumps(scraped_data, ensure_ascii=False, indent=2), file_name=per_file.name)
-                    except Exception as e:
-                        st.error(f'予想準備に失敗しました: {e}')
-                    finally:
-                        st.session_state.scraping_in_progress = False
-    with col_b:
-        st.write('ショートカット:')
-        st.markdown('- **KeibaBook Start**: 起動 & ログを表示する PowerShell を開きます。')
-        if st.button("スクレイパーログを表示 (scraper_log.txt)"):
-            s_path = Path('scraper_log.txt')
-            if s_path.exists():
-                try:
-                    with open(s_path, 'r', encoding='utf-8', errors='ignore') as sf:
-                        s_lines = sf.readlines()
-                    st.text_area("スクレイパーログ (最後の 500 行)", '\n'.join(s_lines[-500:]), height=400)
-                    st.download_button("Download scraper_log.txt", data='\n'.join(s_lines[-500:]), file_name='scraper_log.txt')
-                except Exception as e:
-                    st.error(f"ログ読み込みエラー: {e}")
-            else:
-                st.warning('スクレイパーログが見つかりません (scraper_log.txt)')
-        st.markdown('- Tip: デスクトップのショートカットをタスクバーにピン留めできます。')
-        st.markdown('動作に問題があれば `KeibaBook Console` を使ってログを確認してください。')
+# タブ（Home削除）
+tab1, tab3, tab_training, tab4, tab2, tab5 = st.tabs(["📥 スクレイピング", "🏇 トラックバイアス", "⏱️ 調教", "🎯 レコメンド", "📊 データ", "📝 ログ"])
 
 
 with tab1:
-    st.header("データ取得実行")
+    # シンプルなヘッダー
+    st.markdown(f"### 📥 {selected_date.strftime('%m/%d')} {selected_venue_name} {selected_race_num}R")
     
-    # 最終確認用の表示
-    st.info(f"**対象**: {selected_date} {selected_venue_name} {selected_race_num}R")
+    # 一括取得ボタン（Playwrightをサブプロセスで実行）
+    col1, col2 = st.columns([2, 1])
     
-    # ボタンエリア
-    col_btn1, col_btn2 = st.columns([3, 1])
-    
-    with col_btn1:
-        # スクレイピング実行ボタン
-        start_button = st.button("🚀 スクレイピング開始", type="primary", disabled=st.session_state.scraping_in_progress)
-    
-    with col_btn2:
-        # 中断ボタン
-        if st.session_state.scraping_in_progress:
-            if st.button("⛔ 中断", type="secondary"):
-                st.session_state.abort_scraping = True
-                st.warning("⚠️ 中断リクエストを送信しました...")
-    
-    if start_button:
-        # 手動設定があればそちらを優先
-        target_race_id = manual_race_id if manual_race_id != generated_race_id else generated_race_id
-        target_race_key = manual_race_key if manual_race_key != generated_race_key else generated_race_key
-        target_url = manual_url if manual_url != generated_url else generated_url
-        
-        if not target_race_id or not target_url:
-            st.error("レースIDとURLが無効です")
-        else:
+    with col1:
+        if st.button("🚀 データ取得", type="primary", disabled=st.session_state.scraping_in_progress, use_container_width=True):
             st.session_state.scraping_in_progress = True
             
-            # 設定を更新
-            current_settings = {
-                'race_type': race_type,
-                'venue': selected_venue_name if race_type == 'nar' else None,
-                'venue_type': 'minami_kanto' if (race_type == 'nar' and VenueManager.is_minami_kanto(selected_venue_name)) else 'other' if race_type == 'nar' else None,
-                'race_id': target_race_id,
-                'race_key': target_race_key,
-                'shutuba_url': target_url,
-                'seiseki_url': settings.get('seiseki_url', ''),
-                'playwright_headless': headless_mode,
-                'playwright_timeout': settings.get('playwright_timeout', 30000),
-                'output_dir': settings.get('output_dir', 'data')
-            }
+            # 手動設定があればそちらを優先
+            target_race_id = manual_race_id if manual_race_id != generated_race_id else generated_race_id
+            target_race_key = manual_race_key if manual_race_key != generated_race_key else generated_race_key
+            target_url = manual_url if manual_url != generated_url else generated_url
             
-            # プログレスバー
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            # スクレイピング実行
-            async def run_scraping():
-                # 中断フラグをリセット
-                st.session_state.abort_scraping = False
-                incomplete_files = []  # 中途半端なファイルを追跡
+            if not target_race_id or not target_url:
+                st.error("レースIDとURLが無効です")
+                st.session_state.scraping_in_progress = False
+            else:
+                # 設定を更新
+                current_settings = {
+                    'race_type': race_type,
+                    'venue': selected_venue_name if race_type == 'nar' else None,
+                    'venue_type': 'minami_kanto' if (race_type == 'nar' and VenueManager.is_minami_kanto(selected_venue_name)) else 'other' if race_type == 'nar' else None,
+                    'race_id': target_race_id,
+                    'race_key': target_race_key,
+                    'shutuba_url': target_url,
+                    'seiseki_url': settings.get('seiseki_url', ''),
+                    'playwright_headless': headless_mode,
+                    'playwright_timeout': settings.get('playwright_timeout', 30000),
+                    'output_dir': settings.get('output_dir', 'data')
+                }
+                
+                progress_bar = st.progress(0)
+                status_text = st.empty()
                 
                 try:
-                    status_text.text("初期化中...")
-                    progress_bar.progress(10)
+                    # サブプロセスでPlaywrightスクレイパーを実行
+                    output_file = Path(settings.get('output_dir', 'data')) / f"{target_race_key}.json"
                     
-                    # 中断チェック
-                    if st.session_state.abort_scraping:
-                        raise Exception("ユーザーによる中断")
+                    status_text.text("🔄 Playwrightでデータ取得中...")
+                    progress_bar.progress(20)
                     
-                    # DBマネージャーの設定
-                    db_manager = st.session_state.db_manager if use_duplicate_check else None
+                    # スクレイピングワーカーを実行
+                    result = subprocess.run(
+                        [
+                            sys.executable, 
+                            "scripts/scrape_worker.py",
+                            f"--race_id={target_race_id}",
+                            f"--race_type={race_type}",
+                            f"--output={output_file}"
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=180,  # 3分タイムアウト
+                        cwd=str(Path(__file__).parent)
+                    )
                     
-                    # スクレイパー作成
-                    scraper = KeibaBookScraper(current_settings, db_manager=db_manager)
-                    
-                    status_text.text("ページ取得中 (KeibaBook)...")
-                    progress_bar.progress(30)
-                    
-                    # 中断チェック
-                    if st.session_state.abort_scraping:
-                        raise Exception("ユーザーによる中断")
-                    
-                    # スクレイピング実行 (KeibaBook)
-                    scraped_data = await scraper.scrape()
-                    
-                    # 中断チェック
-                    if st.session_state.abort_scraping:
-                        raise Exception("ユーザーによる中断")
-                    
-                    # JRAオッズ取得 (JRAの場合のみ)
-                    if race_type == 'jra':
-                        status_text.text("リアルタイムオッズ取得中 (JRA)...")
-                        progress_bar.progress(60)
-                        
-                        # 中断チェック
-                        if st.session_state.abort_scraping:
-                            raise Exception("ユーザーによる中断")
-                        
-                        jra_odds = await JRAOddsFetcher.fetch_realtime_odds(selected_venue_name, selected_race_num)
-                        
-                        # オッズデータをマージ
-                        if jra_odds:
-                            for horse in scraped_data.get('horses', []):
-                                horse_num = horse.get('horse_num')
-                                if horse_num in jra_odds:
-                                    horse['current_odds'] = jra_odds[horse_num]
-                                    logger.info(f"JRAオッズ適用: 馬番{horse_num} -> {jra_odds[horse_num]}")
-                    
-                    status_text.text("データ保存中...")
                     progress_bar.progress(80)
                     
-                    # CSV DBに保存
-                    if db_manager:
-                        db_manager.save_race_data(
-                            scraped_data,
-                            target_race_id,
-                            target_race_key
-                        )
-                    
-                    # JSONファイルにも保存
-                    output_dir = Path(current_settings.get('output_dir', 'data'))
-                    output_dir.mkdir(parents=True, exist_ok=True)
-                    json_file = output_dir / f"{target_race_key}.json"
-                    incomplete_files.append(json_file)  # 追跡
-                    
-                    with open(json_file, 'w', encoding='utf-8') as f:
-                        json.dump(scraped_data, f, ensure_ascii=False, indent=2)
-                    
-                    # AI用JSONもエクスポート
-                    if db_manager:
-                        ai_json = db_manager.export_for_ai(target_race_id, str(output_dir / "json"))
-                        if ai_json:
-                            incomplete_files.append(Path(ai_json))  # 追跡
-                    
-                    progress_bar.progress(100)
-                    status_text.text("完了！")
-                    
-                    st.session_state.scraped_data = scraped_data
-                    st.success(f"✅ スクレイピング完了！ ({len(scraped_data.get('horses', []))}頭)")
-                    
-                    return scraped_data
-                    
-                except Exception as e:
-                    logger.error(f"スクレイピングエラー: {e}")
-                    
-                    # 中断の場合は中途半端なファイルを削除
-                    if st.session_state.abort_scraping or "中断" in str(e):
-                        st.warning("🗑️ 中途半端なデータを削除しています...")
-                        for file_path in incomplete_files:
-                            try:
-                                if file_path.exists():
-                                    file_path.unlink()
-                                    logger.info(f"削除: {file_path}")
-                            except Exception as del_err:
-                                logger.error(f"ファイル削除エラー: {del_err}")
-                        st.info("✅ 中断しました。不完全なデータは削除されました。")
+                    if result.returncode == 0 and output_file.exists():
+                        with open(output_file, 'r', encoding='utf-8') as f:
+                            scraped_data = json.load(f)
+                        
+                        horse_count = len(scraped_data.get('horses', []))
+                        
+                        # DBに保存
+                        if use_duplicate_check:
+                            st.session_state.db_manager.save_race_data(
+                                scraped_data, target_race_id, target_race_key
+                            )
+                        
+                        progress_bar.progress(100)
+                        status_text.text("✅ 完了！")
+                        st.success(f"✅ {horse_count}頭のデータを取得しました")
+                        st.session_state.scraped_data = scraped_data
                     else:
-                        st.error(f"❌ エラーが発生しました: {e}")
-                    
-                    status_text.text("中断" if st.session_state.abort_scraping else "エラー")
-                    progress_bar.progress(0)
+                        status_text.text("❌ エラー")
+                        st.error("データ取得に失敗しました")
+                        if result.stderr:
+                            with st.expander("エラー詳細"):
+                                st.code(result.stderr)
+                
+                except subprocess.TimeoutExpired:
+                    st.error("⏱️ タイムアウト（3分経過）")
+                except Exception as e:
+                    st.error(f"❌ エラー: {e}")
                 finally:
                     st.session_state.scraping_in_progress = False
-                    st.session_state.abort_scraping = False
+    
+    with col2:
+        # 中断ボタン（将来用）
+        st.button("⛔ 中断", disabled=not st.session_state.scraping_in_progress, use_container_width=True)
+    
+    # 取得済みデータの表示
+    if 'scraped_data' in st.session_state and st.session_state.scraped_data:
+        data = st.session_state.scraped_data
+        st.markdown("---")
+        st.markdown(f"#### {data.get('race_name', '')} {data.get('race_grade', '')}")
+        
+        horses = data.get('horses', [])
+        if horses:
+            # 簡易テーブル
+            for horse in horses[:5]:  # 最初の5頭だけ表示
+                col_a, col_b, col_c = st.columns([1, 3, 2])
+                with col_a:
+                    st.write(f"**{horse.get('horse_num', '')}**")
+                with col_b:
+                    st.write(horse.get('horse_name', ''))
+                with col_c:
+                    st.write(f"{horse.get('prediction_mark', '')} | {horse.get('jockey', '')}")
             
-            # 非同期実行
-            asyncio.run(run_scraping())
-            
-            # ページをリロードして結果を表示
-            st.rerun()
-
-    # --- 小型の 12ボタン UI (1R単位の取得) ---
-    st.markdown("---")
-    st.caption("🎯 ワンクリックで1R取得（その会場の1〜12R）")
-    cols_small = st.columns(12)
-    output_dir = Path(settings.get('output_dir', 'data'))
-    venue_code_for_id = VenueManager.get_venue_code(selected_venue_name) or 'unknown'
-    date_code = date_str
-    for i in range(1, 13):
-        with cols_small[i-1]:
-            tiny_race_id = f"{date_code}{venue_code_for_id}{i:02d}"
-            tiny_race_key = f"{date_code}_{venue_code_for_id}{i}R"
-            per_dir = output_dir / str(tiny_race_id)
-            per_f = per_dir / f"{tiny_race_key}_1R.json"
-            saved = per_f.exists()
-            label = f"{i} {'🟢' if saved else '⚪'}"
-            if st.button(label, key=f"quick_{tiny_race_id}"):
-                if st.session_state.scraping_in_progress:
-                    st.warning("既にスクレイピング中です。完了までお待ちください。")
-                else:
-                    st.session_state.scraping_in_progress = True
-                    async def run_single():
-                        db_manager = st.session_state.db_manager if use_duplicate_check else None
-                        # Build shutuba URL for JRA or NAR
-                        if race_type == 'nar':
-                            url = f"https://s.keibabook.co.jp/chihou/syutuba/{tiny_race_id}"
-                        else:
-                            url = f"https://s.keibabook.co.jp/cyuou/syutuba/{tiny_race_id}"
-                        scraper = KeibaBookScraper({**settings, 'race_id': tiny_race_id, 'race_key': tiny_race_key, 'shutuba_url': url, 'output_dir': str(output_dir)}, db_manager=db_manager)
-                        with st.spinner(f"{tiny_race_key} の取得中..."):
-                            try:
-                                scraped = await scraper.scrape()
-                                if scraped:
-                                    saved_path = save_per_race_json(output_dir, tiny_race_id, tiny_race_key, scraped)
-                                    st.success(f"保存完了: {saved_path}")
-                                    st.download_button("JSON をダウンロード", data=json.dumps(scraped, ensure_ascii=False, indent=2), file_name=saved_path.name)
-                                else:
-                                    st.warning("データが取得できませんでした。")
-                            except Exception as e:
-                                st.error(f"取得中にエラーが発生しました: {e}")
-                            finally:
-                                st.session_state.scraping_in_progress = False
-                    asyncio.run(run_single())
+            if len(horses) > 5:
+                st.caption(f"... 他 {len(horses) - 5} 頭")
 
 with tab2:
     st.header("📊 データ確認")
@@ -854,6 +548,7 @@ with tab2:
                 copy_text += f"グレード: {json_data.get('race_grade')}\n"
                 copy_text += "-" * 30 + "\n"
                 
+
                 horses = json_data.get('horses', [])
                 
                 # テーブルデータ作成
@@ -865,111 +560,44 @@ with tab2:
                     pedigree = horse.get('pedigree_data', {})
                     father = pedigree.get('father', '-')
                     mother = pedigree.get('mother', '-')
-            # Netkeibaスクレイパーをインポート
-            from src.scrapers.netkeiba_result import NetkeibaResultScraper
-            
-            async def fetch_and_analyze():
-                scraper = NetkeibaResultScraper(headless=headless_mode)
-                result_data = await scraper.fetch_result(race_id)
-                return result_data
-            
-            # 非同期実行
-            result_data = asyncio.run(fetch_and_analyze())
-            
-            if result_data and result_data.get('horses'):
-                st.success(f"✅ 取得完了！ ({len(result_data['horses'])}頭)")
+                    
+                    copy_text += f"{horse.get('horse_num', '?')}番: {horse.get('horse_name', '-')} ({mark}印 | {odds}倍)\n"
+                    copy_text += f"  父: {father} / 母: {mother}\n"
+                    
+                    # テーブル行を追加
+                    table_data.append({
+                        "馬番": horse.get('horse_num', '?'),
+                        "馬名": horse.get('horse_name', '-'),
+                        "印": mark,
+                        "オッズ": odds,
+                        "父": father,
+                        "母": mother
+                    })
                 
-                # セッションに保存
-                st.session_state.track_bias_data = result_data
-            else:
-                st.error("❌ データ取得に失敗しました")
+                # テーブル表示
+                if table_data:
+                    st.table(table_data)
+                    
+                    # コピーボタン
+                    st.download_button(
+                        label="📋 データをコピー用に保存",
+                        data=copy_text,
+                        file_name=f"{json_data.get('race_name', 'race')}_copy.txt",
+                        mime="text/plain"
+                    )
+            
+            except Exception as e:
+                st.error(f"データ読み込みエラー: {e}")
     
-    # トラックバイアス指数を表示
-    if 'track_bias_data' in st.session_state and st.session_state.track_bias_data:
-        data = st.session_state.track_bias_data
+    else:
+        st.info("保存されているデータがありません。スクレイピングを実行してください。")
+
+# tab3: トラックバイアス分析
+if tab3:
+    with tab3:
+        from src.ui import render_track_bias_tab
+        render_track_bias_tab(st.session_state.db_manager, headless_mode)
         
-        st.markdown("---")
-        st.subheader("📊 トラックバイアス指数")
-        
-        bias = data.get('track_bias', {})
-        
-        if bias and bias.get('bias_type') != 'データ不足':
-            # メトリクス表示
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.metric(
-                    "バイアスタイプ",
-                    bias.get('bias_type', 'N/A'),
-                    help="内外・ペースの傾向"
-                )
-            
-            with col2:
-                inner_outer = bias.get('inner_outer_bias', 0)
-                st.metric(
-                    "内外バイアス",
-                    f"{inner_outer:+.1f}",
-                    help="マイナス=内有利、プラス=外有利"
-                )
-            
-            with col3:
-                pace = bias.get('pace_bias', 0)
-                st.metric(
-                    "ペースバイアス",
-                    f"{pace:+.1f}",
-                    help="マイナス=前有利、プラス=後有利"
-                )
-            
-            with col4:
-                confidence = bias.get('confidence', 0)
-                st.metric(
-                    "信頼度",
-                    f"{confidence:.0%}",
-                    help="データの完全性"
-                )
-            
-            # 詳細情報
-            with st.expander("📈 詳細分析"):
-                st.write(f"**総合バイアススコア**: {bias.get('overall_bias_score', 0):.1f}/100")
-                st.write(f"**上がり3Fバイアス**: {bias.get('last_3f_bias', 0):.1f}/100")
-                
-                # 解釈
-                st.markdown("### 💡 解釈")
-                bias_type = bias.get('bias_type', '')
-                
-                if '内有利' in bias_type:
-                    st.info("🔵 **内枠有利**: 内枠の馬が好走しやすい馬場状態です")
-                elif '外有利' in bias_type:
-                    st.info("🔴 **外枠有利**: 外枠の馬が好走しやすい馬場状態です")
-                
-                if '前有利' in bias_type:
-                    st.info("⚡ **前残り**: 逃げ・先行馬が有利な展開です")
-                elif '後有利' in bias_type:
-                    st.info("🏃 **差し有利**: 差し・追込馬が有利な展開です")
-            
-            # 上位6頭の詳細
-            st.markdown("---")
-            st.subheader("🏆 上位6頭の成績")
-            
-            horses = data.get('horses', [])[:6]
-            
-            for i, horse in enumerate(horses, 1):
-                with st.expander(f"{i}着: {horse.get('horse_name', 'N/A')} ({horse.get('horse_num', '?')}番)"):
-                    col_h1, col_h2, col_h3 = st.columns(3)
-                    
-                    with col_h1:
-                        st.text(f"騎手: {horse.get('jockey', 'N/A')}")
-                        st.text(f"タイム: {horse.get('time', 'N/A')}")
-                    
-                    with col_h2:
-                        st.text(f"通過: {horse.get('passing', 'N/A')}")
-                        st.text(f"上がり: {horse.get('last_3f', 'N/A')}")
-                    
-                    with col_h3:
-                        st.text(f"人気: {horse.get('popularity', 'N/A')}番人気")
-                        st.text(f"オッズ: {horse.get('odds', 'N/A')}倍")
-        else:
-            st.warning("⚠️ トラックバイアス指数を計算できませんでした（データ不足）")
 
 with tab4:
     st.header("🎯 レコメンド機能")
@@ -1117,6 +745,11 @@ with tab4:
                 st.warning(f"JSONファイルが見つかりません: {json_file}")
     else:
         st.info("まだデータがありません。スクレイピングを実行してください。")
+
+with tab_training:
+    # 調教早見表タブ
+    from src.ui.training_evaluation_tab import render_training_evaluation_tab
+    render_training_evaluation_tab()
 
 with tab5:
     st.header("ログ・進捗記録")

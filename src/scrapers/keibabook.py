@@ -312,12 +312,108 @@ class KeibaBookScraper:
         
         return race_data
 
+    def _parse_training_simple(self, training_table):
+        """
+        シンプルな調教テーブルをパース（TrainingTableパターン）
+        
+        構造:
+        <tr>
+            <td class="HorseNum">1</td>
+            <td class="TrainingDate">11/5</td>
+            <td class="TrainingLocation">美浦南Ｗ</td>
+            <td class="TrainingTime">68.9-53.5-38.6-11.9</td>
+            <td class="TrainingEvaluation">馬ナリ余力</td>
+        </tr>
+        """
+        from src.utils.training_converter import convert_training_data
+        
+        training_data = {}
+        
+        for row in training_table.find_all('tr'):
+            horse_num_elem = row.select_one("td.HorseNum")
+            if not horse_num_elem:
+                continue
+            
+            horse_num = horse_num_elem.get_text(strip=True)
+            date_elem = row.select_one("td.TrainingDate")
+            location_elem = row.select_one("td.TrainingLocation")
+            time_elem = row.select_one("td.TrainingTime")
+            evaluation_elem = row.select_one("td.TrainingEvaluation")
+            
+            date = date_elem.get_text(strip=True) if date_elem else ''
+            location = location_elem.get_text(strip=True) if location_elem else ''
+            times_str = time_elem.get_text(strip=True) if time_elem else ''
+            evaluation = evaluation_elem.get_text(strip=True) if evaluation_elem else ''
+            
+            # タイムを分割（例: "68.9-53.5-38.6-11.9" → ["68.9", "53.5", "38.6", "11.9"]）
+            times = times_str.split('-') if times_str else []
+            # ラスト4ハロン分を取得（通常は4つ）
+            times = [t for t in times if t and t != '-']
+            
+            if horse_num not in training_data:
+                training_data[horse_num] = {
+                    'horse_name': '',  # シンプル版では馬名なし
+                    'tanpyo': '',
+                    'details': []
+                }
+            
+            # 調教詳細を追加
+            detail = {
+                'date_location': f"{date} {location}",
+                '追い切り方': evaluation,
+                'times': times,
+                'positions': [''] * len(times),  # シンプル版では位置情報なし
+                'awase': '',
+                'comment': ''
+            }
+            
+            training_data[horse_num]['details'].append(detail)
+        
+        logger.info(f"シンプルパターンで{len(training_data)}頭の調教データを取得")
+        
+        # 調教タイム変換を適用
+        training_data = convert_training_data(training_data)
+        
+        return training_data
+    
     def _parse_training_data(self, html_content):
+        """
+        調教データをパース（強化版 + タイム変換）
+        
+        取得データ:
+        - 馬番、馬名、短評（調教全体の評価コメント）
+        - 調教詳細（最大4回分）:
+          - 日付・場所（例: "11/28 栗東C"）
+          - 追い切り方（例: "強め", "一杯に追う"）
+          - 4回分のタイム（例: ["13.0", "12.8", "12.5", "12.3"]）
+          - 変換後タイム（栗東・美浦の差を補正した共通タイム）
+          - 枠位置[n]（中心からの距離）
+          - 併せ馬情報
+          - コメント
+        
+        Returns:
+            調教データ辞書（馬番がキー）
+        """
+        from src.utils.training_converter import convert_training_data
+        
         soup = BeautifulSoup(html_content, 'html.parser')
         training_data = {}
 
+        # KeibaBookの調教テーブルを探す（複数のパターンに対応）
+        training_table = soup.select_one("table.TrainingTable tbody")
+        
+        # TrainingTableパターン（シンプル版）
+        if training_table:
+            logger.info("TrainingTableパターンで調教データをパース")
+            return self._parse_training_simple(training_table)
+        
+        # 従来のパターン（詳細版）
         training_table = soup.select_one("table.default.cyokyo tbody")
         if not training_table:
+            training_table = soup.select_one("table.cyokyo tbody")
+        
+        if not training_table:
+            logger.warning("調教テーブルが見つかりません（TrainingTable/default.cyokyo/cyokyo）")
             return training_data
 
         rows = training_table.find_all('tr', recursive=False)
@@ -360,16 +456,42 @@ class KeibaBookScraper:
                         current_detail['date_location'] = date_location_elem.get_text(strip=True) if date_location_elem else ''
                         current_detail['追い切り方'] = oikiri_elem.get_text(strip=True) if oikiri_elem else ''
                         current_detail['times'] = []
+                        current_detail['positions'] = []  # 枠位置[n]を格納
                         current_detail['awase'] = ''
+                        current_detail['comment'] = ''  # コメントを格納
 
                     elif elem.name == 'table' and 'cyokyodata' in elem.get('class', []):
                         if current_detail:
-                            time_elems = elem.select("tr.time td")
-                            current_detail['times'] = [t.get_text(strip=True) for t in time_elems if t.get_text(strip=True)]
+                            # タイム行を取得
+                            time_row = elem.select_one("tr.time")
+                            if time_row:
+                                time_tds = time_row.find_all('td')
+                                for td in time_tds:
+                                    text = td.get_text(strip=True)
+                                    if text and text != '-':
+                                        # タイムと枠位置を分離（例: "12.5[3]" → "12.5", "[3]"）
+                                        import re
+                                        match = re.match(r'([\d.:]+)(\[[\d\-]+\])?', text)
+                                        if match:
+                                            time_val = match.group(1)
+                                            position_val = match.group(2) if match.group(2) else ''
+                                            current_detail['times'].append(time_val)
+                                            current_detail['positions'].append(position_val)
+                                        else:
+                                            current_detail['times'].append(text)
+                                            current_detail['positions'].append('')
                             
+                            # 併せ馬情報
                             awase_row = elem.select_one("tr.awase td.left")
                             if awase_row:
                                 current_detail['awase'] = awase_row.get_text(strip=True)
+                            
+                            # コメント行（次のp要素またはdiv要素を探す）
+                            comment_elem = elem.find_next_sibling(['p', 'div'])
+                            if comment_elem and comment_elem.get('class'):
+                                # コメント用のクラス名を探す（例: "comment", "cyokyo_comment"）
+                                if any(cls in ['comment', 'cyokyo_comment', 'cyoukyo_comment'] for cls in comment_elem.get('class', [])):
+                                    current_detail['comment'] = comment_elem.get_text(strip=True)
                 
                 if current_detail:
                     training_data[current_horse_num]['details'].append(current_detail)
@@ -377,6 +499,10 @@ class KeibaBookScraper:
                 i += 1
             else:
                 i += 1
+        
+        # 調教タイム変換を適用（栗東・美浦の差を補正）
+        training_data = convert_training_data(training_data)
+        
         return training_data
 
     def _parse_pedigree_data(self, html_content):
@@ -824,27 +950,32 @@ class KeibaBookScraper:
             if timeout_ms:
                 page.set_default_timeout(timeout_ms)
 
-            # ログイン確保: コンテキストに cookie をロードした上でログイン済みでなければログインを実行
-            # 重要: pageを渡して、ログイン処理後も同じページを使い続ける（ページを閉じない）
-            from src.utils.login import KeibaBookLogin
+            # ================================================================================
+            # ⚠️ 重要: ログイン処理 - このセクションを削除しないでください
+            # ================================================================================
+            # 新しい認証モジュールを使用（馬の数で認証状態を確認）
+            from src.utils.keibabook_auth import KeibaBookAuth
             cookie_file = self.settings.get('cookie_file', 'cookies.json')
             login_id = self.settings.get('login_id')
             password = self.settings.get('login_password')
             url = self.shutuba_url
             
-            # pageを渡すことで、ensure_logged_in内でページが閉じられず、
-            # ログイン状態が適用されたページをそのまま使える
-            login_ok = await KeibaBookLogin.ensure_logged_in(
-                context, login_id, password, 
-                cookie_file=cookie_file, 
-                save_cookies=True, 
-                test_url=url,
-                page=page  # ← これが重要！ページを渡して再利用
+            # 認証を確保（Cookieまたはログインで）
+            # target_urlを渡すことで、認証確認後に出馬表ページに遷移
+            login_ok, page = await KeibaBookAuth.ensure_authenticated(
+                context=context,
+                page=page,
+                login_id=login_id,
+                password=password,
+                cookie_file=cookie_file,
+                target_url=url  # 出馬表URLをターゲットに
             )
+            
             if not login_ok:
-                logger.warning("ログインに失敗しました。無料範囲のデータのみ取得されます。")
+                logger.warning("⚠️ ログインに失敗しました。無料範囲（3頭まで）のデータのみ取得されます。")
             else:
-                logger.info("ログイン確認成功。プレミアムデータを取得します。")
+                logger.info("✅ ログイン確認成功。全頭のプレミアムデータを取得します。")
+            # ================================================================================
             
             # 重複チェック（DBマネージャーが設定されている場合）
             if not self.skip_duplicate_check and self.db_manager and self.db_manager.is_url_fetched(url):
@@ -856,9 +987,7 @@ class KeibaBookScraper:
             # レート制御: サイト負担を軽減
             await self.rate_limiter.wait()
             
-            # ログイン後に出馬表URLに遷移してコンテンツを取得
-            # 注: ensure_logged_in()で既にURLに遷移している場合があるが、
-            # 確実性のため再度遷移する（Cookieが適用された状態で）
+            # 現在のページURLを確認し、必要なら出馬表URLに遷移
             current_url = page.url
             if url in current_url or current_url in url:
                 # 既に対象ページにいる場合は、コンテンツのみ取得
@@ -927,6 +1056,12 @@ class KeibaBookScraper:
                     training_html_content = ""
                 
                 parsed_training_data = self._parse_training_data(training_html_content) if training_html_content else {}
+                
+                # 調教タイムを栗東・美浦間で換算
+                if parsed_training_data:
+                    from src.utils.training_converter import convert_training_data
+                    parsed_training_data = convert_training_data(parsed_training_data)
+                    logger.info(f"調教タイム換算完了: {len(parsed_training_data)}頭分")
             else:
                 parsed_training_data = {}
                 logger.info("地方競馬のため調教データをスキップ")
