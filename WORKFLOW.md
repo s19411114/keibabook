@@ -10,17 +10,15 @@
 
 ## 🚀 作業開始手順
 
-> **注意**: プロジェクトの標準ワークフローは Docker です。必要がある場合のみ `LEGACY_VENV.md` を参照して venv を使用してください。
+**環境**: Windows + Python 3.12 + `.venv`
 
-**公式ドキュメント（一本化）**: `DEV_GUIDE.md` を必ず参照してください（詳細セットアップ、実行コマンド、トラブルシューティングを含む）。
+### 毎回実行するコマンド
+```powershell
+# プロジェクトフォルダに移動
+cd C:\GeminiCLI\TEST\keibabook
 
-### 毎回実行するコマンド（推奨: Docker）
-```bash
-# WSLでプロジェクトフォルダに移動
-cd /mnt/c/GeminiCLI/TEST/keibabook
-
-# Dockerで作業 (コンテナに入る)
-docker-compose exec app bash
+# 仮想環境を有効化（VS Codeなら自動）
+.\.venv\Scripts\Activate.ps1
 
 # 現在のブランチとステータスを確認
 git status
@@ -28,14 +26,14 @@ git log --oneline -5
 ```
 
 ### 初回セットアップ（1回のみ）
-```bash
-cd /mnt/c/GeminiCLI/TEST/keibabook
-# 推奨: Docker を利用
-./docker-start.sh
+```powershell
+cd C:\GeminiCLI\TEST\keibabook
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install -r requirements.txt
+playwright install chromium
 ```
-
-### 旧来の仮想環境(必要な場合のみ)
-旧来ワークフロー（ローカルvenv）を使う場合は `LEGACY_VENV.md` を参照してください。通常は Docker を推奨します。
 
 ---
 
@@ -121,16 +119,21 @@ git push -f origin feat/agent-run
 ## 🕷️ スクレイピング実行
 
 ### Streamlit GUI（推奨）
-```bash
-cd /mnt/c/GeminiCLI/TEST/keibabook
-source venv/bin/activate
+```powershell
+cd C:\GeminiCLI\TEST\keibabook
+.\.venv\Scripts\Activate.ps1
 streamlit run app.py
 ```
 
+または起動スクリプト:
+```powershell
+.\scripts\start_streamlit_win.ps1
+```
+
 ### CLI版
-```bash
-cd /mnt/c/GeminiCLI/TEST/keibabook
-source venv/bin/activate
+```powershell
+cd C:\GeminiCLI\TEST\keibabook
+.\.venv\Scripts\Activate.ps1
 python run_scraper.py
 ```
 
@@ -155,9 +158,9 @@ python run_scraper.py
 
 #### 対処法
 1. **現在の作業を保存**
-   ```bash
+   ```powershell
    # 別のターミナルを開く
-   cd /mnt/c/GeminiCLI/TEST/keibabook
+   cd C:\GeminiCLI\TEST\keibabook
    git add -A
    git commit -m "emergency: エディタ制限前の緊急保存"
    ```
@@ -167,7 +170,7 @@ python run_scraper.py
    - 前回のコミットから続行
 
 3. **最悪の場合：Gitから復旧**
-   ```bash
+   ```powershell
    # 最新のコミットを確認
    git log --oneline -5
    

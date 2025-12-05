@@ -32,6 +32,8 @@ class CSVDBManager:
         self.comment_table_path = self.db_dir / "comments.csv"
         self.past_result_table_path = self.db_dir / "past_results.csv"
         self.url_log_path = self.db_dir / "url_log.csv"
+        self.schedule_table_path = self.db_dir / "schedules.csv"  # スケジュールテーブル追加
+        self.track_bias_table_path = self.db_dir / "track_bias_history.csv"  # トラックバイアス履歴テーブル
         
         # テーブルを初期化
         self._init_tables()
@@ -56,6 +58,23 @@ class CSVDBManager:
             pd.DataFrame(columns=[
                 'race_id', 'horse_num', 'horse_name', 'jockey', 'created_at', 'updated_at'
             ]).to_csv(self.horse_table_path, index=False, encoding='utf-8-sig')
+        
+        # スケジュールテーブル（新規追加）
+        if not self.schedule_table_path.exists():
+            pd.DataFrame(columns=[
+                'date', 'venue', 'race_type', 'race_num', 'race_time', 
+                'race_id', 'created_at', 'updated_at'
+            ]).to_csv(self.schedule_table_path, index=False, encoding='utf-8-sig')
+        
+        # トラックバイアス履歴テーブル（新規追加）
+        if not self.track_bias_table_path.exists():
+            pd.DataFrame(columns=[
+                'race_id', 'race_name', 'venue', 'date', 'distance', 'track_condition',
+                'bias_type', 'overall_bias_score', 'confidence',
+                'inner_lane_score', 'outer_lane_score',
+                'front_runner_score', 'closer_score',
+                'created_at', 'updated_at'
+            ]).to_csv(self.track_bias_table_path, index=False, encoding='utf-8-sig')
     
     def is_url_fetched(self, url: str) -> bool:
         """
@@ -326,4 +345,164 @@ class CSVDBManager:
         except Exception as e:
             logger.error(f"JSONエクスポートエラー: {e}")
             return None
+    
+    def save_schedule(self, schedule_data: List[Dict[str, Any]], target_date: str):
+        """
+        スケジュールデータをCSVに保存
+        
+        Args:
+            schedule_data: スケジュールリスト [{'venue': '東京', 'races': [...]}, ...]
+            target_date: 対象日付 (YYYY-MM-DD形式)
+        """
+        try:
+            # 既存データを読み込み
+            if self.schedule_table_path.exists():
+                df = pd.read_csv(self.schedule_table_path, encoding='utf-8-sig')
+            else:
+                df = pd.DataFrame(columns=[
+                    'date', 'venue', 'race_type', 'race_num', 'race_time', 
+                    'race_id', 'created_at', 'updated_at'
+                ])
+            
+            # 新規レコードを作成
+            new_records = []
+            now = datetime.now().isoformat()
+            
+            for venue_data in schedule_data:
+                venue = venue_data.get('venue', '不明')
+                race_type = venue_data.get('race_type', 'unknown')
+                races = venue_data.get('races', [])
+                
+                for race in races:
+                    race_num = race.get('race_num', 0)
+                    race_time = race.get('time', '')
+                    race_id = race.get('race_id', '')
+                    
+                    # 重複チェック（同じ日付・会場・レース番号）
+                    existing = df[
+                        (df['date'] == target_date) & 
+                        (df['venue'] == venue) & 
+                        (df['race_num'] == race_num)
+                    ]
+                    
+                    if len(existing) == 0:
+                        new_records.append({
+                            'date': target_date,
+                            'venue': venue,
+                            'race_type': race_type,
+                            'race_num': race_num,
+                            'race_time': race_time,
+                            'race_id': race_id,
+                            'created_at': now,
+                            'updated_at': now
+                        })
+            
+            # 新規レコードを追加
+            if new_records:
+                new_df = pd.DataFrame(new_records)
+                df = pd.concat([df, new_df], ignore_index=True)
+                df.to_csv(self.schedule_table_path, index=False, encoding='utf-8-sig')
+                logger.info(f"✅ スケジュール保存完了: {len(new_records)}件追加")
+            else:
+                logger.info("ℹ️ 新規スケジュールなし（全て既存データ）")
+                
+        except Exception as e:
+            logger.error(f"スケジュール保存エラー: {e}", exc_info=True)
 
+    def save_track_bias(self, race_id: str, bias_data: Dict[str, Any], race_info: Dict[str, Any]):
+        """
+        トラックバイアスデータをCSVに保存
+        
+        Args:
+            race_id: レースID
+            bias_data: トラックバイアス指数データ（track_bias.pyの出力）
+            race_info: レース基本情報（race_name, venue, date, distance, track_condition）
+        """
+        try:
+            # 既存データを読み込み
+            if self.track_bias_table_path.exists():
+                df = pd.read_csv(self.track_bias_table_path, encoding='utf-8-sig')
+            else:
+                df = pd.DataFrame(columns=[
+                    'race_id', 'race_name', 'venue', 'date', 'distance', 'track_condition',
+                    'bias_type', 'overall_bias_score', 'confidence',
+                    'inner_lane_score', 'outer_lane_score',
+                    'front_runner_score', 'closer_score',
+                    'created_at', 'updated_at'
+                ])
+            
+            # 重複チェック（同じrace_idが既に存在する場合は更新）
+            now = datetime.now().isoformat()
+            existing_index = df[df['race_id'] == race_id].index
+            
+            new_record = {
+                'race_id': race_id,
+                'race_name': race_info.get('race_name', ''),
+                'venue': race_info.get('venue', ''),
+                'date': race_info.get('date', ''),
+                'distance': race_info.get('distance', ''),
+                'track_condition': race_info.get('track_condition', ''),
+                'bias_type': bias_data.get('bias_type', ''),
+                'overall_bias_score': bias_data.get('overall_bias_score', 0.0),
+                'confidence': bias_data.get('confidence', 0.0),
+                'inner_lane_score': bias_data.get('inner_lane_score', 0.0),
+                'outer_lane_score': bias_data.get('outer_lane_score', 0.0),
+                'front_runner_score': bias_data.get('front_runner_score', 0.0),
+                'closer_score': bias_data.get('closer_score', 0.0),
+                'created_at': now if len(existing_index) == 0 else df.loc[existing_index[0], 'created_at'],
+                'updated_at': now
+            }
+            
+            if len(existing_index) > 0:
+                # 既存レコードを更新
+                for col, val in new_record.items():
+                    df.loc[existing_index[0], col] = val
+                logger.info(f"✅ トラックバイアス更新: {race_id}")
+            else:
+                # 新規レコード追加
+                new_df = pd.DataFrame([new_record])
+                df = pd.concat([df, new_df], ignore_index=True)
+                logger.info(f"✅ トラックバイアス保存: {race_id}")
+            
+            # CSVに保存
+            df.to_csv(self.track_bias_table_path, index=False, encoding='utf-8-sig')
+                
+        except Exception as e:
+            logger.error(f"トラックバイアス保存エラー: {e}", exc_info=True)
+    
+    def get_track_bias_history(self, venue: Optional[str] = None, days: int = 30) -> List[Dict[str, Any]]:
+        """
+        トラックバイアス履歴を取得（アーカイブとして活用）
+        
+        Args:
+            venue: 会場名でフィルタ（Noneの場合は全会場）
+            days: 過去何日分取得するか
+            
+        Returns:
+            トラックバイアス履歴のリスト
+        """
+        try:
+            if not self.track_bias_table_path.exists():
+                return []
+            
+            df = pd.read_csv(self.track_bias_table_path, encoding='utf-8-sig')
+            
+            # 会場フィルタ
+            if venue:
+                df = df[df['venue'] == venue]
+            
+            # 日付フィルタ（過去N日）
+            if 'date' in df.columns:
+                cutoff_date = (datetime.now() - pd.Timedelta(days=days)).strftime('%Y-%m-%d')
+                df = df[df['date'] >= cutoff_date]
+            
+            # 日付降順でソート
+            if 'date' in df.columns:
+                df = df.sort_values('date', ascending=False)
+            
+            # 辞書リストに変換
+            return df.to_dict('records')
+            
+        except Exception as e:
+            logger.error(f"トラックバイアス履歴取得エラー: {e}")
+            return []

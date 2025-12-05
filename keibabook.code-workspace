@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        // 新しいキーを追加: 推奨インタプリタをワークスペース設定で指定
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+        // 端末起動時に仮想環境を自動有効化（統一の挙動）
+        "python.terminal.activateEnvironment": true
+    }
+}

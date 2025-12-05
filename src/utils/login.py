@@ -107,42 +107,21 @@ class KeibaBookLogin:
     async def is_logged_in(page: Page, test_url: str = "https://s.keibabook.co.jp/") -> bool:
         """
         Return True if navigation to test_url does not redirect to login.
-        Also checks for premium content indicators.
+        シンプルなログインチェック（リダイレクトのみ確認）
         """
         try:
-            await page.goto(test_url, wait_until='domcontentloaded', timeout=15000)
+            await page.goto(test_url, wait_until='domcontentloaded', timeout=60000)  # 60秒に延長
             current_url = page.url
             
             # If the URL contains 'login', assume not logged in
             if 'login' in current_url:
-                logger.debug(f"Login check failed: redirected to login page ({current_url})")
+                logger.debug(f"ログインチェック失敗: ログインページにリダイレクトされました ({current_url})")
                 return False
             
-            # Additional check: look for premium content indicators in the page
-            # This helps detect cases where cookies are loaded but session is invalid
-            try:
-                content = await page.content()
-                # Check if page contains login prompt or restricted content message
-                if 'ログインしてください' in content or 'ログインが必要です' in content:
-                    logger.debug("Login check failed: page contains login prompt")
-                    return False
-                
-                # For pedigree/kettou pages, check if full pedigree data is available
-                if 'kettou' in current_url:
-                    # Count pedigree links - should have 14 for full 3-generation pedigree
-                    from bs4 import BeautifulSoup
-                    soup = BeautifulSoup(content, 'html.parser')
-                    pedigree_links = soup.select("table.kettou.sandai a.umalink_click")
-                    if len(pedigree_links) < 6:
-                        logger.debug(f"Login check: pedigree links={len(pedigree_links)} (expected >=6 for logged in)")
-                        # This might indicate not logged in, but don't fail completely
-            except Exception as content_check_err:
-                logger.debug(f"Content check error (non-fatal): {content_check_err}")
-            
-            logger.debug(f"Login check passed: on page {current_url}")
+            logger.info(f"ログインチェック成功: {current_url}")
             return True
         except Exception as e:
-            logger.warning(f"Login check error: {e}")
+            logger.warning(f"ログインチェックエラー: {e}")
             return False
 
     @staticmethod

@@ -8,42 +8,67 @@
 
 | 項目 | 値 |
 |------|------|
-| 作業ディレクトリ | `~/keibabook` (WSLホーム) |
-| Python環境 | `source venv/bin/activate` |
-| エディタ | VS Code (WSL接続) |
+| 作業ディレクトリ | `C:\GeminiCLI\TEST\keibabook` |
+| Python環境 | `.venv` (Python 3.12) |
+| エディタ | VS Code (Windows) |
 
-> ❌ **禁止**: `/mnt/c/...` (Windows側フォルダ) での作業
-> ❌ **禁止**: Dockerの使用
+> ❌ **禁止**: WSL・Docker の使用
 
 ### 2. 作業開始時の確認コマンド
 
-```bash
+```powershell
 # 必ず最初に実行
-pwd  # ~/keibabook であることを確認
-source venv/bin/activate
-which python  # ~/keibabook/venv/bin/python が表示されるべき
+pwd  # C:\GeminiCLI\TEST\keibabook であることを確認
+.\.venv\Scripts\Activate.ps1
+Get-Command python | Select-Object -ExpandProperty Source  # .venv内のPythonが表示されるべき
 ```
 
 ### 3. 禁止事項
 
-- ❌ **venvをアクティベートせずにPythonを実行しない**
+- ❌ **.venvをアクティベートせずにPythonを実行しない**
 - ❌ **`pip install` をシステムPythonに直接実行しない**
 - ❌ **環境を確認せずにスクリプトを実行しない**
-- ❌ **Dockerコマンドを使用しない**
+- ❌ **WSL・Dockerコマンドを使用しない**
+
+### 4. 🚫 削除禁止リスト
+
+以下のファイル・ディレクトリは**絶対に削除してはいけません**：
+
+**ドキュメント（参考資料として保存）:**
+- `docs/DATA_SOURCES.md` - データソースURL一覧（JRA・地方競馬の公式URL等）
+- `docs/MULTI_SOURCE_STRATEGY.md` - データ取得戦略
+- `docs/*.md` - すべてのドキュメント
+- `README.md`, `WORKFLOW.md`, `HANDOVER.md`
+- `issues/HANDOVER_CLAUDE_HAIKU.md` - 過去の開発履歴と参考URL
+
+**設定・認証:**
+- `.vscode/settings.json` - VS Code設定
+- `config/settings.yml` - アプリケーション設定
+- `cookies.json` - 認証情報（有効期限: 2026-11-25）
+
+**データディレクトリ:**
+- `data/` - 取得済みレースデータ
+- `pedigree_store/` - 血統データ
+- `raw_html/` - デバッグ用HTML
+
+**URLや参考情報を削除する前に:**
+1. そのURLが参考資料として保存されているか確認
+2. 削除が必要な場合は `docs/` に移動して出典を明記
+3. 削除/移動の理由を `PROJECT_LOG.md` に記録
 
 ---
 
 ## 📁 プロジェクト構造
 
 ```
-~/keibabook/
-├── venv/               # Python仮想環境
-├── src/                # ソースコード
-│   ├── scrapers/      # スクレイパー
-│   └── utils/         # ユーティリティ
-├── data/              # 出力データ
-├── config/            # 設定ファイル
-├── tests/             # テストコード
+C:\GeminiCLI\TEST\keibabook\
+├── .venv\              # Python仮想環境 (Python 3.12)
+├── src\                # ソースコード
+│   ├── scrapers\      # スクレイパー
+│   └── utils\         # ユーティリティ
+├── data\              # 出力データ
+├── config\            # 設定ファイル
+├── tests\             # テストコード
 ├── app.py             # Streamlit UI
 ├── run_scraper.py     # CLIスクレイパー
 └── requirements.txt   # 依存関係
@@ -55,31 +80,36 @@ which python  # ~/keibabook/venv/bin/python が表示されるべき
 
 ### スクレイピング
 
-```bash
-cd ~/keibabook
-source venv/bin/activate
+```powershell
+cd C:\GeminiCLI\TEST\keibabook
+.\.venv\Scripts\Activate.ps1
 python run_scraper.py
 ```
 
 ### Streamlit起動
 
-```bash
-cd ~/keibabook
-source venv/bin/activate
+```powershell
+cd C:\GeminiCLI\TEST\keibabook
+.\.venv\Scripts\Activate.ps1
 streamlit run app.py
+```
+
+または起動スクリプト:
+```powershell
+.\scripts\start_streamlit_win.ps1
 ```
 
 ### テスト実行
 
-```bash
-cd ~/keibabook
-source venv/bin/activate
-pytest tests/
+```powershell
+cd C:\GeminiCLI\TEST\keibabook
+.\.venv\Scripts\Activate.ps1
+pytest tests\
 ```
 
 ### 依存関係の更新
 
-```bash
+```powershell
 pip install -r requirements.txt
 ```
 
@@ -89,14 +119,14 @@ pip install -r requirements.txt
 
 ### 症状: Pythonモジュールが見つからない
 
-```bash
-source venv/bin/activate
+```powershell
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
 ### 症状: Playwrightがエラー
 
-```bash
+```powershell
 playwright install chromium
 ```
 
@@ -106,9 +136,9 @@ playwright install chromium
 
 新しいエージェントは以下を最初に確認:
 
-- [ ] `pwd` で `~/keibabook` にいることを確認
-- [ ] `source venv/bin/activate` を実行
-- [ ] `which python` で venv内のPythonを確認
+- [ ] `pwd` で `C:\GeminiCLI\TEST\keibabook` にいることを確認
+- [ ] `.\.venv\Scripts\Activate.ps1` を実行
+- [ ] `Get-Command python` で .venv内のPythonを確認
 - [ ] このファイル (`AGENT_RULES.md`) を読む
 - [ ] `DEV_GUIDE.md` を参照
 

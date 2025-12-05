@@ -416,3 +416,41 @@ class TrackBiasAnalyzer:
             'bias_type': 'データ不足',
             'confidence': 0.0
         }
+
+
+def get_latest_bias() -> dict:
+    """
+    最新のトラックバイアス情報を取得
+    
+    Returns:
+        dict: バイアス情報（race_name, date, bias, confidence）
+    """
+    try:
+        import json
+        from pathlib import Path
+        
+        # data/track_bias ディレクトリから最新のJSONを取得
+        bias_dir = Path("data/track_bias")
+        if not bias_dir.exists():
+            return None
+        
+        json_files = list(bias_dir.glob("*.json"))
+        if not json_files:
+            return None
+        
+        # 最新のファイルを取得
+        latest_file = max(json_files, key=lambda p: p.stat().st_mtime)
+        
+        with open(latest_file, 'r', encoding='utf-8') as f:
+            bias_data = json.load(f)
+        
+        # 簡易的なバイアス情報を返す
+        return {
+            'race_name': bias_data.get('race_name', 'N/A'),
+            'date': bias_data.get('date', 'N/A'),
+            'bias': bias_data.get('bias_type', 'N/A'),
+            'confidence': f"{bias_data.get('confidence', 0.0):.1f}%"
+        }
+    
+    except Exception:
+        return None

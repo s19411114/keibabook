@@ -233,12 +233,41 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             for d in details[-3:]:  # 直近3本のみ表示
                 date_loc = d.get('date_location', '')
                 oikiri = d.get('追い切り方', '')
-                times = d.get('times', [])
+                center = d.get('training_center', '')
+                course = d.get('course', '')
+                
+                # 換算後タイムを優先表示（元タイムも括弧内に表示）
+                converted_times = d.get('converted_times', [])
+                positions = d.get('positions', [])
+                
+                if converted_times:
+                    time_parts = []
+                    for idx, conv in enumerate(converted_times):
+                        conv_str = conv.get('converted_str', '')
+                        orig_str = conv.get('original_str', '')
+                        pos = positions[idx] if idx < len(positions) else ''
+                        
+                        # 換算タイムと元タイムが異なる場合のみ元タイムを表示
+                        if conv_str and conv_str != orig_str:
+                            time_parts.append(f"{conv_str}{pos}({orig_str})")
+                        else:
+                            time_parts.append(f"{orig_str}{pos}")
+                    time_str = '-'.join(time_parts)
+                else:
+                    # フォールバック: 元タイムのみ
+                    times = d.get('times', [])
+                    time_str = '-'.join([f"{t}{positions[i] if i < len(positions) else ''}" for i, t in enumerate(times)]) if times else ''
+                
                 awase = d.get('awase', '')
-                time_str = '-'.join(times) if times else ''
+                comment = d.get('comment', '')
+                
                 lines.append(f"  - {date_loc} {oikiri} {time_str}")
+                if center and course:
+                    lines.append(f"    ({center}{course})")
                 if awase:
                     lines.append(f"    併せ: {awase}")
+                if comment:
+                    lines.append(f"    コメント: {comment}")
         
         # 厩舎の話
         stable = h.get('stable_comment', '')

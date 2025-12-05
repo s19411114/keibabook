@@ -1,8 +1,7 @@
 {
-  "python.terminal.activateEnvironment": false,
-  "python.terminal.activateEnvInCurrentTerminal": false,
-  "python.autoComplete.activateEnvironment": false,
-  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
   "python.analysis.diagnosticMode": "openFilesOnly",
   "python.analysis.autoImportCompletions": false,
   "files.watcherExclude": {
@@ -27,23 +26,6 @@
     "**/__pycache__": true,
     "**/*.pyc": true
   },
-  "python-envs.defaultEnvManager": "none",
-  "python-envs.pythonProjects": [],
-  "python.terminal.activateEnvInCurrentTerminal": false,
-  "python.envFile": "${workspaceFolder}/.env.disabled",
-  "terminal.integrated.env.linux": {
-    "VIRTUAL_ENV": "",
-    "CONDA_ACTIVATE_BASE": "false",
-    "PYTHONPATH": "",
-    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-  },
-  "terminal.integrated.profiles.linux": {
-    "bash": {
-      "path": "/bin/bash",
-      "args": ["--noprofile", "--norc", "-c", "source ${workspaceFolder}/.vscode/bash_profile_override 2>/dev/null || true; exec /bin/bash --noprofile --norc"]
-    }
-  },
-  "terminal.integrated.defaultProfile.linux": "bash",
   "python.analysis.memory.keepLibraryAst": false,
   "python.analysis.indexing": false,
   "python.languageServer": "Pylance",
@@ -55,5 +37,12 @@
   "python.venvPath": "",
   "python.poetryPath": "",
   "terminal.integrated.inheritEnv": false,
-  "python.experiments.enabled": false
+  "python.experiments.enabled": false,
+  "python-envs.pythonProjects": [
+    {
+      "path": "",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    }
+  ]
 }
