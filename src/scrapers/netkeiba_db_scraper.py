@@ -14,7 +14,14 @@ from pathlib import Path
 
 import requests
 import pandas as pd
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+except Exception:
+    # Fallback: if tqdm isn't installed, use a no-op passthrough
+    def tqdm(iterable, *args, **kwargs):
+        for v in iterable:
+            yield v
+
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 
