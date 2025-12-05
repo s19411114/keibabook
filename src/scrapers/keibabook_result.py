@@ -3,6 +3,7 @@
 レース後コメント・次走へのメモを取得
 """
 import asyncio
+from pathlib import Path
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from typing import Dict, List, Any
@@ -78,7 +79,7 @@ class KeibaBookResultScraper:
                 html_content = await page.content()
                 
                 # デバッグ用にHTML保存
-                with open(f"debug_result_{race_id}.html", "w", encoding="utf-8") as f:
+                with open(Path("debug_files") / f"debug_result_{race_id}.html", "w", encoding="utf-8") as f:
                     f.write(html_content)
                 
                 # パース

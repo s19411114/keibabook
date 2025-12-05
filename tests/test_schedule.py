@@ -36,9 +36,9 @@ async def get_race_schedule():
                 print(f'  {rid}')
         
         # HTMLを保存
-        with open('debug_schedule.html', 'w', encoding='utf-8') as f:
+        with open('debug_files/debug_schedule.html', 'w', encoding='utf-8') as f:
             f.write(content)
-        print('Saved debug_schedule.html')
+        print('Saved debug_files/debug_schedule.html')
         
         await browser.close()
 

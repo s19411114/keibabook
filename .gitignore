@@ -73,6 +73,7 @@ temp/
 # Debug files
 debug_*.html
 debug_*.txt
+debug_files/
 *_temp.txt
 schedule_temp.txt
 

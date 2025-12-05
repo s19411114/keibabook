@@ -76,7 +76,7 @@ async def test_training_data():
             html_content = await page.content()
             
             # デバッグ用にHTMLを保存
-            debug_file = f"debug_training_{race_id}.html"
+            debug_file = f"debug_files/debug_training_{race_id}.html"
             with open(debug_file, 'w', encoding='utf-8') as f:
                 f.write(html_content)
             logger.info(f"デバッグHTML保存: {debug_file}")

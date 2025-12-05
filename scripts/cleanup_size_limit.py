@@ -41,7 +41,7 @@ def main():
         print(f"Directory not found: {root}", file=sys.stderr)
         sys.exit(2)
 
-    patterns = ["debug_*", "bench_*", "*.tmp", "*tmp_*", "pp_*", "playwright_test.py", "*.log"]
+    patterns = ["debug_*", "debug_files/*", "bench_*", "*.tmp", "*tmp_*", "pp_*", "playwright_test.py", "*.log"]
     files = find_matching_files(root, patterns)
     total = sum(size for _, size, _ in files)
 

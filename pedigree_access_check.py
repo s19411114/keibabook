@@ -50,9 +50,9 @@ async def test_pedigree_access():
             html_content = await page.content()
             
             # Save for inspection
-            with open("debug_pedigree_test.html", "w", encoding="utf-8") as f:
+            with open("debug_files/debug_pedigree_test.html", "w", encoding="utf-8") as f:
                 f.write(html_content)
-            print("✅ HTML saved to debug_pedigree_test.html")
+            print("✅ HTML saved to debug_files/debug_pedigree_test.html")
             
             # Parse pedigree data
             soup = BeautifulSoup(html_content, 'html.parser')
