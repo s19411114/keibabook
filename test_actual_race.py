@@ -48,9 +48,9 @@ async def test_login():
         
         # デバッグ用にHTML保存
         content = await page.content()
-        with open('debug_race.html', 'w', encoding='utf-8') as f:
+        with open('debug_files/debug_race.html', 'w', encoding='utf-8') as f:
             f.write(content)
-        print('\nSaved debug_race.html')
+        print('\nSaved debug_files/debug_race.html')
         
         await browser.close()
 

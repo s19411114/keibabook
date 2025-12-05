@@ -3,7 +3,7 @@ import re
 
 def analyze():
     try:
-        with open("debug_schedule.html", "r", encoding="utf-8") as f:
+        with open("debug_files/debug_schedule.html", "r", encoding="utf-8") as f:
             content = f.read()
             
         soup = BeautifulSoup(content, 'html.parser')

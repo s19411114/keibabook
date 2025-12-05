@@ -18,7 +18,7 @@ scraper = KeibaBookScraper(settings)
 
 # 血統データのパース
 print("=== 血統データ（Pedigree）のテスト ===")
-with open('debug_pedigree.html', 'r', encoding='utf-8') as f:
+with open('debug_files/debug_pedigree.html', 'r', encoding='utf-8') as f:
     pedigree_html = f.read()
 
 pedigree_data = scraper._parse_pedigree_data(pedigree_html)
@@ -35,7 +35,7 @@ print("\\n" + "="*50 + "\\n")
 
 # 調教データのパース
 print("=== 調教データ（Training）のテスト ===")
-with open('debug_training.html', 'r', encoding='utf-8') as f:
+with open('debug_files/debug_training.html', 'r', encoding='utf-8') as f:
     training_html = f.read()
 
 training_data = scraper._parse_training_data(training_html)

@@ -14,10 +14,10 @@ import sys
 def main():
     # Read the HTML file
     try:
-        with open('debug_nouryoku.html', 'r', encoding='utf-8') as f:
+        with open('debug_files/debug_nouryoku.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
     except FileNotFoundError:
-        print("debug_nouryoku.html not found in the working directory")
+        print("debug_files/debug_nouryoku.html not found in the working directory")
         sys.exit(1)
 
     soup = BeautifulSoup(html_content, 'html.parser')

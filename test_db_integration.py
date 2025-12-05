@@ -40,10 +40,10 @@ async def main():
     
     # Read the HTML file
     try:
-        with open('debug_nouryoku.html', 'r', encoding='utf-8') as f:
+        with open('debug_files/debug_nouryoku.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
     except FileNotFoundError:
-        print("Error: debug_nouryoku.html not found.")
+        print("Error: debug_files/debug_nouryoku.html not found.")
         return
 
     # Parse data

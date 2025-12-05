@@ -70,6 +70,9 @@ class HttpxKeibaBookScraper:
         
         # デバッグ情報
         self._last_fetches = []
+        # Ensure debug dir exists
+        self.debug_dir = Path("debug_files")
+        self.debug_dir.mkdir(parents=True, exist_ok=True)
         
         # ベースURL
         if self.race_type == 'nar':
@@ -532,7 +535,7 @@ class HttpxKeibaBookScraper:
             
             # デバッグ用HTML保存
             if not self.settings.get('skip_debug_files', False):
-                with open(f"debug_page_{race_key}.html", "w", encoding="utf-8") as f:
+                with open(self.debug_dir / f"debug_page_{race_key}.html", "w", encoding="utf-8") as f:
                     f.write(html_content)
             
             # 出馬表をパース
@@ -554,7 +557,7 @@ class HttpxKeibaBookScraper:
                     pedigree_html = self.fetch_page_sync(pedigree_url)
                     
                     if not self.settings.get('skip_debug_files', False):
-                        with open(f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
+                        with open(self.debug_dir / f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
                             f.write(pedigree_html)
                     
                     pedigree_list = self._parse_pedigree_data(pedigree_html)
@@ -583,7 +586,7 @@ class HttpxKeibaBookScraper:
                     training_html = self.fetch_page_sync(training_url)
                     
                     if not self.settings.get('skip_debug_files', False):
-                        with open(f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
+                        with open(self.debug_dir / f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
                             f.write(training_html)
                     
                     training_data = self._parse_training_data(training_html)

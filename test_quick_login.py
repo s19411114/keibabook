@@ -39,9 +39,9 @@ async def test():
         else:
             # コンテンツを確認
             content = await page.content()
-            with open('debug_test.html', 'w', encoding='utf-8') as f:
+            with open('debug_files/debug_test.html', 'w', encoding='utf-8') as f:
                 f.write(content)
-            print('Saved debug_test.html for inspection')
+            print('Saved debug_files/debug_test.html for inspection')
         
         await browser.close()
 

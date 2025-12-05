@@ -97,9 +97,9 @@ async def test_login_with_cookies():
                 content = await page.content()
                 
                 # HTMLをデバッグ保存
-                with open('debug_login_test.html', 'w', encoding='utf-8') as f:
-                    f.write(content)
-                print(f"   📄 HTMLを debug_login_test.html に保存")
+                with open('debug_files/debug_login_test.html', 'w', encoding='utf-8') as f:
+                    f.write(page_content)
+                print(f"   📄 HTMLを debug_files/debug_login_test.html に保存")
                 
                 # 馬の行を数える（複数のパターン）
                 horse_count = 0

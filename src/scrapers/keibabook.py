@@ -2,6 +2,7 @@ import os
 import json
 import time
 import asyncio
+from pathlib import Path
 from src.utils.config import load_settings
 from src.utils.logger import get_logger
 from src.utils.rate_limiter import RateLimiter
@@ -34,6 +35,9 @@ class KeibaBookScraper:
         self.rate_limiter = RateLimiter(self.settings.get('rate_limit_base'))  # レート制御
         # record fetch details for debugging and perf analysis
         self._last_fetches = []
+        # Ensure debug dir exists
+        self.debug_dir = Path("debug_files")
+        self.debug_dir.mkdir(parents=True, exist_ok=True)
         self._comments_concurrency = int(self.settings.get('comments_concurrency', 1))
         self._parallel_page_fetch = bool(self.settings.get('parallel_page_fetch', False))
         
@@ -802,7 +806,7 @@ class KeibaBookScraper:
                 self.db_manager.log_url(self.seiseki_url, self.settings['race_id'], 'result', 'success')
             
             # デバッグ用にHTMLを保存
-            with open("debug_result.html", "w", encoding="utf-8") as f:
+            with open(self.debug_dir / "debug_result.html", "w", encoding="utf-8") as f:
                 f.write(result_html_content)
             
             # 結果ページをパース
@@ -849,7 +853,7 @@ class KeibaBookScraper:
                 self.db_manager.log_url(point_url, self.settings['race_id'], 'point', 'success')
             
             # デバッグ用にHTMLを保存
-            with open("debug_point.html", "w", encoding="utf-8") as f:
+            with open(self.debug_dir / "debug_point.html", "w", encoding="utf-8") as f:
                 f.write(point_html_content)
             
             # ポイントページをパース
@@ -1022,7 +1026,7 @@ class KeibaBookScraper:
                 html_text = str(html_content)
             race_key = self.settings.get('race_key', 'unknown')
             if not self.settings.get('skip_debug_files', False):
-                with open(f"debug_page_{race_key}.html", "w", encoding="utf-8") as f:
+                with open(self.debug_dir / f"debug_page_{race_key}.html", "w", encoding="utf-8") as f:
                     f.write(html_text)
             # ------------------------------------
 
@@ -1049,7 +1053,7 @@ class KeibaBookScraper:
                     if self.db_manager:
                         self.db_manager.log_url(training_url, self.settings['race_id'], 'training', 'success')
                     if not self.settings.get('skip_debug_files', False):
-                        with open(f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
+                        with open(self.debug_dir / f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
                             f.write(training_html_content)
                 else:
                     logger.info(f"スキップ（既取得）: {training_url}")
@@ -1086,7 +1090,7 @@ class KeibaBookScraper:
                 if self.db_manager:
                     self.db_manager.log_url(pedigree_url, self.settings['race_id'], 'pedigree', 'success')
                 if not self.settings.get('skip_debug_files', False):
-                    with open(f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
+                    with open(self.debug_dir / f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
                         f.write(pedigree_html_content)
             else:
                 logger.info(f"スキップ（既取得）: {pedigree_url}")
@@ -1115,7 +1119,7 @@ class KeibaBookScraper:
                     if self.db_manager:
                         self.db_manager.log_url(stable_comment_url, self.settings['race_id'], 'stable_comment', 'success')
                     if not self.settings.get('skip_debug_files', False):
-                        with open(f"debug_stable_comment_{race_key}.html", "w", encoding="utf-8") as f:
+                        with open(self.debug_dir / f"debug_stable_comment_{race_key}.html", "w", encoding="utf-8") as f:
                             f.write(stable_comment_html_content)
                 else:
                     logger.info(f"スキップ（既取得）: {stable_comment_url}")
@@ -1146,7 +1150,7 @@ class KeibaBookScraper:
                     if self.db_manager:
                         self.db_manager.log_url(previous_race_comment_url, self.settings['race_id'], 'previous_race_comment', 'success')
                     if not self.settings.get('skip_debug_files', False):
-                        with open(f"debug_previous_race_comment_{race_key}.html", "w", encoding="utf-8") as f:
+                        with open(self.debug_dir / f"debug_previous_race_comment_{race_key}.html", "w", encoding="utf-8") as f:
                             f.write(previous_race_comment_url_content)
                 else:
                     logger.info(f"スキップ（既取得）: {previous_race_comment_url}")
@@ -1191,7 +1195,7 @@ class KeibaBookScraper:
                             if self.db_manager:
                                 self.db_manager.log_url(cpu_url, self.settings['race_id'], 'cpu_prediction', 'success')
                             if not self.settings.get('skip_debug_files', False):
-                                with open(f"debug_cpu_{race_key}.html", "w", encoding="utf-8") as f:
+                                with open(self.debug_dir / f"debug_cpu_{race_key}.html", "w", encoding="utf-8") as f:
                                     f.write(cpu_html)
                             
                             cpu_data = self.jra_parser.parse_cpu_prediction(cpu_html)
@@ -1229,7 +1233,7 @@ class KeibaBookScraper:
                         if self.db_manager:
                             self.db_manager.log_url(girigiri_url, self.settings['race_id'], 'girigiri', 'success')
                         if not self.settings.get('skip_debug_files', False):
-                            with open(f"debug_girigiri_{race_key}.html", "w", encoding="utf-8") as f:
+                            with open(self.debug_dir / f"debug_girigiri_{race_key}.html", "w", encoding="utf-8") as f:
                                 f.write(girigiri_html)
                         
                         girigiri_data = self.jra_parser.parse_girigiri_info(girigiri_html)
@@ -1248,7 +1252,7 @@ class KeibaBookScraper:
                         if self.db_manager:
                             self.db_manager.log_url(feature_url, self.settings['race_id'], 'feature', 'success')
                         if not self.settings.get('skip_debug_files', False):
-                            with open(f"debug_feature_{race_key}.html", "w", encoding="utf-8") as f:
+                            with open(self.debug_dir / f"debug_feature_{race_key}.html", "w", encoding="utf-8") as f:
                                 f.write(feature_html)
                         
                         feature_data = self.jra_parser.parse_special_feature(feature_html)
@@ -1284,7 +1288,7 @@ class KeibaBookScraper:
                     if self.db_manager:
                         self.db_manager.log_url(result_url, self.settings['race_id'], 'result', 'success')
                     if not self.settings.get('skip_debug_files', False):
-                        with open(f"debug_result_{race_key}.html", "w", encoding="utf-8") as f:
+                        with open(self.debug_dir / f"debug_result_{race_key}.html", "w", encoding="utf-8") as f:
                             f.write(result_html)
                     
                     result_data = self.result_parser.parse_result_page(result_html)
@@ -1321,7 +1325,7 @@ class KeibaBookScraper:
             # Save debug fetch summary
             if not self.settings.get('skip_debug_files', False):
                 try:
-                    with open(f"debug_fetches_{race_key}.json", "w", encoding="utf-8") as f:
+                    with open(self.debug_dir / f"debug_fetches_{race_key}.json", "w", encoding="utf-8") as f:
                         import json
                         json.dump(self._last_fetches, f, ensure_ascii=False, indent=2)
                 except Exception:

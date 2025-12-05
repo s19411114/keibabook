@@ -59,7 +59,7 @@ async def test_login():
         # 存在しないページエラー
         if '存在しません' in content:
             print('   ❌ Page does not exist')
-            with open('debug_race2.html', 'w', encoding='utf-8') as f:
+            with open('debug_files/debug_race2.html', 'w', encoding='utf-8') as f:
                 f.write(content)
             await browser.close()
             return
@@ -85,9 +85,9 @@ async def test_login():
         print(f'   Waku TDs: {len(waku_tds)}')
         
         # HTMLを保存
-        with open('debug_race2.html', 'w', encoding='utf-8') as f:
+        with open('debug_files/debug_race2.html', 'w', encoding='utf-8') as f:
             f.write(content)
-        print('\n   Saved debug_race2.html')
+        print('\n   Saved debug_files/debug_race2.html')
         
         await browser.close()
 

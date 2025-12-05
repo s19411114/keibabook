@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 # 血統データのパース（修正版）
 print("=== 血統データ（Pedigree）のテスト（修正版） ===")
-with open('debug_pedigree.html', 'r', encoding='utf-8') as f:
+with open('debug_files/debug_pedigree.html', 'r', encoding='utf-8') as f:
     pedigree_html = f.read()
 
 soup = BeautifulSoup(pedigree_html, 'html.parser')
