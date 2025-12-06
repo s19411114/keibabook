@@ -118,3 +118,5 @@ await self._scrape_horse_comments(page, horses, base_url)
 - [ ] ポイント情報の可視化
 - [ ] 穴馬検出アルゴリズムの改善
 
+
+ArchivedAt: 2025-12-06T16:05:03.013270
