@@ -23,6 +23,7 @@
 - src/utils/login.py: 基本ログインクラス
 - scripts/login_helper.py: Streamlit用ログインヘルパー
 - scripts/test_login.py: ログイン診断ツール
+ - scripts/login_diag.py: ログイン診断ツール
 - cookies.json: セッションCookie保存先
 
 ================================================================================

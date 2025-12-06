@@ -483,3 +483,33 @@ def format_training_evaluation(evaluation_data: Dict) -> str:
         lines.append("")
     
     return "\n".join(lines)
+
+
+def evaluate_oikiri(oikiri_text: str) -> float:
+    """
+    追い切りテキストから単純な評価スコアを返す
+
+    スコア定義（簡易）:
+      - None（軽め）: 0.0
+      - 調整値 <= -0.5: 5.5
+      - 調整値 <= -0.4: 5.0
+      - 調整値 <= -0.2: 4.5
+      - 調整値 == 0.0: 4.0
+      - 調整値 <= 0.3: 3.0
+      - それ以外: 2.5
+    """
+    adj = get_oikiri_adjustment(oikiri_text)
+    if adj is None:
+        return 0.0
+    # マッピング
+    if adj <= -0.5:
+        return 5.5
+    if adj <= -0.4:
+        return 5.0
+    if adj <= -0.2:
+        return 4.5
+    if adj == 0.0:
+        return 4.0
+    if adj <= 0.3:
+        return 3.0
+    return 2.5

@@ -13,6 +13,7 @@ python scripts/login_helper.py
 - src/utils/keibabook_auth.py: 認証モジュール（コア）
 - src/utils/login.py: 基本ログインクラス
 - scripts/test_login.py: ログイン診断ツール
+ - scripts/login_diag.py: ログイン診断ツール
 - cookies.json: セッションCookie保存先
 
 ================================================================================

@@ -108,3 +108,4 @@ bench_playwright.py
 .venv/
 *.bak
 競馬予想/
+.venv_test_repro/
