@@ -1,4 +1,7 @@
 # 地方競馬専用機能
+Status: archived
+
+Note: This document contains features that are not currently in active use and were likely generated during a short trial period. It has been archived for historical reference and may be removed in a later cleanup step.
 
 ## 概要
 
