@@ -32,19 +32,36 @@ except Exception:
 db = CSVDBManager()
 
 # Some helper constants
-VENUE_CODES = {
-    "札幌": "01", "函館": "02", "福島": "03", "新潟": "04", "東京": "05",
-    "中山": "06", "中京": "07", "京都": "08", "阪神": "09", "小倉": "10"
-}
+# Use VenueManager numeric codes for consistent JRA/NAR mapping
+NUMERIC_CODES = VenueManager.NUMERIC_CODES
+VENUE_CODES = NUMERIC_CODES
+# JRA venue priority order (to match original Streamlit layout)
+JRA_VENUES = ["東京","中山","阪神","京都","中京","福島","新潟","小倉","札幌","函館"]
+
+# Helper to update the venue select based on race type (calls later in the UI build)
+def _update_venue_options():
+    # race_type and venue_select are created later in the UI; we'll reference them at call-time
+    try:
+        if race_type.value.startswith('地方'):
+            opts = VenueManager.get_minami_kanto_venues() + ["――"] + VenueManager.get_other_venues()
+        else:
+            opts = JRA_VENUES
+
+        default_v = settings.get('venue') if settings.get('venue') in opts else (opts[0] if opts else None)
+        venue_select.set_options(opts)
+        venue_select.value = default_v
+    except Exception:
+        pass
 
 # Sidebar-like panel
 with ui.row().classes('items-start gap-6'):
     with ui.column().style('width: 290px;'):
         ui.label('🐎 競馬ブックスクレイパー (NiceGUI prototype)')
+        ui.markdown('軽量プロトタイプ: 左のサイドバーで種別（JRA/NAR）を切り替え、会場・レースを選んで「データ取得」してください。ログインは Playwright を利用します。')
         ui.separator()
 
         # Race type
-        race_type = ui.radio(['中央 (JRA)', '地方 (NAR)'], value='中央 (JRA)')
+        race_type = ui.radio(['中央 (JRA)', '地方 (NAR)'], value='中央 (JRA)', on_change=lambda e: _update_venue_options())
 
         # Date
         now = datetime.now()
@@ -53,22 +70,27 @@ with ui.row().classes('items-start gap-6'):
         date_input = ui.date(value=default_date)
 
         # venue
-        venue_options = list(VENUE_CODES.keys())
-        default_v = settings.get('venue', '東京')
-        if default_v not in venue_options:
-            default_v = venue_options[0]
-        venue_select = ui.select(venue_options, value=default_v)
+        # Start with empty options; `_update_venue_options` will populate based on race type
+        venue_select = ui.select([], value=None, label='会場（JRA/NARの切替あり）')
+        # Populate the options according to the current race_type
+        _update_venue_options()
 
-        # Race number grid
-        selected_race = ui.number( value=1, min=1, max=12)
+        # Race number grid (3 rows x 4 columns) with compact fixed-size buttons
+        selected_race = ui.number(value=1, min=1, max=12)
         ui.label('レース番号').classes('mt-2')
-        # Simple row of 12 buttons
         def set_race(n):
             selected_race.value = n
 
-        with ui.row().classes('gap-2 mt-1'): 
-            for i in range(1,13):
-                ui.button(f'{i}R', on_click=lambda e, n=i: set_race(n)).props('color=primary')
+        for row in range(3):
+            with ui.row().classes('gap-2 mt-1'):
+                for col_idx in range(4):
+                    race_num = row * 4 + col_idx + 1
+                    if race_num <= 12:
+                        ui.button(
+                            f"{race_num}R",
+                            on_click=lambda e, n=race_num: set_race(n),
+                            style='min-width: 48px; padding: 6px 8px; font-size: 13px;',
+                        ).props('color=primary')
 
         # Login status
         status_label = ui.label('ログイン状況を確認中...')
@@ -82,23 +104,30 @@ with ui.row().classes('items-start gap-6'):
                 status_label.set_text(f'⚠️ 未ログイン: {msg}')
 
         ui.button('ログイン状態の更新', on_click=lambda: asyncio.create_task(refresh_login()))
+        # Run once at startup to reflect cookie/login status
+        asyncio.create_task(refresh_login())
 
         async def do_login():
             status_label.set_text('ログイン中...')
+            log_area.set_text('ログインプロセスを開始しています...')
             try:
-                result = await asyncio.create_subprocess_exec(
+                proc = await asyncio.create_subprocess_exec(
                     sys.executable, 'scripts/login_helper.py',
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
                 )
-                stdout, stderr = await result.communicate()
-                if result.returncode == 0:
+                stdout, stderr = await proc.communicate()
+                stdout_text = stdout.decode('utf-8', errors='replace')
+                stderr_text = stderr.decode('utf-8', errors='replace')
+                log_area.set_text('\n'.join(['ログイン出力:', '---', stdout_text, '---', stderr_text]))
+                if proc.returncode == 0:
                     status_label.set_text('✅ ログイン成功')
                 else:
                     status_label.set_text('❌ ログイン失敗')
-                    ui.notify(f'Login failed: {stderr.decode()[:200]}')
+                    ui.notify('Login failed: see logs', color='negative')
             except Exception as e:
                 status_label.set_text('❌ エラー')
-                ui.notify(str(e))
+                log_area.set_text(f'エラー: {e}')
+                ui.notify(str(e), color='negative')
 
         ui.button('🔑 ログイン実行', on_click=lambda e: asyncio.create_task(do_login()))
         ui.button('🚪 ログアウト', on_click=lambda e: (os.remove(settings.get('cookie_file', 'cookies.json')) if os.path.exists(settings.get('cookie_file', 'cookies.json')) else None) or asyncio.create_task(refresh_login()))
@@ -130,12 +159,14 @@ async def run_scrape():
     venue = venue_select.value
     race_num = int(selected_race.value)
     # Generate IDs (fall back to manual inputs if provided)
-    venue_code = VENUE_CODES.get(venue, '00')
+    venue_code = VenueManager.get_venue_numeric_code(venue) or '00'
     generated_race_id = f"{date_str}{venue_code}{race_num:02d}"
     generated_race_key = f"{date_str}_{venue}{race_num}R"
 
     target_race_id = manual_race_id.value or generated_race_id
-    target_url = manual_url.value or f"https://s.keibabook.co.jp/cyuou/syutuba/{target_race_id}"
+    # Choose URL domain depending on JRA/NAR
+    base_path = 'chihou' if race_type.value.startswith('地方') else 'cyuou'
+    target_url = manual_url.value or f"https://s.keibabook.co.jp/{base_path}/syutuba/{target_race_id}"
 
     # Progress indicator
     log_area.set_text('Starting scrape...')
