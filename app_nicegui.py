@@ -108,7 +108,7 @@ with ui.row().classes('items-start gap-6'):
 
         async def do_login():
             status_label.set_text('ログイン中...')
-            log_area.set_text('ログインプロセスを開始しています...')
+            log_area.update('ログインプロセスを開始しています...')
             try:
                 proc = await asyncio.create_subprocess_exec(
                     sys.executable, 'scripts/login_helper.py',
@@ -117,7 +117,7 @@ with ui.row().classes('items-start gap-6'):
                 stdout, stderr = await proc.communicate()
                 stdout_text = stdout.decode('utf-8', errors='replace')
                 stderr_text = stderr.decode('utf-8', errors='replace')
-                log_area.set_text('\n'.join(['ログイン出力:', '---', stdout_text, '---', stderr_text]))
+                log_area.update('\n'.join(['ログイン出力:', '---', stdout_text, '---', stderr_text]))
                 if proc.returncode == 0:
                     status_label.set_text('✅ ログイン成功')
                 else:
@@ -125,7 +125,7 @@ with ui.row().classes('items-start gap-6'):
                     ui.notify('Login failed: see logs', color='negative')
             except Exception as e:
                 status_label.set_text('❌ エラー')
-                log_area.set_text(f'エラー: {e}')
+                log_area.update(f'エラー: {e}')
                 ui.notify(str(e), color='negative')
 
         ui.button('🔑 ログイン実行', on_click=lambda e: asyncio.create_task(do_login()))
@@ -168,7 +168,7 @@ async def run_scrape():
     target_url = manual_url.value or f"https://s.keibabook.co.jp/{base_path}/syutuba/{target_race_id}"
 
     # Progress indicator
-    log_area.set_text('Starting scrape...')
+    log_area.update('Starting scrape...')
     try:
         proc = await asyncio.create_subprocess_exec(
             sys.executable, 'scripts/scrape_worker.py', f'--race_id={target_race_id}', f'--race_type=jra', f'--output=data/{generated_race_key}.json',
@@ -176,7 +176,7 @@ async def run_scrape():
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode == 0:
-            log_area.set_text('Scrape success')
+            log_area.update('Scrape success')
             # load file
             out_file = Path('data') / f'{generated_race_key}.json'
             if out_file.exists():
@@ -189,12 +189,12 @@ async def run_scrape():
                 if stderr:
                     ui.notify(stderr.decode()[:300])
         else:
-            log_area.set_text('Scrape failed')
+            log_area.update('Scrape failed')
             if stderr:
                 ui.notify(stderr.decode()[:300])
 
     except Exception as e:
-        log_area.set_text(f'Error: {e}')
+        log_area.update(f'Error: {e}')
         ui.notify(str(e))
 
 
