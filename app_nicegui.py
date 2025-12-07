@@ -177,10 +177,8 @@ def refresh_files():
     files_box.set_items(json_files)
 
 
-@ui.page('/')
-async def index():
-    refresh_files()
-
+# Populate files list on startup
+refresh_files()
 
 if __name__ == '__main__':
     # Launch NiceGUI - if installed, this will run uvicorn/web server
