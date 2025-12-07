@@ -209,7 +209,8 @@ class UpsetDetector:
                         'score': 20.0,
                         'importance': 0.8
                     }
-        except:
+        except Exception as e:
+            logger.debug(f"斤量解析エラー: {e}")
             pass
         
         return None
@@ -249,7 +250,8 @@ class UpsetDetector:
             if '着' in position_str:
                 return int(position_str.replace('着', ''))
             return int(position_str)
-        except:
+        except Exception as e:
+            logger.debug(f"着順解析エラー: {position_str} -> {e}")
             return None
     
     def _parse_odds(self, odds_str: str) -> Optional[float]:
@@ -259,6 +261,7 @@ class UpsetDetector:
         
         try:
             return float(str(odds_str).replace(',', '').replace('倍', ''))
-        except:
+        except Exception as e:
+            logger.debug(f"オッズ解析エラー: {odds_str} -> {e}")
             return None
 

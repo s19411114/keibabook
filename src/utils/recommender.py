@@ -86,7 +86,8 @@ class HorseRecommender:
             if '着' in position_str:
                 return int(position_str.replace('着', ''))
             return int(position_str)
-        except:
+        except Exception as e:
+            logger.debug(f"着順解析エラー: {position_str} -> {e}")
             return None
     
     def _parse_odds(self, odds_str: str) -> Optional[float]:
@@ -97,7 +98,8 @@ class HorseRecommender:
         try:
             # "10.5" -> 10.5, "200.0" -> 200.0
             return float(odds_str.replace(',', ''))
-        except:
+        except Exception as e:
+            logger.debug(f"オッズ解析エラー: {odds_str} -> {e}")
             return None
     
     def analyze_horse_performance(self, horse_data: Dict[str, Any]) -> Dict[str, Any]:

@@ -61,7 +61,8 @@ for url in urls:
                     if el and len(el.get_text(" ",strip=True))>10:
                         pedigree_section = el
                         break
-                except:
+                except Exception as e:
+                    print('selector check error', e)
                     continue
             # fallback: first table that contains explicit labels
             if not pedigree_section:

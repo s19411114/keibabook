@@ -80,7 +80,8 @@ class OddsDBManager:
         try:
             # "10.5" -> 10.5, "200.0" -> 200.0
             return float(str(odds_str).replace(',', '').replace('倍', ''))
-        except:
+        except Exception as e:
+            logger.debug(f"オッズ文字列解析失敗: {odds_str} -> {e}")
             return None
     
     def get_odds_history(self, race_id: str, horse_num: Optional[str] = None) -> pd.DataFrame:

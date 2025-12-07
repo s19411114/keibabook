@@ -350,7 +350,8 @@ class KeibaBookAuth:
             if created_page:
                 try:
                     await page.close()
-                except:
+                except Exception as e:
+                    logger.debug(f"ページクローズエラー: {e}")
                     pass
                 return False, None
             return False, page

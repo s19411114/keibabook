@@ -180,7 +180,8 @@ class HorseRanker:
                     return 60.0
                 else:
                     return 40.0
-        except:
+        except Exception as e:
+            logger.debug(f"斤量解析エラー: {e}")
             pass
         
         return 50.0
@@ -307,7 +308,8 @@ class HorseRanker:
             if '着' in position_str:
                 return int(position_str.replace('着', ''))
             return int(position_str)
-        except:
+        except Exception as e:
+            logger.debug(f"着順解析エラー: {position_str} -> {e}")
             return None
     
     def update_weights(self, new_weights: Dict[str, float]):

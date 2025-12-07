@@ -32,7 +32,8 @@ if predictions:
         import json as json_module
         try:
             predictions = json_module.loads(predictions)
-        except:
+        except Exception as e:
+            print('predictions JSON parse error:', e)
             pass
     print(f"予想印: {predictions}")
 else:
