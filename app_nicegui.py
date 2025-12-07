@@ -53,7 +53,11 @@ with ui.row().classes('items-start gap-6'):
         date_input = ui.date(value=default_date)
 
         # venue
-        venue_select = ui.select(list(VENUE_CODES.keys()), value=settings.get('venue', '東京'))
+        venue_options = list(VENUE_CODES.keys())
+        default_v = settings.get('venue', '東京')
+        if default_v not in venue_options:
+            default_v = venue_options[0]
+        venue_select = ui.select(venue_options, value=default_v)
 
         # Race number grid
         selected_race = ui.number( value=1, min=1, max=12)
