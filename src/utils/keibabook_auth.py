@@ -263,7 +263,28 @@ class KeibaBookAuth:
                 await KeibaBookAuth.save_cookies(page.context, cookie_file)
                 return True
             else:
-                logger.error("❌ ログイン失敗（まだログインページ）")
+                # 失敗時にデバッグ情報を保存
+                logger.error("❌ ログイン失敗（まだログインページ） - デバッグ情報を保存します")
+                try:
+                    debug_dir = Path('debug_files')
+                    debug_dir.mkdir(exist_ok=True)
+                    html = await page.content()
+                    debug_file = debug_dir / 'debug_login_failed.html'
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(html)
+                    logger.info(f"ログイン失敗時のHTMLを保存しました: {debug_file}")
+                    # 検出可能な要素をログに記録
+                    selectors_found = []
+                    for sel in ["input[name='login_id']", "input[name='pswd']", "input[name='autologin']", "input[name='submitbutton']", "form"]:
+                        try:
+                            node = await page.query_selector(sel)
+                            if node:
+                                selectors_found.append(sel)
+                        except Exception:
+                            pass
+                    logger.info(f"検出されたセレクタ: {selectors_found}")
+                except Exception as e:
+                    logger.error(f"ログイン失敗デバッグの保存中にエラー: {e}")
                 return False
                 
         except Exception as e:
