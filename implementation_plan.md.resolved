@@ -133,7 +133,7 @@ LOW_TRAFFIC_DELAY = 1.0  # 深夜帯も同じ
 
 以下のファイルを更新してDocker関連記述を削除/修正すべき:
 - [DEV_GUIDE.md](file:///home/u/projects/TEST/keibabook/DEV_GUIDE.md)
-- [WSL_LIGHTWEIGHT_SETUP.md](file:///home/u/projects/TEST/keibabook/WSL_LIGHTWEIGHT_SETUP.md)
+- [WSL_LIGHTWEIGHT_SETUP.md (archived)](migration/backups/WSL_LIGHTWEIGHT_SETUP_20251207T194410.md)
 - [HANDOVER.md](file:///home/u/projects/TEST/keibabook/HANDOVER.md)
 - [PROJECT_LOG.md](file:///home/u/projects/TEST/keibabook/PROJECT_LOG.md)
 - [issues/HANDOVER_TASKS.md](file:///home/u/projects/TEST/keibabook/issues/HANDOVER_TASKS.md)
