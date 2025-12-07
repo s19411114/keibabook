@@ -174,7 +174,7 @@ def refresh_files():
     json_files = []
     if outdir.exists():
         json_files = [p.name for p in outdir.glob('*.json')]
-    files_box.set_items(json_files)
+    files_box.set_options(json_files)
 
 
 # Populate files list on startup
