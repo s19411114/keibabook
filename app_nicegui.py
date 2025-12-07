@@ -169,11 +169,11 @@ with ui.row().classes('items-start gap-6'):
                     status_label.set_text('✅ ログイン成功')
                 else:
                     status_label.set_text('❌ ログイン失敗')
-                    ui.notify('Login failed: see logs', color='negative')
+                    ui.run(lambda: ui.notify('Login failed: see logs', color='negative'))
             except Exception as e:
                 status_label.set_text('❌ エラー')
                 log_area.set_value(f'エラー: {e}')
-                ui.notify(str(e), color='negative')
+                ui.run(lambda: ui.notify(str(e), color='negative'))
 
 
         ui.button('🔑 ログイン実行', on_click=lambda e: asyncio.create_task(do_login()))
@@ -231,19 +231,19 @@ async def run_scrape():
                 with open(out_file, 'r', encoding='utf-8') as f:
                     content = json.load(f)
                 json_area.set_value(json.dumps(content, ensure_ascii=False, indent=2))
-                ui.notify('✅ データ取得完了')
+                ui.run(lambda: ui.notify('✅ データ取得完了'))
             else:
-                ui.notify('⚠️ 出力ファイルが見つかりません')
+                ui.run(lambda: ui.notify('⚠️ 出力ファイルが見つかりません'))
                 if stderr:
-                    ui.notify(stderr.decode()[:300])
+                    ui.run(lambda: ui.notify(stderr.decode()[:300]))
         else:
             log_area.set_value('Scrape failed')
             if stderr:
-                ui.notify(stderr.decode()[:300])
+                ui.run(lambda: ui.notify(stderr.decode()[:300]))
 
     except Exception as e:
         log_area.set_value(f'Error: {e}')
-        ui.notify(str(e))
+        ui.run(lambda: ui.notify(str(e)))
 
 
 # Helper to refresh saved JSON list
