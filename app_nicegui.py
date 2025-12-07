@@ -219,7 +219,7 @@ async def run_scrape():
     log_area.update('Starting scrape...')
     try:
         proc = await asyncio.create_subprocess_exec(
-            sys.executable, 'scripts/scrape_worker.py', f'--race_id={target_race_id}', f'--race_type=jra', f'--output=data/{generated_race_key}.json',
+            sys.executable, 'scripts/scrape_worker.py', f'--race_id={target_race_id}', f"--race_type={'nar' if race_type.value.startswith('地方') else 'jra'}", f'--output=data/{generated_race_key}.json',
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
         stdout, stderr = await proc.communicate()
