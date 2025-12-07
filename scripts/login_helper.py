@@ -54,7 +54,13 @@ async def main():
         async with async_playwright() as p:
             # ブラウザを起動
             print("\n🌐 ブラウザを起動中...")
-            browser = await p.chromium.launch(headless=True)
+            headless = settings.get('playwright_headless', True)
+            # Support environment overrides: PLAYWRIGHT_HEADLESS
+            env_headless = os.environ.get('PLAYWRIGHT_HEADLESS')
+            if env_headless is not None:
+                headless = env_headless.strip().lower() not in ('false','0','no')
+            print(f"Launching browser (headless={headless})")
+            browser = await p.chromium.launch(headless=headless)
             context = await browser.new_context()
             page = await context.new_page()
             

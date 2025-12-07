@@ -231,8 +231,27 @@ class KeibaBookAuth:
         try:
             logger.info(f"ログイン開始: {login_id[:3]}***")
             
-            await page.goto(KeibaBookAuth.LOGIN_URL, wait_until='domcontentloaded', timeout=30000)
-            
+            await page.goto(KeibaBookAuth.LOGIN_URL, wait_until='networkidle', timeout=60000)
+
+            # Wait for input fields to appear and fill
+            try:
+                await page.wait_for_selector("input[name='login_id']", timeout=60000)
+                await page.wait_for_selector("input[name='pswd']", timeout=60000)
+            except Exception as e:
+                logger.error(f"ログインフォーム要素の待機中にエラー: {e}")
+                # デバッグHTMLを保存
+                try:
+                    debug_dir = Path('debug_files')
+                    debug_dir.mkdir(exist_ok=True)
+                    html = await page.content()
+                    debug_file = debug_dir / 'debug_login_missing_inputs.html'
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(html)
+                    logger.info(f"ログインフォームが見つからないHTMLを保存しました: {debug_file}")
+                except Exception:
+                    pass
+                raise
+
             # 認証情報を入力
             await page.fill("input[name='login_id']", login_id)
             await page.fill("input[name='pswd']", password)
