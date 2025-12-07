@@ -50,8 +50,33 @@ def _update_venue_options():
         default_v = settings.get('venue') if settings.get('venue') in opts else (opts[0] if opts else None)
         venue_select.set_options(opts)
         venue_select.value = default_v
+        try:
+            update_preview()
+        except Exception:
+            pass
     except Exception:
         pass
+
+# Preview helper to show ID and link
+def update_preview():
+    try:
+        sd = date_input.value
+        ds = sd.strftime('%Y%m%d') if hasattr(sd,'strftime') else str(sd)
+        vname = venue_select.value or ''
+        rnum = int(selected_race.value) if selected_race.value else 1
+        vc = VenueManager.get_venue_numeric_code(vname) or '00'
+        gid = f"{ds}{vc}{rnum:02d}"
+        base_path = 'chihou' if race_type.value.startswith('地方') else 'cyuou'
+        gurl = f"https://s.keibabook.co.jp/{base_path}/syutuba/{gid}"
+        try:
+            preview_md.update(f'ID: {gid}  [🔗 出馬表]({gurl})')
+        except Exception:
+            pass
+    except Exception:
+        try:
+            preview_md.update('ID: -')
+        except Exception:
+            pass
 
 # Sidebar-like panel
 with ui.row().classes('items-start gap-6'):
@@ -67,19 +92,28 @@ with ui.row().classes('items-start gap-6'):
         now = datetime.now()
         today = date.today()
         default_date = today if now.hour < 17 else today + timedelta(days=1)
-        date_input = ui.date(value=default_date)
+        date_input = ui.date(value=default_date, on_change=lambda e: update_preview())
+
+        # preview of generated ID/URL
+        preview_md = ui.markdown('')
 
         # venue
         # Start with empty options; `_update_venue_options` will populate based on race type
         venue_select = ui.select([], value=None, label='会場（JRA/NARの切替あり）')
         # Populate the options according to the current race_type
         _update_venue_options()
+        # update preview when selection changes
+        try:
+            venue_select.on_change(lambda e: update_preview())
+        except Exception:
+            pass
 
         # Race number grid (3 rows x 4 columns) with compact fixed-size buttons
         selected_race = ui.number(value=1, min=1, max=12)
         ui.label('レース番号').classes('mt-2')
         def set_race(n):
             selected_race.value = n
+            update_preview()
 
         for row in range(3):
             with ui.row().classes('gap-2 mt-1'):
