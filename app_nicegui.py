@@ -66,7 +66,7 @@ with ui.row().classes('items-start gap-6'):
         def set_race(n):
             selected_race.value = n
 
-        with ui.row().wrap(False).classes('gap-2 mt-1'): 
+        with ui.row().classes('gap-2 mt-1'): 
             for i in range(1,13):
                 ui.button(f'{i}R', on_click=lambda e, n=i: set_race(n)).props('color=primary')
 
