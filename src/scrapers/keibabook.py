@@ -308,8 +308,9 @@ class KeibaBookScraper:
                 return bool(self.db_manager.is_url_fetched(url, max_age_seconds=self.duplicate_check_ttl))
             else:
                 return bool(self.db_manager.is_url_fetched(url))
-        except Exception:
+        except Exception as e:
             # 判定に失敗してもフェールセーフとして再取得を許す
+            logger.debug(f"重複チェック判定エラー（再取得許可）: {e}")
             return False
 
     def _log_url(self, url, tag, status='success'):
@@ -319,8 +320,8 @@ class KeibaBookScraper:
         try:
             if self.db_manager:
                 self.db_manager.log_url(url, self.settings.get('race_id'), tag, status)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"URL記録エラー（無視）: {e}")
 
     def _parse_training_simple(self, training_table):
         """

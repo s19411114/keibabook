@@ -95,6 +95,62 @@ Notes:
 - If a file needs to be re-enabled for a specific workflow, move it back and add a note in `ISSUES_MASTER.md` with the reason and reviewer approval.
 - Improvements: type hints, Pydantic, logs, CI/CD, doc generation
 
+## 2025-12-08 Gemini Code Review Findings
+
+以下は [docs/REVIEW_20251208_gemini.md](file:///home/u/projects/TEST/keibabook/docs/REVIEW_20251208_gemini.md) の要約です。
+
+### BUGS
+
+- BUG/bare-except: `src/scrapers/keibabook.py` 等に bare except 使用箇所あり
+  - reporter: gemini_agent
+  - status: PARTIAL (keibabook.py主要2箇所修正済み、他ファイルは残存)
+  - priority: P2
+  - notes: `except Exception as e` に変更し、ログに詳細出力
+
+- BUG/unused-base-url: `keibabook.py` で同じ base_url 計算が2回実行
+  - reporter: gemini_agent
+  - status: TODO
+  - priority: P3
+
+### DESIGN
+
+- DESIGN/scrape-method-complexity: `scrape()` メソッドが約400行・深いネスト
+  - reporter: gemini_agent
+  - status: TODO
+  - priority: P2
+  - notes: 小さなヘルパメソッドに分割推奨
+
+- DESIGN/app-tab-inconsistency: `app.py` のタブ分離が不完全
+  - reporter: gemini_agent
+  - status: TODO
+  - priority: P3
+  - notes: 全タブを `src/ui/` に分離して一貫性確保
+
+### IMPROVE
+
+- IMPROVE/bak-cleanup: `.bak` ファイルが残存（4件）
+  - reporter: gemini_agent
+  - status: DONE (2025-12-08 gemini_agent)
+  - priority: P1
+  - notes: 3件削除済み、`.gitignore` に既に *.bak あり
+
+- IMPROVE/type-hints: 型ヒント追加推奨
+  - reporter: gemini_agent
+  - status: TODO
+  - priority: P3
+
+- IMPROVE/pydantic-models: Pydantic モデル導入検討
+  - reporter: gemini_agent
+  - status: TODO
+  - priority: P3
+
+- IMPROVE/structured-logging: 構造化ログ導入検討
+  - reporter: gemini_agent
+  - status: TODO
+  - priority: P3
+
+---
+
 ## Templates & Workflow
 Use the files under `docs/templates/` to standardize new docs and tasks. Key templates:
 - `docs/templates/implementation_plan.md` — 実装計画 / Milestones
