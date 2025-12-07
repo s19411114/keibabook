@@ -180,6 +180,6 @@ def refresh_files():
 # Populate files list on startup
 refresh_files()
 
-if __name__ == '__main__':
+if __name__ in {"__main__", "__mp_main__"}:
     # Launch NiceGUI - if installed, this will run uvicorn/web server
     ui.run(title='KeibaBook NiceGUI Prototype', port=8080)
