@@ -104,7 +104,7 @@ with ui.row().classes('items-start gap-6'):
 
         ui.button('ログイン状態の更新', on_click=lambda: asyncio.create_task(refresh_login()))
         # Run once at startup to reflect cookie/login status
-        asyncio.create_task(refresh_login())
+        ui.timer(0, lambda: asyncio.create_task(refresh_login()), once=True)
 
         async def do_login():
             status_label.set_text('ログイン中...')
