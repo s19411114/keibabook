@@ -53,7 +53,7 @@ with ui.row().classes('items-start gap-6'):
         date_input = ui.date(value=default_date)
 
         # venue
-        venue_select = ui.select(items=list(VENUE_CODES.keys()), value=settings.get('venue', '東京'))
+        venue_select = ui.select(list(VENUE_CODES.keys()), value=settings.get('venue', '東京'))
 
         # Race number grid
         selected_race = ui.number( value=1, min=1, max=12)
@@ -116,7 +116,7 @@ with ui.row().classes('items-start gap-6'):
         log_area = ui.markdown('')
 
         # Simple list of saved files
-        files_box = ui.select(items=[], label='保存済みデータ', value=None)
+        files_box = ui.select([], label='保存済みデータ', value=None)
 
 
 async def run_scrape():
