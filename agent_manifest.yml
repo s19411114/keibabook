@@ -1,0 +1,31 @@
+name: keibabook
+version: 1.0
+maintainer: unknown
+
+# Machine-readable manifest for AI agents and automation
+# Commands and expected artifacts
+commands:
+  start_nicegui:
+    cmd: .venv/bin/python app_nicegui.py
+    check_port: 8080
+  open_logged_in_browser:
+    cmd: .venv/bin/python scripts/open_logged_in_browser.py
+    description: "Open a headful browser with cookies.json loaded; saved cookies are updated"
+  run_single_race_headful:
+    cmd: .venv/bin/python scripts/run_single_race.py --headful
+  test_login:
+    cmd: .venv/bin/python scripts/test_login.py
+health_check:
+  - description: venv_active
+    cmd: python -c "import sys; print(sys.version)"
+  - description: cookies_tk
+    cmd: python scripts/check_cookies.py
+
+artifacts:
+  - data/*.json   # scraped JSON
+  - cookies.json  # authentication cookies
+
+update_docs:
+  docs_root: docs/
+  archived_root: docs/archived/
+  guidelines_file: docs/AGENT_ONBOARDING.md

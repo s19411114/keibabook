@@ -128,6 +128,12 @@ pip install -r requirements.txt
 
 ```powershell
 playwright install chromium
+
+## 📌 ドキュメント運用ルール（重要）
+1. すべてのバグ報告・タスク・設計変更・改善提案は `docs/ISSUES_MASTER.md` に記載してください。
+2. 新しい課題を追加する場合は `カテゴリ/短い見出し` を先頭にし、`reporter:` `status:` `priority:` を明記してください。
+3. 完了した課題は `scripts/archive_doc.py --move docs/ISSUES_MASTER.md` または `scripts/archive_doc.py --move <file>` を使って `docs/archived/` に移動してください。プロジェクトログは自動更新されます。
+4. `implementation_plan.md.resolved` の内容は `docs/ISSUES_MASTER.md` にマージされ、過去の計画は `docs/archived/` に移してください。
 ```
 
 ---
