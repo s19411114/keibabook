@@ -16,7 +16,7 @@ $sc = $shell.CreateShortcut($scPath)
 # Set a valid target so Windows shows the icon; use powershell.exe to invoke start script
 $powershellPath = (Get-Command powershell.exe).Source
 $sc.TargetPath = $powershellPath
-$sc.Arguments = "-NoExit -ExecutionPolicy Bypass -File 'C:\\GeminiCLI\\TEST\\keibabook\\scripts\\start_dev.ps1'"
+$sc.Arguments = "-NoExit -ExecutionPolicy Bypass -File 'C:\\GeminiCLI\\TEST\\keibabook\\scripts\\start_streamlit_win.ps1'"
 $sc.WorkingDirectory = 'C:\GeminiCLI\TEST\keibabook\scripts'
 
 if (Test-Path $IconPath) { $sc.IconLocation = (Resolve-Path $IconPath).Path }

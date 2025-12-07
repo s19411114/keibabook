@@ -1,6 +1,6 @@
 param(
     [string]$Name = "KeibaBook Console",
-    [string]$TargetScript = "$PSScriptRoot\start_dev.ps1",
+    [string]$TargetScript = "$PSScriptRoot\start_streamlit_win.ps1",
     [string]$IconPath = ""
 )
 
@@ -12,7 +12,7 @@ try {
     $sc = $shell.CreateShortcut($shortcutPath)
     $psPath = (Get-Command powershell.exe).Source
     $repoRoot = (Split-Path $PSScriptRoot -Parent)
-    $command = "Set-Location -Path '$repoRoot'; .\scripts\start_dev.ps1 -Open"
+    $command = "Set-Location -Path '$repoRoot'; .\scripts\start_streamlit_win.ps1"
     $args = '-NoExit -ExecutionPolicy Bypass -Command "' + $command + '"'
     $sc.TargetPath = $psPath
     $sc.Arguments = $args
@@ -26,7 +26,7 @@ try {
         if (Test-Path $candidate1) { $sc.IconLocation = $candidate1 } elseif (Test-Path $candidate2) { $sc.IconLocation = $candidate2 }
     }
     $sc.WindowStyle = 1
-    $sc.Description = "Start KeibaBook dev environment and keep console open"
+    $sc.Description = "Start KeibaBook Streamlit UI (venv) and keep console open"
     $sc.Save()
     Write-Host "Console shortcut created: $shortcutPath"
 } catch {
