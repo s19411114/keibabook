@@ -20,6 +20,7 @@ python scripts/login_helper.py
 """
 import asyncio
 import sys
+import os
 from pathlib import Path
 
 # プロジェクトルートをパスに追加
