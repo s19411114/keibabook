@@ -4,6 +4,7 @@
 
 構成の例:
 - `docs/templates/` : ドキュメント作成テンプレート
+	- 追加テンプレート: `task_template.md`, `handover_template.md` を追加しました
 - `docs/archived/` : 解決済み、アーカイブ対象のドキュメント（履歴）
 - `docs/README.md` : このファイル（ドキュメント運用ルール）
 - その他: `DATA_SOURCES.md`, `VENUE_GUIDE.md` などカテゴリ別のドキュメント
