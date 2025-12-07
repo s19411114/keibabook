@@ -40,6 +40,8 @@ class KeibaBookScraper:
         self.debug_dir.mkdir(parents=True, exist_ok=True)
         self._comments_concurrency = int(self.settings.get('comments_concurrency', 1))
         self._parallel_page_fetch = bool(self.settings.get('parallel_page_fetch', False))
+        # Skip opening individual horse pages by default (safety and site load)
+        self.skip_individual_pages = bool(self.settings.get('skip_individual_pages', True))
         
         # 競馬種別に応じたベースURL設定
         if self.race_type == 'nar':
@@ -1035,14 +1037,11 @@ class KeibaBookScraper:
             # 地方競馬の場合は最小限のデータのみ取得（馬柱、出馬表、血統）
             # 中央競馬の場合は全データを取得
             
-            # 調教データを取得してマージ（地方競馬ではスキップ）
-            if self.race_type != 'nar':
-                base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
-                training_url = f"{base_url}/cyokyo/0/{self.settings['race_id']}"
-            else:
-                training_url = None
+            # 調教データを取得してマージ（中央/地方の両方で取得）
+            base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
+            training_url = f"{base_url}/cyokyo/0/{self.settings['race_id']}"
             
-            # 調教データ取得（地方競馬ではスキップ）
+            # 調教データ取得（中央/地方の両方で取得）
             if training_url and not self.settings.get('skip_training', False):
                 # レート制御
                 await self.rate_limiter.wait()
@@ -1066,9 +1065,9 @@ class KeibaBookScraper:
                     from src.utils.training_converter import convert_training_data
                     parsed_training_data = convert_training_data(parsed_training_data)
                     logger.info(f"調教タイム換算完了: {len(parsed_training_data)}頭分")
-            else:
-                parsed_training_data = {}
-                logger.info("地方競馬のため調教データをスキップ")
+                else:
+                    parsed_training_data = {}
+                    logger.info("調教データをスキップまたは未検出")
 
             for horse in race_data.get('horses', []):
                 horse_num = horse.get('horse_num')
@@ -1263,6 +1262,11 @@ class KeibaBookScraper:
                 
                 # AI指数は出馬表ページから既に取得済み（parse_race_dataで処理）
             
+            # 個別馬ページは開かない（デフォルト）
+            # 旧設定 `skip_horse_comments` を尊重しつつ、明示的に`skip_individual_pages`がFalseの場合のみ個別ページを開く
+            if self.race_type == 'jra' and not self.settings.get('skip_horse_comments', False) and not self.skip_individual_pages:
+                await self._scrape_horse_comments(page, race_data.get('horses', []), base_url)
+
             # ===== 地方競馬専用ページの取得 =====
             if self.race_type == 'nar':
                 # ポイントページを取得
@@ -1271,8 +1275,7 @@ class KeibaBookScraper:
                     race_data['point_info'] = point_data
                 
                 # 個別馬のコメントを取得（穴馬のヒント）
-                # Keep sequential by default (comments_concurrency defaults to 1)
-                await self._scrape_horse_comments(page, race_data.get('horses', []), base_url)
+                # 地方競馬では個別馬ページを開かない（point等のみ取得）
             
             # ===== レース結果ページの取得（レース終了後のみ） =====
             if self.settings.get('fetch_result', False) and self.seiseki_url:

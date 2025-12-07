@@ -114,6 +114,8 @@ Schedule sources (priority):
 Schedule caching policy:
 - Schedules (race times/venues) are cached per session in Streamlit to avoid repeated page requests; this is safe because schedules don't change frequently.
 - Real-time data (like odds) are not cached by default (to prevent stale odds). Odds retrieval is done per-request and can be implemented with a short cache TTL if necessary.
+ - Individual horse detail pages are not opened by the scraper by default (config: `skip_individual_pages`, default True) to reduce load and keep scraping lightweight.
+ - Training data is retrieved for both JRA and NAR races where available (the scraper attempts to fetch `{base_url}/cyokyo/0/<race_id>` for both types).
 
 Next race auto-selection:
 - Next-race auto-selection is configurable in the Streamlit UI under "Developer Settings".
