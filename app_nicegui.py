@@ -116,7 +116,7 @@ with ui.row().classes('items-start gap-6'):
 
     # Main content column
     with ui.column().classes('grow'):
-        json_area = ui.textarea(label='取得/表示JSON', value='', rows=20).style('width: 100%')
+        json_area = ui.textarea(label='取得/表示JSON', value='').style('width: 100%; height: 360px;')
         log_area = ui.markdown('')
 
         # Simple list of saved files
