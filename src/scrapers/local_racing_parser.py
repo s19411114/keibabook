@@ -1,6 +1,6 @@
 """
 地方競馬専用パーサー
-ポイント情報、個別馬コメントなどを取得
+ポイント情報、特定の馬のコメントなどを取得
 """
 from bs4 import BeautifulSoup
 from typing import Dict, List, Any, Optional
@@ -86,35 +86,9 @@ class LocalRacingParser:
         
         return point_data
     
-    def parse_horse_comment(self, html_content: str, horse_num: str) -> Optional[str]:
-        """
-        個別馬のコメントを取得（穴馬のヒント）
-        
-        Args:
-            html_content: 馬の詳細ページのHTML
-            horse_num: 馬番
-            
-        Returns:
-            コメント文字列（見つからない場合はNone）
-        """
-        soup = BeautifulSoup(html_content, 'html.parser')
-        
-        # コメントを探す（複数のセレクタパターンを試す）
-        comment_selectors = [
-            ".horse_comment", ".HorseComment", ".comment", ".Comment",
-            "[class*='comment']", "[class*='Comment']"
-        ]
-        
-        for selector in comment_selectors:
-            comment_elem = soup.select_one(selector)
-            if comment_elem:
-                comment_text = comment_elem.get_text(strip=True)
-                if comment_text:
-                    logger.debug(f"馬{horse_num}のコメント取得: {comment_text[:50]}...")
-                    return comment_text
-        
-        logger.debug(f"馬{horse_num}のコメントが見つかりませんでした")
-        return None
+    # Note: The previous implementation allowed parsing comments from individual horse pages.
+    # We no longer fetch individual horse pages, and thus the per-horse detail parser has been
+    # removed. Use aggregated data from stable/previous/training/point pages instead.
     
     def _parse_horse_info(self, item) -> Optional[Dict[str, Any]]:
         """馬情報をパース"""

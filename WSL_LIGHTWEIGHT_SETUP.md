@@ -58,7 +58,7 @@ code .
 # "🚫 Virtual environments disabled" メッセージが表示されればOK
 
 # 4. 必要時のvenv手動アクティベート
-source /path/to/venv/bin/activate
+source /path/to/.venv/bin/activate
 ```
 
 ### スクレイピング・UI実行例

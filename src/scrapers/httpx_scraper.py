@@ -28,6 +28,7 @@ from bs4 import BeautifulSoup
 from src.utils.config import load_settings
 from src.utils.logger import get_logger
 from src.utils.rate_limiter import RateLimiter
+from src.utils.db_utils import safe_log_url
 
 logger = get_logger(__name__)
 
@@ -545,7 +546,7 @@ class HttpxKeibaBookScraper:
             
             # URL記録
             if self.db_manager:
-                self.db_manager.log_url(self.shutuba_url, race_id, 'shutuba', 'success')
+                safe_log_url(self.db_manager, self.shutuba_url, race_id, 'shutuba', 'success')
             
             # 血統ページを取得
             base_url = '/'.join(self.shutuba_url.split('/')[:4])
@@ -570,7 +571,7 @@ class HttpxKeibaBookScraper:
                             horse['pedigree_data'] = {}
                     
                     if self.db_manager:
-                        self.db_manager.log_url(pedigree_url, race_id, 'pedigree', 'success')
+                        safe_log_url(self.db_manager, pedigree_url, race_id, 'pedigree', 'success')
                     
                     logger.info(f"血統データ取得成功: {len(pedigree_list)}頭")
                     
@@ -600,7 +601,7 @@ class HttpxKeibaBookScraper:
                             horse['training_data'] = {}
                     
                     if self.db_manager:
-                        self.db_manager.log_url(training_url, race_id, 'training', 'success')
+                        safe_log_url(self.db_manager, training_url, race_id, 'training', 'success')
                     
                     logger.info(f"調教データ取得成功: {len(training_data)}頭")
                     

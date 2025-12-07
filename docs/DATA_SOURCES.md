@@ -43,6 +43,9 @@
 
 ## Netkeiba
 
+> **Policy Update (2025-12-06)**: Netkeiba の過去データ収集（Netkeiba DB のアーカイブ、結果ページのトラックバイアス計算、batch pedigree の収集など）は keiba-ai プロジェクトに移管します。
+> See: migration/to_keiba_ai/manifest.md and migration/to_keiba_ai/README.md
+
 ### カレンダー
 - **URL**: https://race.netkeiba.com/top/calendar.html?rf=sidemenu
 - **用途**: 中央・地方全体のカレンダー

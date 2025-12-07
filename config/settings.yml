@@ -18,6 +18,19 @@ playwright_headless: true
 playwright_timeout: 30000  # ms
 # 重複チェックを無効化（テスト・デバッグ用）
 skip_duplicate_check: true  # true: 重複チェックをスキップ, false: 重複チェックを実行（デフォルト）
+# 重複チェックの TTL（秒）。0: 無効（既取得なら常にスキップ）、デフォルト3600 = 1時間
+duplicate_check_ttl_seconds: 3600
+# 日付ベースの特集ページを取得する: true を設定すると、各レースとは別にその日の特集（一覧/日別）ページも取得して解析します。
+# デフォルト: false
+fetch_daily_special_pages: false
+# レース単位で取得済みならスキップするTTL（秒）。0で無効（デフォルト）
+# 推奨値: 7日 = 604800 秒（運用で調整してください）
+skip_race_if_fetched_within_seconds: 604800
+# 強制取得フラグ: scrape() で強制再取得したい場合、True にするか
+# scrape(..., force=True) を呼び出してください。デフォルト False
+force_recheck_on_scrape: false
+# コメント集約時にソースをタグ付け（例: [stable] コメント）。デフォルト False
+tag_comment_sources: false
 # ログイン情報（自動ログイン用）
 # ⚠️ 以下にあなたのログイン情報を入力してください
 login_id: ""

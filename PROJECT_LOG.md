@@ -39,7 +39,7 @@
     ```
 2.  **旧来の仮想環境をアクティベート (レガシー)**
     ```bash
-    source venv/bin/activate
+    source .venv/bin/activate
     ```
     (プロンプトの先頭に `(venv)` が表示される)
 

@@ -21,7 +21,7 @@ Note: This document contains features that are not currently in active use and w
 
 これらの情報は本当に当たっているため、穴馬発見の重要なヒントになります。
 
-### 2. 個別馬のコメント
+### 2. 特定の馬のコメント
 
 各馬の詳細ページからコメントを取得します。穴馬のヒントになる重要な情報です。
 
@@ -54,7 +54,7 @@ point_data = await self._scrape_point_page(page, base_url)
 }
 ```
 
-### 個別馬コメントの取得
+### 特定の馬のコメントの取得
 
 ```python
 # src/scrapers/keibabook.py の _scrape_horse_comments() メソッド
@@ -95,7 +95,7 @@ await self._scrape_horse_comments(page, horses, base_url)
    - `src/scrapers/local_racing_parser.py` の `parse_point_page()` メソッド
    - セレクタを実際のHTML構造に合わせて調整
 
-2. **個別馬コメントのセレクタ**
+2. **特定の馬のコメントのセレクタ**
    - `src/scrapers/local_racing_parser.py` の `parse_horse_comment()` メソッド
    - セレクタを実際のHTML構造に合わせて調整
 

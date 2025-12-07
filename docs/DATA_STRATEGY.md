@@ -2,6 +2,12 @@
 
 ⚠️ **削除禁止** - 両サイトの役割分担を明確化
 
+> **Policy Update (2025-12-06): Netkeiba historical + track-bias migration**
+>
+> - Netkeiba の過去レース収集（アーカイブ）、Netkeiba DB スクレイパー、`track_bias` 計算、`run_pedigree` バッチは keiba-ai に移管します。
+> - keibabook は今後、1レース分のJSON生成と keibabook 固有の情報（レース後のコメント、調教、ポイント等）に集中します。
+> - 移管候補のコード／スクリプトは `migration/to_keiba_ai/` にまとめています（参照: migration/to_keiba_ai/manifest.md）。
+>
 ## 基本方針: 両サイト併用で補完
 
 ### 競馬ブック（メインデータソース）

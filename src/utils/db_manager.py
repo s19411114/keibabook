@@ -76,7 +76,7 @@ class CSVDBManager:
                 'created_at', 'updated_at'
             ]).to_csv(self.track_bias_table_path, index=False, encoding='utf-8-sig')
     
-    def is_url_fetched(self, url: str) -> bool:
+    def is_url_fetched(self, url: str, max_age_seconds: Optional[int] = None) -> bool:
         """
         URLが既に取得済みかチェック
         
@@ -91,7 +91,20 @@ class CSVDBManager:
         
         try:
             df = pd.read_csv(self.url_log_path, encoding='utf-8-sig')
-            return url in df['url'].values
+            rows = df[df['url'] == url]
+            if len(rows) == 0:
+                return False
+            if max_age_seconds is None or max_age_seconds == 0:
+                return True
+            # Check the most recent fetched_at
+            try:
+                latest = rows.sort_values('fetched_at', ascending=False).iloc[0]
+                fetched_at = datetime.fromisoformat(latest['fetched_at'])
+                age = (datetime.now() - fetched_at).total_seconds()
+                return age <= max_age_seconds
+            except Exception:
+                # Fallback: if parsing fails, treat as fetched to avoid extra fetches
+                return True
         except Exception as e:
             logger.warning(f"URLログ読み込みエラー: {e}")
             return False
@@ -209,12 +222,13 @@ class CSVDBManager:
             logger.warning(f"レースID取得エラー: {e}")
             return []
     
-    def is_race_fetched(self, race_id: str) -> bool:
+    def is_race_fetched(self, race_id: str, max_age_seconds: Optional[int] = None) -> bool:
         """
         指定されたレースIDのデータが取得済みかチェック
         
         Args:
             race_id: レースID
+            max_age_seconds: 指定した秒数以内に取得された場合はTrueを返す（Noneは無効）
             
         Returns:
             取得済みの場合True
@@ -224,8 +238,20 @@ class CSVDBManager:
         
         try:
             df = pd.read_csv(self.url_log_path, encoding='utf-8-sig')
-            # 出馬表ページが取得されていれば取得済みと判断
-            return ((df['race_id'] == race_id) & (df['page_type'] == 'shutuba') & (df['status'] == 'success')).any()
+            # 出馬表ページで成功したもののみを対象
+            rows = df[(df['race_id'] == race_id) & (df['page_type'] == 'shutuba') & (df['status'] == 'success')]
+            if len(rows) == 0:
+                return False
+            if max_age_seconds is None or max_age_seconds == 0:
+                return True
+            try:
+                latest = rows.sort_values('fetched_at', ascending=False).iloc[0]
+                fetched_at = datetime.fromisoformat(latest['fetched_at'])
+                age = (datetime.now() - fetched_at).total_seconds()
+                return age <= max_age_seconds
+            except Exception:
+                # 解析失敗時は fetched とみなす（保守的）
+                return True
         except Exception as e:
             logger.warning(f"レース取得状況確認エラー: {e}")
             return False

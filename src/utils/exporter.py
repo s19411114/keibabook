@@ -20,7 +20,7 @@
 
 【地方競馬専用】
 - ポイント: 大穴馬、激走馬、AI血統予想、パワー馬場向き馬
-- 個別馬コメント（穴馬のヒント）
+- 特定の馬のコメント（穴馬のヒント）
 
 【レース後】
 - レース結果: 着順、タイム、着差、通過順位、上がり3F
@@ -136,6 +136,28 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             lines.append(f"### コース分析\n{feature_data['course_analysis']}")
         lines.append("")
     
+    # ===== 中央競馬専用: 当日特集ページ（一覧等） =====
+    daily_features = race_data.get('daily_feature', [])
+    if daily_features:
+        lines.append("## 当日特集ページ（一覧・日別の特集）")
+        for df in daily_features:
+            if not df:
+                continue
+            url = df.get('url', '')
+            data = df.get('data', {})
+            title = data.get('title', '') if data else ''
+            lines.append(f"- URL: {url} - {title}")
+            # 簡易的に注目馬(本命/対抗/穴馬)を出力
+            picks = data.get('picks', {}) if data else {}
+            if picks and any(picks.values()):
+                if picks.get('honmei'):
+                    lines.append(f"  - 本命: {', '.join(picks.get('honmei', []))}")
+                if picks.get('taikou'):
+                    lines.append(f"  - 対抗: {', '.join(picks.get('taikou', []))}")
+                if picks.get('anaba'):
+                    lines.append(f"  - 穴馬: {', '.join(picks.get('anaba', []))}")
+        lines.append("")
+
     # ===== 地方競馬専用: ポイント情報 =====
     point_data = race_data.get('point_info', {})
     if point_data:
@@ -283,11 +305,11 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             lines.append("#### 前走レース回顧")
             lines.append(f"{prev_comment}")
         
-        # 個別コメント
+        # 特定の馬のコメント
         ind_comment = h.get('individual_comment', '')
         if ind_comment:
             lines.append("")
-            lines.append("#### 馬個別コメント")
+            lines.append("#### 特定の馬のコメント")
             lines.append(f"{ind_comment}")
         
         # 過去成績

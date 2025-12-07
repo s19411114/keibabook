@@ -71,7 +71,7 @@ wait_seconds = min(10 * (attempt + 1), 30)  # 最大30秒
 **問題点**:
 - 1レースで約6-8回のURLフェッチ（出馬表、調教、血統、厩舎コメント、前走コメント等）
 - 各フェッチに1〜3秒の待機が入る → **最低18〜24秒の待機時間**
-- 地方競馬（NAR）の場合、個別馬コメントも取得するためさらに遅い
+- 地方競馬（NAR）の場合、特定の馬のコメントも取得するためさらに遅い
 
 **修正案**:
 - デフォルトの `rate_limit_base` を0.5秒に短縮
@@ -165,7 +165,7 @@ docker-compose run --rm app python scripts/run_single_race.py --venue 浦和 --r
 または、WSL2内で直接実行（Docker不要）:
 ```bash
 cd /mnt/c/GeminiCLI/TEST/keibabook
-source venv/bin/activate
+source .venv/bin/activate
 python scripts/run_single_race.py --venue 浦和 --race 9 --skip-debug-files
 ```
 

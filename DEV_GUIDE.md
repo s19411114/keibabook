@@ -34,7 +34,7 @@ cd ~/keibabook
 python3 -m venv venv
 
 # venvをアクティベート
-source venv/bin/activate
+source .venv/bin/activate
 
 # 依存関係をインストール
 pip install -r requirements.txt
@@ -47,7 +47,7 @@ playwright install chromium
 
 ```bash
 cd ~/keibabook
-source venv/bin/activate
+source .venv/bin/activate
 # プロンプトに (venv) が表示されることを確認
 ```
 
