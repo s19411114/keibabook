@@ -80,6 +80,19 @@ These are time-consuming tasks intended for handover to other agents. Short summ
 Notes:
 - The full `issues/HANDOVER_TASKS.md` content has been archived at `docs/archived/archived-<timestamp>-HANDOVER_TASKS.md` (moved via script).
 - Assign these tasks directly into this ISSUES_MASTER and add `status:` and `assignee:` lines to track.
+
+## Archived Items (Docker-related scripts and shortcuts)
+The following Docker-related scripts have been archived and are no longer part of recommended dev workflow (we use `.venv`):
+- `scripts/start_dev.sh` -> docs/archived/archived-20251207T134432Z-start_dev.sh
+- `scripts/start_dev.ps1` -> docs/archived/archived-20251207T134432Z-start_dev.ps1
+- `scripts/start_dev.cmd` -> docs/archived/archived-20251207T134432Z-start_dev.cmd
+- `start_app.bat` -> docs/archived/archived-20251207T134432Z-start_app.bat
+- `create_shortcut.bat` -> docs/archived/archived-20251207T134432Z-create_shortcut.bat
+- `scripts/create_shortcut.ps1` -> docs/archived/archived-20251207T134432Z-create_shortcut.ps1
+
+Notes:
+- These files are kept in `docs/archived/` for historical reference only. DO NOT use them for routine development unless explicitly required and documented.
+- If a file needs to be re-enabled for a specific workflow, move it back and add a note in `ISSUES_MASTER.md` with the reason and reviewer approval.
 - Improvements: type hints, Pydantic, logs, CI/CD, doc generation
 
 ---

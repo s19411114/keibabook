@@ -31,7 +31,7 @@
 
 ### 3.1. 開発環境のセットアップ
 
-> **注意**: プロジェクトの標準は Docker です。以下の venv 手順はレガシーです。Docker のセットアップ方法は `DOCKER_SETUP.md` を参照してください。
+> **注意**: プロジェクトの推奨実行環境は `.venv`（ローカル Python 仮想環境）です。Docker の参照はすでにアーカイブ済みで、参考用に `docs/archived/` に保存されています。
 
 1.  **プロジェクトディレクトリに移動:**
     ```bash
@@ -115,3 +115,19 @@ AIによる競馬予測の精度を向上させるため、以下の情報重要
     -   年齢による一律な割引は避け、近走の内容や調教気配を重視し、穴馬としての可能性を探る。
 -   **⑤ 斤量:**
     -   斤量の絶対値だけでなく、馬体重に対する斤量比を重要なファクターとして評価する。
+
+- Archived /home/u/projects/TEST/keibabook/implementation_plan.md.resolved as archived-20251207T133305Z-implementation_plan.md.resolved at 20251207T133305ZZ
+
+- Archived /home/u/projects/TEST/keibabook/issues/HANDOVER_TASKS.md as archived-20251207T133403Z-HANDOVER_TASKS.md at 20251207T133403ZZ
+
+- Archived /home/u/projects/TEST/keibabook/scripts/start_dev.sh as archived-20251207T134432Z-start_dev.sh at 20251207T134432ZZ
+
+- Archived /home/u/projects/TEST/keibabook/scripts/start_dev.ps1 as archived-20251207T134432Z-start_dev.ps1 at 20251207T134432ZZ
+
+- Archived /home/u/projects/TEST/keibabook/scripts/start_dev.cmd as archived-20251207T134432Z-start_dev.cmd at 20251207T134432ZZ
+
+- Archived /home/u/projects/TEST/keibabook/start_app.bat as archived-20251207T134432Z-start_app.bat at 20251207T134432ZZ
+
+- Archived /home/u/projects/TEST/keibabook/create_shortcut.bat as archived-20251207T134432Z-create_shortcut.bat at 20251207T134432ZZ
+
+- Archived /home/u/projects/TEST/keibabook/scripts/create_shortcut.ps1 as archived-20251207T134432Z-create_shortcut.ps1 at 20251207T134432ZZ

@@ -52,10 +52,10 @@ scripts\start_streamlit_win.cmd
 
 ### 🖱 Windows: デスクトップショートカット作成
 
-簡単に起動したい場合は、バッチファイル `create_shortcut.bat` でデスクトップショートカットを自動生成できます。
+簡単に起動したい場合は、以前は `create_shortcut.bat` によるショートカット作成がありましたが、現在はアーカイブされています。Windowsでショートカットを作成するには `scripts/create_console_shortcut.ps1` を使用してください（PowerShellを管理者権限で実行し、仮想環境をアクティベートしてから実行）。
 
-```cmd
-create_shortcut.bat
+```powershell
+.\scripts\create_console_shortcut.ps1
 ```
 
 デスクトップに `KeibaBook Start` ショートカットが作成されます。タスクバーにピン留めすると1クリックで起動できます。
