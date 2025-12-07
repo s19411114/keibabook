@@ -80,6 +80,18 @@ async def manual_login():
                 print(f"✅ ログイン検知！ URL: {current_url}")
                 logged_in = True
                 break
+            # または、tk クッキーが設定された場合もログイン完了とみなす
+            try:
+                cookies = await context.cookies()
+                for c in cookies:
+                    if c.get('name') == 'tk':
+                        print("✅ tkクッキー検出: ログイン完了とみなします")
+                        logged_in = True
+                        break
+                if logged_in:
+                    break
+            except Exception:
+                pass
             
             # 残り時間を表示
             elapsed = int(time.time() - start_time)
