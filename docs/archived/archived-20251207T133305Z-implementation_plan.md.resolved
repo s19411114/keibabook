@@ -1,0 +1,297 @@
+# KeibaBook スクレイパー コードレビューレポート
+
+> **目的**: アプリ全体の構造的問題、バグ、改善提案、今後のタスクをまとめたレポート
+
+---
+
+## 📊 概要
+
+| 項目 | 件数 |
+|------|------|
+| 🔴 重大なバグ・問題 | 5件 |
+| 🟡 中程度の問題 | 8件 |
+| 🟢 改善提案 | 6件 |
+| 📝 既存タスク (未完了) | 4件 |
+
+---
+
+## 🔴 重大なバグ・問題 (即時対応推奨)
+
+### 1. 不適切なエラーハンドリング (Bare `except:`)
+
+**影響**: デバッグ困難、サイレント障害
+
+```
+src/utils/odds_db.py:83
+src/utils/keibabook_auth.py:353
+src/utils/upset_detector.py:212, 252, 262
+src/utils/horse_ranker.py:183, 310
+src/utils/recommender.py:89, 100
+```
+
+> [!CAUTION]
+> 9箇所で `except:` (bare except) を使用しています。これは全ての例外（KeyboardInterrupt含む）をキャッチし、エラーの原因を隠蔽します。
+
+**推奨修正**:
+```diff
+-        except:
++        except Exception as e:
++            logger.error(f"予期せぬエラー: {e}")
+```
+
+---
+
+### 2. バックアップファイルの残存
+
+**ファイル**:
+- [keibabook.py.bak](file:///home/u/projects/TEST/keibabook/src/scrapers/keibabook.py.bak)
+- [result_parser.py.bak](file:///home/u/projects/TEST/keibabook/src/scrapers/result_parser.py.bak)
+- [exporter.py.bak](file:///home/u/projects/TEST/keibabook/src/utils/exporter.py.bak)
+
+> [!WARNING]
+> バックアップファイルは Git で管理されるべきです。これらのファイルは削除してください。
+
+---
+
+### 3. requirements.txt のフォーマットエラー
+
+```python
+# 行9-10に余分なスペースがある
+ pytest>=7.0.0     # 先頭にスペース
+ pytest-asyncio>=0.21.0  # 先頭にスペース
+```
+
+---
+
+### 4. app.py のサイズ過大 (786行)
+
+**問題**: 単一ファイルに UI ロジック、ビジネスロジック、スタイリングが混在
+
+**推奨**: 以下のように分割
+- `src/ui/tabs/scraping_tab.py`
+- `src/ui/tabs/training_tab.py`
+- `src/ui/tabs/recommend_tab.py`
+- `src/ui/components/sidebar.py`
+- `src/ui/styles.py`
+
+---
+
+### 5. keibabook.py の巨大化 (1343行)
+
+**問題**: 単一クラスに全スクレイピング機能が集約
+
+**推奨**: 責任分離
+- `ShutubaScraper` (出馬表)
+- `TrainingScraper` (調教)
+- `PedigreeScraper` (血統)
+- `CommentScraper` (コメント)
+
+---
+
+## 🟡 中程度の問題 (早期対応推奨)
+
+### 1. パフォーマンス: 429バックオフが過大
+
+**ファイル**: [keibabook.py:82](file:///home/u/projects/TEST/keibabook/src/scrapers/keibabook.py#L82)
+
+```python
+wait_seconds = min(10 * (attempt + 1), 30)  # 最大30秒に修正済み
+```
+
+> [!NOTE]
+> 既に修正済みですが、[PERFORMANCE_ANALYSIS.md](file:///home/u/projects/TEST/keibabook/issues/PERFORMANCE_ANALYSIS.md) によると以前は最大300秒でした。
+
+---
+
+### 2. レート制限のデフォルト値
+
+**ファイル**: [rate_limiter.py](file:///home/u/projects/TEST/keibabook/src/utils/rate_limiter.py)
+
+```python
+DEFAULT_DELAY = 1.0  # 0.5-1秒のランダム待機
+LOW_TRAFFIC_DELAY = 1.0  # 深夜帯も同じ
+```
+
+**問題**: 深夜帯と通常時間帯で同じ待機時間
+
+**推奨**: 深夜帯は 0.5秒に短縮可能
+
+---
+
+### 3. ログイン確認の非効率
+
+**問題**: `ensure_logged_in()` が毎回新しいページを開く
+
+**推奨**: Cookie有効期限をチェックしてスキップ
+
+---
+
+### 4. ドキュメント内の古いDocker参照
+
+> [!WARNING]
+> **Dockerは使用していないが、12個のmdファイルにDocker参照が残存**
+
+以下のファイルを更新してDocker関連記述を削除/修正すべき:
+- [DEV_GUIDE.md](file:///home/u/projects/TEST/keibabook/DEV_GUIDE.md)
+- [WSL_LIGHTWEIGHT_SETUP.md (archived)](migration/backups/WSL_LIGHTWEIGHT_SETUP_20251207T194410.md)
+- [HANDOVER.md](file:///home/u/projects/TEST/keibabook/HANDOVER.md)
+- [PROJECT_LOG.md](file:///home/u/projects/TEST/keibabook/PROJECT_LOG.md)
+- [issues/HANDOVER_TASKS.md](file:///home/u/projects/TEST/keibabook/issues/HANDOVER_TASKS.md)
+- [issues/PERFORMANCE_ANALYSIS.md](file:///home/u/projects/TEST/keibabook/issues/PERFORMANCE_ANALYSIS.md)
+
+---
+
+### 5. テストカバレッジの不足
+
+**現状**: 31テストファイルが存在するが、以下が不足
+- レート制限のテスト
+- パフォーマンステスト
+- エラー処理のテスト
+
+---
+
+### 7. 重複コード (check_*.py)
+
+プロジェクトルートに類似した検証スクリプトが多数存在:
+- [check_cookie.py](file:///home/u/projects/TEST/keibabook/check_cookie.py)
+- [check_cookies.py](file:///home/u/projects/TEST/keibabook/check_cookies.py)
+- [check_data.py](file:///home/u/projects/TEST/keibabook/check_data.py)
+- [check_json.py](file:///home/u/projects/TEST/keibabook/check_json.py)
+- [check_correct_urls.py](file:///home/u/projects/TEST/keibabook/check_correct_urls.py)
+- [check_real_schedule.py](file:///home/u/projects/TEST/keibabook/check_real_schedule.py)
+- [check_today_schedule.py](file:///home/u/projects/TEST/keibabook/check_today_schedule.py)
+- [check_tokyo11r.py](file:///home/u/projects/TEST/keibabook/check_tokyo11r.py)
+- [check_tokyo_races.py](file:///home/u/projects/TEST/keibabook/check_tokyo_races.py)
+
+**推奨**: `scripts/` に統合し、共通ユーティリティを抽出
+
+---
+
+### 8. ハードコードされた値
+
+**ファイル**: [app.py:178-182](file:///home/u/projects/TEST/keibabook/app.py#L178-182)
+
+```python
+VENUE_CODES = {
+    "東京": "05", "中山": "06", "京都": "08", "阪神": "09",
+    ...
+}
+```
+
+**推奨**: `config/venues.yml` に外部化
+
+---
+
+## 🟢 改善提案
+
+### 1. 型ヒントの追加
+
+**現状**: ほとんどの関数に型ヒントがない
+
+**推奨**:
+```python
+def scrape(self, context: Optional[BrowserContext] = None) -> Dict[str, Any]:
+```
+
+---
+
+### 2. Pydantic モデルの導入
+
+**推奨**: データ検証とシリアライズのために
+
+```python
+from pydantic import BaseModel
+
+class HorseData(BaseModel):
+    horse_num: str
+    horse_name: str
+    odds: Optional[float] = None
+    popularity: Optional[int] = None
+```
+
+---
+
+### 3. ログ設定の改善
+
+**現状**: [logger.py](file:///home/u/projects/TEST/keibabook/src/utils/logger.py) が10行のみ
+
+**推奨**: 
+- ログレベル設定の外部化
+- ローテーション設定
+- JSON形式ログ出力オプション
+
+---
+
+### 4. CI/CD パイプラインの構築
+
+**現状**: なし
+
+**推奨**:
+- GitHub Actions で自動テスト
+- Lint チェック (flake8, mypy)
+- タイムアウト検出
+
+---
+
+### 5. 設定管理の改善
+
+**現状**: [config/settings.yml](file:///home/u/projects/TEST/keibabook/config/settings.yml) + 環境変数 + ハードコード
+
+**推奨**: `python-dotenv` + `pydantic-settings` で統一
+
+---
+
+### 6. ドキュメント生成
+
+**推奨**: Sphinx または MkDocs で API ドキュメントを自動生成
+
+---
+
+## 📝 既存タスク (HANDOVER_TASKS.md より)
+
+| タスク | 優先度 | 推定時間 | 状態 |
+|--------|--------|----------|------|
+| ~~Docker環境の最適化~~ | - | - | ❌ 不要 |
+| ~~run_pedigree.py の非同期化~~ | - | - | ❌ メモリ8GB制約 |
+| テストスイートの拡充 | 中 | 2-3時間 | 未着手 |
+| ログ・モニタリング改善 | 低 | 1-2時間 | 未着手 |
+| ドキュメントのDocker参照削除 | 低 | 1時間 | 新規追加 |
+
+---
+
+## 📋 推奨アクション優先順位
+
+```mermaid
+flowchart TD
+    A[1. Bare except修正] --> B[2. バックアップファイル削除]
+    B --> C[3. requirements.txt修正]
+    C --> D[4. Docker参照削除]
+    D --> E[5. app.py分割]
+    E --> F[6. keibabook.py分割]
+    F --> G[7. テスト拡充]
+    G --> H[8. CI/CD構築]
+```
+
+---
+
+## ✅ 良い点
+
+1. **既存ドキュメントが充実**: README, ARCHITECTURE, DEVELOPMENT_ROADMAP, PROJECT_LOG
+2. **問題分析が詳細**: PERFORMANCE_ANALYSIS.md で原因と対策が明確
+3. **テストファイルが存在**: 31ファイルのテストコード
+4. **レート制御を実装**: サイト負荷を考慮した設計
+5. **Streamlit UIが完成**: ユーザーフレンドリーなインターフェース
+
+---
+
+## 📌 次のステップ
+
+1. **即時**: bare except の修正、バックアップファイル削除、requirements.txt修正
+2. **短期 (1週間)**: ドキュメントのDocker参照削除、app.py のリファクタリング
+3. **中期 (2-4週間)**: keibabook.py分割、テスト拡充
+4. **長期**: CI/CD構築、型ヒント追加、Pydantic導入
+
+> [!NOTE]
+> **除外したタスク**:
+> - Docker環境最適化 → 使用しない
+> - 並列処理/非同期化 → メモリ8GB制約でクラッシュのため除外
