@@ -95,6 +95,21 @@ Notes:
 - If a file needs to be re-enabled for a specific workflow, move it back and add a note in `ISSUES_MASTER.md` with the reason and reviewer approval.
 - Improvements: type hints, Pydantic, logs, CI/CD, doc generation
 
+## Templates & Workflow
+Use the files under `docs/templates/` to standardize new docs and tasks. Key templates:
+- `docs/templates/implementation_plan.md` — 実装計画 / Milestones
+- `docs/templates/bug_template.md` — バグ報告のテンプレート（Status, Reporter, Severity）
+- `docs/templates/task_template.md` — タスクのテンプレート（Assignee, Due）
+- `docs/templates/handover_template.md` — 引き継ぎ向けテンプレート
+ 
+運用ルールのまとめ:
+1. 新しい設計/バグ/タスクは `docs/` に作成する。
+2. ステータスは YAML front-matter（Status: draft/open/review/resolved/closed）で管理する。
+3. 完了（Status: closed/resolved）にしたら `scripts/archive_docs.py --confirm` を使って `docs/archived/` に移動する。
+4. `PROJECT_LOG.md` にアーカイブの要約が自動で追加される。手順は `scripts/archive_doc.py` を使用。
+
+例: タスクを作るときは `docs/task-YYYYMMDD-short-title.md` を `docs/templates/task_template.md` から作成し、`Status: todo` で作業を開始、完了後 `Status: closed` を入れてアーカイブする。
+
 ---
 
 ## 運用ルール（例）

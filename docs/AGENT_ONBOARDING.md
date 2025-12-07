@@ -60,6 +60,14 @@ python scripts/agent_health_check.py --output health.json
 2. 確認済み・完了した作業は `docs/archived/` に移動する（ファイル名プレフィックス `archived-YYYYMMDD-<desc>.md`）
 3. ドキュメントは必ず `PROJECT_LOG.md` に要約を残す（誰が何をいつやったか）
 4. 重要変更は `AGENT_RULES.md` と `HANDOVER.md` に反映する
+5. テンプレート一覧と利用
+  - 計画書（Implementation Plan）: `docs/templates/implementation_plan.md`
+  - バグレポート（Bug Report）: `docs/templates/bug_template.md`
+  - タスク（Task）: `docs/templates/task_template.md`
+  - 引継ぎ（Handover）: `docs/templates/handover_template.md`
+  - デザイン（Design/Proposal）: `docs/templates/design_template.md`
+
+テンプレートを使うことで、以下のメタ情報が自動で付与され、`scripts/archive_docs.py` による運用がおこなえます: `Status`, `Date`, `Author`, `Assignee`, `Tags`。
 
 ---
 
