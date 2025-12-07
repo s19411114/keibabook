@@ -89,8 +89,7 @@ with ui.row().classes('items-start gap-6'):
                         ui.button(
                             f"{race_num}R",
                             on_click=lambda e, n=race_num: set_race(n),
-                            style='min-width: 48px; padding: 6px 8px; font-size: 13px;',
-                        ).props('color=primary')
+                        ).style('min-width: 48px; padding: 6px 8px; font-size: 13px;').props('color=primary')
 
         # Login status
         status_label = ui.label('ログイン状況を確認中...')
