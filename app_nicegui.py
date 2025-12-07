@@ -146,7 +146,7 @@ with ui.row().classes('items-start gap-6'):
 
         async def do_login():
             status_label.set_text('ログイン中...')
-            log_area.update('ログインプロセスを開始しています...')
+            log_area.set_value('ログインプロセスを開始しています...')
 
             # Use credentials from UI if provided; otherwise fallback to settings.yml
             env = dict(os.environ)
@@ -164,7 +164,7 @@ with ui.row().classes('items-start gap-6'):
                 stdout, stderr = await proc.communicate()
                 stdout_text = stdout.decode('utf-8', errors='replace')
                 stderr_text = stderr.decode('utf-8', errors='replace')
-                log_area.update('\n'.join(['ログイン出力:', '---', stdout_text, '---', stderr_text]))
+                log_area.set_value('\n'.join(['ログイン出力:', '---', stdout_text, '---', stderr_text]))
                 if proc.returncode == 0:
                     status_label.set_text('✅ ログイン成功')
                 else:
@@ -172,7 +172,7 @@ with ui.row().classes('items-start gap-6'):
                     ui.notify('Login failed: see logs', color='negative')
             except Exception as e:
                 status_label.set_text('❌ エラー')
-                log_area.update(f'エラー: {e}')
+                log_area.set_value(f'エラー: {e}')
                 ui.notify(str(e), color='negative')
 
 
@@ -193,7 +193,7 @@ with ui.row().classes('items-start gap-6'):
     # Main content column
     with ui.column().classes('grow'):
         json_area = ui.textarea(label='取得/表示JSON', value='').style('width: 100%; height: 360px;')
-        log_area = ui.markdown('')
+        log_area = ui.textarea(label='ログ/出力', value='').style('width: 100%; height: 160px;')
 
         # Simple list of saved files
         files_box = ui.select([], label='保存済みデータ', value=None)
@@ -216,7 +216,7 @@ async def run_scrape():
     target_url = manual_url.value or f"https://s.keibabook.co.jp/{base_path}/syutuba/{target_race_id}"
 
     # Progress indicator
-    log_area.update('Starting scrape...')
+    log_area.set_value('Starting scrape...')
     try:
         proc = await asyncio.create_subprocess_exec(
             sys.executable, 'scripts/scrape_worker.py', f'--race_id={target_race_id}', f"--race_type={'nar' if race_type.value.startswith('地方') else 'jra'}", f'--output=data/{generated_race_key}.json',
@@ -224,7 +224,7 @@ async def run_scrape():
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode == 0:
-            log_area.update('Scrape success')
+            log_area.set_value('Scrape success')
             # load file
             out_file = Path('data') / f'{generated_race_key}.json'
             if out_file.exists():
@@ -237,12 +237,12 @@ async def run_scrape():
                 if stderr:
                     ui.notify(stderr.decode()[:300])
         else:
-            log_area.update('Scrape failed')
+            log_area.set_value('Scrape failed')
             if stderr:
                 ui.notify(stderr.decode()[:300])
 
     except Exception as e:
-        log_area.update(f'Error: {e}')
+        log_area.set_value(f'Error: {e}')
         ui.notify(str(e))
 
 
