@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-secrets
+        name: Run check_secrets.py
+        entry: python3 scripts/check_secrets.py --path . --fail-if-any
+        language: system
+        files: ''
