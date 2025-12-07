@@ -29,7 +29,22 @@ python --version  # 3.12.x を期待
 3. 依存関係を確認
 
 ```bash
+# プロジェクトの仮想環境が無い場合は作成する
+python3 -m venv .venv
+source .venv/bin/activate
+
 pip install -r requirements.txt  # (必要に応じて)
+```
+
+4. 開発用のツールを導入（推奨）
+
+```bash
+pip install -r dev-requirements.txt
+pre-commit install
+pre-commit run --all-files  # 任意: 全ファイルを検査
+```
+
+これはローカルのコミット前に簡易的な検査（`scripts/check_secrets.py` など）を走らせ、機密のコミットを未然に防ぎます。
 ```
 
 4. `PYTHONPATH` を調整せず、スクリプトは `scripts/` から起動すること（ただし CLI 実行時はプロジェクトルート内から起動）

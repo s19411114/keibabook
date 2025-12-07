@@ -10,6 +10,23 @@
 
 **セキュリティ**: 認証情報は `config/settings.yml` に書き込まないでください。`LOGIN_ID` / `LOGIN_PASSWORD` を環境変数で渡すことを推奨します。
 
+**開発ツール（必須）**: ローカルで作業する場合、プロジェクトルートに仮想環境を作成し、開発ツールをインストールして `pre-commit` を有効にしてください。
+
+```bash
+# 1) 仮想環境を作成して有効化
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 2) 実行環境と開発ツールをインストール
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+pip install -r dev-requirements.txt
+
+# 3) pre-commit を有効化する（コミット前に検査が走ります）
+pre-commit install
+pre-commit run --all-files  # 任意: 全ファイルを検査
+```
+
 ⚠️ **重要**: `docs/` フォルダには参考資料（JRA・地方競馬の公式URL等）が保存されています。削除しないでください。詳細は [AGENT_RULES.md](AGENT_RULES.md) を参照。
 
 ### 🔧 初回セットアップ（1回のみ）

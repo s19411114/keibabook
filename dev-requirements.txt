@@ -1,0 +1,5 @@
+pre-commit>=3.0
+pytest>=8.0
+black
+ruffpre-commit>=3.3.2
+detect-secrets>=1.4.0
