@@ -94,6 +94,10 @@ with ui.row().classes('items-start gap-6'):
         # Login status
         status_label = ui.label('ログイン状況を確認中...')
 
+        # Login credentials (can be left blank to use config/settings.yml)
+        login_id_input = ui.input(label='ログインID', value=settings.get('login_id', ''))
+        login_password_input = ui.input(label='ログインパスワード', value=settings.get('login_password', ''), password=True)
+
         async def refresh_login():
             cookie_file = settings.get('cookie_file', 'cookies.json')
             is_valid, msg = KeibaBookAuth.is_cookie_valid(cookie_file)
@@ -109,10 +113,19 @@ with ui.row().classes('items-start gap-6'):
         async def do_login():
             status_label.set_text('ログイン中...')
             log_area.update('ログインプロセスを開始しています...')
+
+            # Use credentials from UI if provided; otherwise fallback to settings.yml
+            env = dict(os.environ)
+            if login_id_input.value:
+                env['LOGIN_ID'] = login_id_input.value
+            if login_password_input.value:
+                env['LOGIN_PASSWORD'] = login_password_input.value
+
             try:
                 proc = await asyncio.create_subprocess_exec(
                     sys.executable, 'scripts/login_helper.py',
-                    stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+                    stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+                    env=env
                 )
                 stdout, stderr = await proc.communicate()
                 stdout_text = stdout.decode('utf-8', errors='replace')
@@ -127,6 +140,7 @@ with ui.row().classes('items-start gap-6'):
                 status_label.set_text('❌ エラー')
                 log_area.update(f'エラー: {e}')
                 ui.notify(str(e), color='negative')
+
 
         ui.button('🔑 ログイン実行', on_click=lambda e: asyncio.create_task(do_login()))
         ui.button('🚪 ログアウト', on_click=lambda e: (os.remove(settings.get('cookie_file', 'cookies.json')) if os.path.exists(settings.get('cookie_file', 'cookies.json')) else None) or asyncio.create_task(refresh_login()))
