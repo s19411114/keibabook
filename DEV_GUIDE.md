@@ -48,7 +48,7 @@ playwright install chromium
 ```bash
 cd ~/keibabook
 source .venv/bin/activate
-# プロンプトに (venv) が表示されることを確認
+# プロンプトに (.venv) が表示されることを確認
 ```
 
 ## 4. 主要コマンド
