@@ -4,6 +4,15 @@
 
 目的:
 - Netkeiba の過去データ収集、トラックバイアス計算、ペディグリー収集などの重い・長期的バッチ処理は keiba-ai に移管します。
+
+移管済 / 移管対象（main から移動済み / 仮置き済み）:
+
+- `src/scrapers/netkeiba_result.py` (結果ページスクレイパー)  -> migration/to_keiba_ai/src/scrapers/netkeiba_result.py
+- `src/scrapers/netkeiba_db_scraper.py` (Netkeiba DB バッチ) -> migration/to_keiba_ai/src/scrapers/netkeiba_db_scraper.py
+- `src/utils/track_bias.py` (トラックバイアス分析) -> migration/to_keiba_ai/src/utils/track_bias.py
+- `run_pedigree.py`, `run_pedigree_safe.py`, `pedigree_queue.json`, `pedigree_store/` -> migration/to_keiba_ai/root-files/
+
+注: 上記ファイルは main から削除/無効化して移行フォルダにまとめられています。将来的に keiba-ai に取り込まれ次第、keibabook は `src/adapters/keiba_ai_adapter.py` 経由でデータを取得する方針です。
 - keibabook は 1 レース分の JSON 抽出と keibabook 固有フィールド（レース後コメント、調教等）に限定します。
 
 移管作業の注意点:

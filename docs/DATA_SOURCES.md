@@ -37,17 +37,16 @@
 - **実装**: `src/scrapers/nar_schedule.py`
 
 ### 南関東競馬（参考）
-- **URL**: https://www.nankankeiba.com/odds/race/{race_id}
-- **用途**: 南関東4場のオッズ（参考）
-- **実装**: `src/scrapers/odds_fetcher.py`
-
 ## Netkeiba
 
-> **Policy Update (2025-12-06)**: Netkeiba の過去データ収集（Netkeiba DB のアーカイブ、結果ページのトラックバイアス計算、batch pedigree の収集など）は keiba-ai プロジェクトに移管します。
-> See: migration/to_keiba_ai/manifest.md and migration/to_keiba_ai/README.md
+> **移管メモ (2025-12-08)**: 以下の重めの収集・解析処理は keiba-ai へ移管済み、または移管予定です。keibabook に残すのは per-race JSON 抽出や軽量なスケジューリングのみです。
 
-### カレンダー
-- **URL**: https://race.netkeiba.com/top/calendar.html?rf=sidemenu
+- Netkeiba: `src/scrapers/netkeiba_result.py` (移管済 -> migration/to_keiba_ai/src/scrapers/netkeiba_result.py)
+- Netkeiba DB: `src/scrapers/netkeiba_db_scraper.py` (移管済 -> migration/to_keiba_ai/src/scrapers/netkeiba_db_scraper.py)
+- Batch pedigree: `run_pedigree.py`, `run_pedigree_safe.py`, `pedigree_queue*.json`, `pedigree_store/` (移管済/候補)
+- Track bias: `src/utils/track_bias.py` (移管済 -> migration/to_keiba_ai/src/utils/track_bias.py)
+
+> 既存の UI/軽量スクリプトは引き続き keibabook で維持します。移行に伴う呼び出し側の修正や `keiba_ai_adapter` の導入は別途行ってください。
 - **用途**: 中央・地方全体のカレンダー
 - **実装**: `src/scrapers/netkeiba_calendar.py`
 - **特徴**: 視覚的なカレンダー表示
