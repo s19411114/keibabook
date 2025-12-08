@@ -2,6 +2,7 @@
 Title: Code Review - KeibaBook Application
 Author: Gemini Agent
 Date: 2025-12-08
+Category: review
 Status: open
 Tags: review, design, bugs, improvement
 ---
@@ -33,9 +34,6 @@ src/
 - `src/ui/` への UI コンポーネント分離（`track_bias_tab.py`, `training_evaluation_tab.py`）
 - `comment_aggregator.py` への個別コメント集約ロジックの分離
 - `training_converter.py` への調教タイム変換ロジック分離
-- `fetcher.py` への共通フェッチ処理の切り出し
-- 専用パーサー群: `local_racing_parser.py`, `jra_special_parser.py`, `result_parser.py`
-
 **課題・改善余地 ⚠️:**
 - `keibabook.py` は依然1406行と大きい。`scrape()` メソッド内のネストが深い
 - `app.py` は786行。タブごとの分離が `src/ui/` に部分的なため一貫性がない
@@ -54,22 +52,15 @@ src/
 
 ## 2. バグ報告
 
-### BUG-001: bare except 使用箇所
-
 - **severity**: medium
 - **status**: TODO
 - **files**: 
-  - `src/scrapers/keibabook.py` (line 311-313, 321-323)
-  - その他 `src/utils/odds_db.py` 等
-
 ```python
 # 例: src/scrapers/keibabook.py:311-313
 except Exception:
     # 判定に失敗してもフェールセーフとして再取得を許す
     return False
 ```
-
-**問題点**: エラーの詳細がログに出力されない。デバッグ時に原因追跡が困難。
 
 **推奨修正**:
 ```python
@@ -89,6 +80,36 @@ base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])  # 2回計算
 ```
 
 **問題点**: 同じ計算が複数回実行されている。
+
+### BUG-003: ログイン認証の信頼性問題 (2025-12-08追加)
+
+- **status**: IMPROVED
+
+- **severity**: high
+- **status**: TODO
+- **files**:
+  - `src/utils/keibabook_auth.py`
+  - `src/utils/login.py`
+  - `config/settings.yml`
+
+**根本原因**:
+1. **馬の数による認証確認の脆弱性**: `horse_count >= 6` で判定しているが、少頭数レースや開催日外では誤検出
+2. **CSSセレクタの不一致**: `table.syutuba` を使用しているが、実際のHTMLは `table.syutuba_sp`
+3. **認証情報の未設定**: `settings.yml` の `login_id/login_password` が空のため、Cookie失効時に再ログイン不可
+4. **エラーログの不足**: 失敗時の原因特定が困難
+
+**影響**:
+- 未ログイン状態では3頭分のデータしか取得できない
+- 血統・調教データが不完全になる
+
+**推奨修正**:
+1. 環境変数 `LOGIN_ID`, `LOGIN_PASSWORD` を設定 (KeibaBookAuth で環境変数からのフォールバックを実装しました)
+2. CSSセレクタに `table.syutuba_sp tbody tr` を追加
+3. 認証確認方法をログアウトリンク存在確認等に変更検討
+
+**実施**: `verify_login_by_horse_count` にログアウトリンク/『ログアウト』文言チェックを追加して判定精度を向上
+
+**詳細レポート**: [ログイン問題バグ調査レポート](file:///home/u/.gemini/antigravity/brain/4265f8df-30be-4a64-943e-dc9cd47bdc9b/implementation_plan.md)
 
 ---
 

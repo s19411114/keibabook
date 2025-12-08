@@ -70,6 +70,15 @@ class KeibaBookScraper:
         else:
             # 中央競馬の場合
             self.base_url_pattern = "https://s.keibabook.co.jp/cyuou"
+        # Base URL derived from provided shutuba_url (used across many fetches)
+        if self.shutuba_url:
+            try:
+                self.base_url = '/'.join(self.shutuba_url.split('/')[:4])
+            except Exception as e:
+                logger.debug(f"base_urlの計算に失敗しました: {e}")
+                self.base_url = ''
+        else:
+            self.base_url = ''
 
     async def _fetch_page_content(self, page, url, retry_count=3, retry_delay=2, wait_until=None):
         """
@@ -955,9 +964,9 @@ class KeibaBookScraper:
                             logger.info(f"日別特集ページ取得成功: {day_url}")
                         except Exception as e:
                             logger.warning(f"日別特集ページ取得エラー: {day_url}: {e}")
-                    except Exception:
+                    except Exception as e:
                         # Rate limiter or other transient error; continue to next candidate
-                        logger.debug(f"日別特集試行中に一時エラー、次の候補へ: {day_url}")
+                        logger.debug(f"日別特集試行中に一時エラー、次の候補へ: {day_url}: {e}")
         except Exception as e:
             logger.warning(f"特集ページ全体の取得処理でエラーが発生しました: {e}")
         return special_data
@@ -1115,7 +1124,8 @@ class KeibaBookScraper:
                 else:
                     # Fallback for mocked objects: convert to str
                     html_text = str(html_content)
-            except Exception:
+            except Exception as e:
+                logger.debug(f"html_content 文字列変換中に例外: {e}")
                 html_text = str(html_content)
             race_key = self.settings.get('race_key', 'unknown')
             if not self.settings.get('skip_debug_files', False):
@@ -1129,7 +1139,7 @@ class KeibaBookScraper:
             # 中央競馬の場合は全データを取得
             
             # 調教データを取得してマージ（中央/地方の両方で取得）
-            base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
+            base_url = self.base_url
             training_url = f"{base_url}/cyokyo/0/{self.settings['race_id']}"
             
             # 調教データ取得（中央/地方の両方で取得）
@@ -1167,7 +1177,7 @@ class KeibaBookScraper:
                     horse['training_data'] = {}
 
             # 血統データを取得してマージ（馬柱、出馬表、血統は必須）
-            base_url = '/'.join(self.settings['shutuba_url'].split('/')[:4])
+            base_url = self.base_url
             pedigree_url = f"{base_url}/kettou/{self.settings['race_id']}"
             
             # レート制御
@@ -1392,16 +1402,16 @@ class KeibaBookScraper:
                     with open(self.debug_dir / f"debug_fetches_{race_key}.json", "w", encoding="utf-8") as f:
                         import json
                         json.dump(self._last_fetches, f, ensure_ascii=False, indent=2)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"debug_fetches JSON保存エラー: {e}")
             return race_data
         finally:
             if created_browser and browser:
                 try:
                     await browser.close()
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"ブラウザクローズ時のエラー: {e}")
                 try:
                     await self._playwright.__aexit__(None, None, None)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"playwright __aexit__ エラー: {e}")

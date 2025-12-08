@@ -1,5 +1,7 @@
 ---
 Title: Task: <短い概要>
+Category: task
+Owner: <担当者>
 Author: <name>
 Date: <YYYY-MM-DD>
 Status: todo

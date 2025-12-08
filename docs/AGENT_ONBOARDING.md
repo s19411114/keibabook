@@ -1,4 +1,10 @@
 # AIエージェント向けオンボーディング（AGENT_ONBOARDING.md）
+# ---
+# Title: Agent Onboarding
+# Category: onboarding
+# Status: guide
+# ---
+# AIエージェント向けオンボーディング（AGENT_ONBOARDING.md）
 
 このファイルは、AIエージェントや開発者がプロジェクトにスムーズに参加し、同じ手順で運用できるように階層化、チェックリスト、ルーチンをまとめたものです。
 

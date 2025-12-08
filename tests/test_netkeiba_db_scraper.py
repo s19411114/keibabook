@@ -4,11 +4,9 @@ Netkeiba DB スクレイパーのテストスクリプト
 import sys
 from pathlib import Path
 
-# プロジェクトルートをパスに追加
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
-
-from src.scrapers.netkeiba_db_scraper import NetkeibaDBScraper
+# Netkeiba DB scraper は keiba-ai に移行されたため、このテストは main では実行しません。
+# テストや移行検証は migration/to_keiba_ai 側のテストで管理してください。
+print("SKIP: netkeiba_db_scraper tests moved to migration/to_keiba_ai")
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -23,8 +21,8 @@ def main():
     logger.info(f"対象レース: {race_id_list}")
     
     try:
-        scraper = NetkeibaDBScraper(output_dir="data/netkeiba_archive")
-        results = scraper.scrape_all(race_id_list)
+        print("SKIP: netkeiba_db_scraper has been moved to migration. No action in main tests.")
+        return 0
         
         logger.info("\n=== 取得結果サマリ ===")
         for key, df in results.items():

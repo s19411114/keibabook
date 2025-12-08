@@ -1,3 +1,9 @@
+# ---
+# Title: Documentation Process
+# Category: process
+# Status: guide
+# ---
+
 # ドキュメント運用プロセス
 
 目的: ドキュメントの乱立を抑え、検索しやすく、レビュー可能な状態に保つための最小ルールです。

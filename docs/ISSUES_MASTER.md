@@ -1,3 +1,9 @@
+# ---
+# Title: Issues Master
+# Category: issues
+# Status: guide
+# ---
+
 # ISSUES_MASTER — Centralized Tasks, Bug Reports, and Improvements
 
 このファイルはプロジェクトのすべての課題（バグ、設計変更、改善提案、作業タスク）を1つの場所にまとめた中央台帳です。
@@ -149,6 +155,31 @@ Notes:
   - status: TODO
   - priority: P3
 
+### BUG-003: ログイン認証の信頼性問題
+
+- reporter: gemini_agent
+- status: PARTIAL (CSSセレクタ修正済み、認証情報設定は要確認)
+- priority: P1
+- severity: High
+- date: 2025-12-08
+- files affected:
+  - `src/utils/keibabook_auth.py` (主要認証ロジック)
+  - `src/utils/login.py` (基本ログインクラス)
+  - `src/scrapers/keibabook.py` (認証呼び出し)
+
+**根本原因**:
+1. 馬の数でログイン判定（6頭以上=成功）は少頭数レースや開催日外で誤検出
+2. CSSセレクタ `table.syutuba` と実際の `table.syutuba_sp` の不一致
+3. Cookie失効時の再ログインができない（`settings.yml` の `login_id/login_password` が空）
+4. エラー時のログ情報が不十分
+
+**推奨修正**:
+- 認証情報を環境変数 (`LOGIN_ID`, `LOGIN_PASSWORD`) で設定
+- CSSセレクタに `table.syutuba_sp tbody tr` を追加
+- 認証確認方法を馬の数からログアウトリンク等の存在確認に変更検討
+
+**関連ドキュメント**: [ログイン問題バグ調査レポート](file:///home/u/.gemini/antigravity/brain/4265f8df-30be-4a64-943e-dc9cd47bdc9b/implementation_plan.md)
+
 ---
 
 ## Templates & Workflow
@@ -177,3 +208,32 @@ Use the files under `docs/templates/` to standardize new docs and tasks. Key tem
 
 ## 履歴 (履歴は `docs/archived/` に毎回移動してください)
 
+---
+
+## これからの課題・改善提案
+
+### DOC/consolidation: ドキュメント統合ルールの改善
+
+- reporter: gemini_agent
+- status: TODO
+- priority: P2
+- date: 2025-12-08
+
+**問題点**:
+現状、同じ情報が複数ファイルに分散している:
+1. `ISSUES_MASTER.md` にバグの詳細
+2. `docs/bug-*.md` に同じバグの詳細（重複）
+3. `REVIEW_*.md` にもバグリストあり
+
+**改善案**:
+1. **ISSUES_MASTER.md を唯一の台帳として使用** - すべてのバグ/タスク情報をここに集約
+2. **個別ファイル (bug-*.md等) は作成しない** - ISSUES_MASTERに直接追記
+3. **レビュー文書は発見のみ記録** - 詳細はISSUES_MASTERへリンク
+4. **Templates & Workflow セクションの更新** - 上記ルールを明記
+
+**エージェント向けルール追記案**:
+```
+新規課題はISSUES_MASTER.mdに直接追記する。
+個別のbug-*.md, task-*.mdファイルは作成しない。
+レビュー文書からはISSUES_MASTERへリンクで参照する。
+```

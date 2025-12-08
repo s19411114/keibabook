@@ -1,3 +1,9 @@
+# ---
+# Title: Documentation Root
+# Category: process
+# Status: guide
+# ---
+
 # docs/
 
 このディレクトリはプロジェクトの設計、運用手順、データソース、仕様、FAQなどのドキュメントを格納します。
@@ -7,12 +13,17 @@
 	- 追加テンプレート: `task_template.md`, `handover_template.md` を追加しました
 - `docs/archived/` : 解決済み、アーカイブ対象のドキュメント（履歴）
 - `docs/README.md` : このファイル（ドキュメント運用ルール）
+ - `docs/README.md` : このファイル（ドキュメント運用ルール）
+ - `docs/INDEX.md` : ドキュメントの自動インデックス（`scripts/generate_docs_index.py` で更新可能）
 - その他: `DATA_SOURCES.md`, `VENUE_GUIDE.md` などカテゴリ別のドキュメント
 
 ドキュメントのワークフロー（推奨）:
 1. 新規の設計・提案は `docs/` に `design-<short-name>.md` として作成し、先頭に `Status: draft` を記載します。
 2. バグ報告は `issues/` に `bug-<id>-title.md` を作成して `Status: open` を付与します。
 3. 修正・議論を経て `Status: resolved` または `Status: closed` になったものは `docs/scripts/archive_docs.py` を使って `docs/archived/` に移動します（手動でも可）。
+
+インデックス更新方法:
+1. `python scripts/generate_docs_index.py --confirm` を実行して `docs/INDEX.md` を更新します。
 
 ドキュメントのテンプレートやアーカイブ基準は `docs/templates/` と `docs/ARCHIVE_GUIDE.md` を参照してください。
 

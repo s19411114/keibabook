@@ -1,3 +1,9 @@
+# ---
+# Title: Active Tasks
+# Category: operations
+# Status: active
+# ---
+
 # ACTIVE_TASKS.md
 
 このファイルは現在進行中のタスク（今すぐやること、次にやること、完了）を保持します。

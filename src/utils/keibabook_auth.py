@@ -183,9 +183,15 @@ class KeibaBookAuth:
             if rows:
                 horse_count = len(rows)
             
-            # パターン2: syutubaテーブル
+            # パターン2: syutubaテーブルの行
             if horse_count == 0:
                 rows = await page.query_selector_all('table.syutuba tbody tr')
+                if rows:
+                    horse_count = len(rows)
+            
+            # パターン2b: syutuba_spテーブルの行（実際のHTML構造で使用）
+            if horse_count == 0:
+                rows = await page.query_selector_all('table.syutuba_sp tbody tr')
                 if rows:
                     horse_count = len(rows)
             
@@ -204,8 +210,22 @@ class KeibaBookAuth:
             
             logger.info(f"検出された馬の数: {horse_count}")
             
-            # 3頭以下は未ログイン
-            is_logged_in = horse_count >= 6
+            # 補助チェック: ログアウトリンクや「ログアウト」文言があるかどうか
+            logout_found = False
+            try:
+                logout_nodes = await page.query_selector_all('a[href*="logout"], a[class*="logout"], a[href*="/logout"]')
+                if logout_nodes and len(logout_nodes) > 0:
+                    logout_found = True
+                else:
+                    # ページ内のテキストに「ログアウト」があるかをチェック
+                    page_html = await page.content()
+                    if 'ログアウト' in page_html:
+                        logout_found = True
+            except Exception as e:
+                logger.debug(f"ログアウト検出中にエラー: {e}")
+
+            # 3頭以下は未ログイン。ただしログアウトリンクがあればログイン済みと判断
+            is_logged_in = (horse_count >= 6) or logout_found
             
             return is_logged_in, horse_count
             
@@ -248,8 +268,8 @@ class KeibaBookAuth:
                     with open(debug_file, 'w', encoding='utf-8') as f:
                         f.write(html)
                     logger.info(f"ログインフォームが見つからないHTMLを保存しました: {debug_file}")
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"デバッグHTML保存中の例外: {e}")
                 raise
 
             # 認証情報を入力
@@ -299,8 +319,8 @@ class KeibaBookAuth:
                             node = await page.query_selector(sel)
                             if node:
                                 selectors_found.append(sel)
-                        except Exception:
-                            pass
+                        except Exception as e:
+                            logger.debug(f"Selector検出中に例外が発生しました: {e}")
                     logger.info(f"検出されたセレクタ: {selectors_found}")
                 except Exception as e:
                     logger.error(f"ログイン失敗デバッグの保存中にエラー: {e}")
@@ -314,8 +334,8 @@ class KeibaBookAuth:
     async def ensure_authenticated(
         context: BrowserContext,
         page: Page = None,
-        login_id: str = None,
-        password: str = None,
+            login_id: str = None,
+            password: str = None,
         cookie_file: str = 'cookies.json',
         target_url: str = None
     ) -> Tuple[bool, Page]:
@@ -360,6 +380,11 @@ class KeibaBookAuth:
                     logger.warning(f"⚠️ Cookie認証失敗（{horse_count}頭のみ）")
             
             # Step 3: Cookieが無効な場合、ログインを試みる
+            # If login_id/password not provided, fallback to environment variables
+            if not login_id:
+                login_id = os.getenv('LOGIN_ID') or os.getenv('KEIBABOOK_LOGIN_ID')
+            if not password:
+                password = os.getenv('LOGIN_PASSWORD') or os.getenv('KEIBABOOK_LOGIN_PASSWORD')
             if login_id and password:
                 logger.info("認証情報でログインを試みます...")
                 success = await KeibaBookAuth.perform_login(page, login_id, password, cookie_file)
@@ -380,8 +405,8 @@ class KeibaBookAuth:
             if target_url:
                 try:
                     await page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"ターゲット遷移中にエラー: {e}")
             
             return False, page
             

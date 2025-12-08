@@ -1,3 +1,9 @@
+# ---
+# Title: Local Racing (NAR) Guide
+# Category: local-racing
+# Status: guide
+# ---
+
 # 地方競馬（NAR）対応ガイド
 
 ## 概要

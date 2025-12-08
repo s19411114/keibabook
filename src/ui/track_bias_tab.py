@@ -46,8 +46,8 @@ def render_track_bias_tab(db_manager, headless_mode=True):
                     del st.session_state.track_bias_data
                     st.rerun()
         
-        if fetch_button:
-            _fetch_netkeiba_data(selected_race_id, headless_mode, db_manager)
+            if fetch_button:
+                st.warning("この機能は keiba-ai に移行しました。Netkeiba の直接スクレイピングは main では無効化されています。")
     else:
         st.info("📝 まずtab1でレースデータをスクレイピングしてください")
     
@@ -57,44 +57,12 @@ def render_track_bias_tab(db_manager, headless_mode=True):
 
 
 def _fetch_netkeiba_data(race_id: str, headless_mode: bool, db_manager):
-    """Netkeibaからデータを取得してDBに保存"""
-    with st.spinner(f"Netkeibaからレース結果を取得中... (ID: {race_id})"):
-        try:
-            # Netkeibaスクレイパーをインポート
-            from src.scrapers.netkeiba_result import NetkeibaResultScraper
-            
-            async def fetch_and_analyze():
-                scraper = NetkeibaResultScraper(headless=headless_mode)
-                result_data = await scraper.fetch_result(race_id)
-                return result_data
-            
-            # 非同期実行
-            result_data = asyncio.run(fetch_and_analyze())
-            
-            if result_data and result_data.get('horses'):
-                st.success(f"✅ 取得完了！({len(result_data['horses'])}頭)")
-                
-                # トラックバイアスデータをDBに保存
-                if result_data.get('track_bias'):
-                    race_info = {
-                        'race_name': result_data.get('race_info', {}).get('race_name', ''),
-                        'venue': result_data.get('race_info', {}).get('venue', ''),
-                        'date': result_data.get('race_info', {}).get('date', ''),
-                        'distance': result_data.get('race_info', {}).get('distance', ''),
-                        'track_condition': result_data.get('race_info', {}).get('conditions', '')
-                    }
-                    db_manager.save_track_bias(race_id, result_data['track_bias'], race_info)
-                    st.success("💾 トラックバイアスをデータベースに保存しました")
-                
-                # セッションに保存
-                st.session_state.track_bias_data = result_data
-                st.rerun()
-            else:
-                st.error("❌ データ取得に失敗しました")
-        
-        except Exception as e:
-            st.error(f"エラー: {e}")
-            logger.error(f"Netkeiba取得エラー: {e}", exc_info=True)
+    """Netkeibaからデータを取得する機能は keiba-ai に移行済みのため無効化されています。
+
+    ここでは直接スクレイピングを行わず、ユーザーに keiba-ai で対応する旨を案内します。
+    """
+    st.info("Netkeiba のレース結果取得およびトラックバイアス分析は keiba-ai に移管されました。\n" \
+            "keiba-ai が利用可能になったらこの機能を再有効化してください。")
 
 
 def _display_track_bias(data: dict):

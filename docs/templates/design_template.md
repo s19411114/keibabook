@@ -1,5 +1,7 @@
 ---
 Title: <短いタイトル>
+Category: design
+Owner: <所属/担当者>
 Author: <作者名>
 Date: <YYYY-MM-DD>
 Status: draft

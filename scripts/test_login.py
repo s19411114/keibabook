@@ -117,6 +117,13 @@ async def test_login_with_cookies():
                         horse_count = len(horse_rows)
                         print(f"   🐴 syutuba形式: {horse_count}頭")
                 
+                # パターン2b: syutuba_spテーブルの行（実際のHTML構造で使用）
+                if horse_count == 0:
+                    horse_rows = await page.query_selector_all('table.syutuba_sp tbody tr')
+                    if horse_rows:
+                        horse_count = len(horse_rows)
+                        print(f"   🐴 syutuba_sp形式: {horse_count}頭")
+                
                 # パターン3: 馬名リンクを数える
                 if horse_count == 0:
                     horse_links = await page.query_selector_all('a[href*="/uma/"]')

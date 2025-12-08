@@ -1,5 +1,7 @@
 ---
 Title: Implementation Plan: <short-title>
+Category: implementation
+Owner: <担当者>
 Author: <name>
 Date: <YYYY-MM-DD>
 Status: draft

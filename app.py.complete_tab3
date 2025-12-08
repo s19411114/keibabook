@@ -614,24 +614,7 @@ with tab3:
         race_id = race_id_match.group(1)
         
         with st.spinner(f"レース結果を取得中... (ID: {race_id})"):
-            # Netkeibaスクレイパーをインポート
-            from src.scrapers.netkeiba_result import NetkeibaResultScraper
-            
-            async def fetch_and_analyze():
-                scraper = NetkeibaResultScraper(headless=headless_mode)
-                result_data = await scraper.fetch_result(race_id)
-                return result_data
-            
-            # 非同期実行
-            result_data = asyncio.run(fetch_and_analyze())
-            
-            if result_data and result_data.get('horses'):
-                st.success(f"✅ 取得完了！ ({len(result_data['horses'])}頭)")
-                
-                # セッションに保存
-                st.session_state.track_bias_data = result_data
-            else:
-                st.error("❌ データ取得に失敗しました")
+            st.warning("この機能は keiba-ai に移行しました。Netkeiba 結果の直接取得は main では無効化されています。")
     
     # トラックバイアス指数を表示
     if 'track_bias_data' in st.session_state and st.session_state.track_bias_data:

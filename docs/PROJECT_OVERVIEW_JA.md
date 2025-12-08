@@ -1,3 +1,9 @@
+# ---
+# Title: Project Overview (JA)
+# Category: overview
+# Status: guide
+# ---
+
 # プロジェクト概要（日本語）
 
 このドキュメントは、repo の主要ファイルの置き場所と最重要ファイル（requirements.txt など）について簡潔に説明します。

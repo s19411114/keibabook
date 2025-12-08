@@ -99,7 +99,8 @@ class KeibaBookLogin:
                                 return True
                         except Exception:
                             continue
-        except Exception:
+        except Exception as e:
+            logger.debug(f"Cookie expiry check エラー: {e}")
             return True
         return False
 

@@ -1,3 +1,9 @@
+# ---
+# Title: Document Archive Guide
+# Category: process
+# Status: guide
+# ---
+
 # ドキュメント・アーカイブ ガイドライン
 
 このファイルは、ドキュメントやバグレポートのアーカイブ手順を示します。
