@@ -1,6 +1,3 @@
-# MIGRATION COPY: src/scrapers/netkeiba_result.py
-# Origin: keibabook
-
 """
 Netkeiba結果ページスクレイパー
 レース結果とトラックバイアス分析用データを取得
