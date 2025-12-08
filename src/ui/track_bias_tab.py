@@ -1,12 +1,11 @@
 """
-トラックバイアス分析タブ
-Netkeibaから結果データを取得してトラックバイアスを分析
-"""
-import asyncio
-import streamlit as st
-from src.utils.logger import get_logger
+Keibabook UI placeholder for Track Bias Tab
 
-logger = get_logger(__name__)
+NOTE: This UI tab has been moved to keiba-ai migration. The full implementation
+was copied to `migration/to_keiba_ai/src/ui/track_bias_tab.py`. This module is a
+minimal shim to keep `import` compatibility and show a message in the UI.
+"""
+import streamlit as st
 
 
 def render_track_bias_tab(db_manager, headless_mode=True):
@@ -17,16 +16,19 @@ def render_track_bias_tab(db_manager, headless_mode=True):
         db_manager: DBマネージャーインスタンス
         headless_mode: ヘッドレスモードでブラウザを起動するか
     """
-    st.header("🏇 トラックバイアス分析")
-    st.markdown("保存済みレースの結果データを取得してトラックバイアスを分析します")
+    st.header("🏇 トラックバイアス分析 (移行済)")
+    st.info("このタブは keiba-ai に移管されました。詳細と履歴は migration/to_keiba_ai を参照してください。")
     
     # トラックバイアス履歴をアーカイブ表示
     _display_track_bias_archive(db_manager)
     
     st.markdown("---")
     
-    # 保存済みレース一覧から選択
-    race_ids = db_manager.get_race_ids()
+    # 保存済みレース一覧は保持するが、直接の取得は無効化
+    try:
+        race_ids = db_manager.get_race_ids()
+    except Exception:
+        race_ids = []
     
     if race_ids:
         selected_race_id = st.selectbox(
@@ -51,9 +53,8 @@ def render_track_bias_tab(db_manager, headless_mode=True):
     else:
         st.info("📝 まずtab1でレースデータをスクレイピングしてください")
     
-    # トラックバイアス指数を表示
-    if 'track_bias_data' in st.session_state and st.session_state.track_bias_data:
-        _display_track_bias(st.session_state.track_bias_data)
+    st.markdown("---")
+    st.write("トラックバイアスの取得と解析は keiba-ai に移行されました。GUI の再度有効化は移行完了後に検討してください。")
 
 
 def _fetch_netkeiba_data(race_id: str, headless_mode: bool, db_manager):
