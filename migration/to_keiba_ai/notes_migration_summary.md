@@ -6,6 +6,7 @@ Generated: 2025-12-08
 - `src/scrapers/netkeiba_result.py` → migration/to_keiba_ai/src/scrapers/netkeiba_result.py
 - `src/scrapers/netkeiba_db_scraper.py` → migration/to_keiba_ai/src/scrapers/netkeiba_db_scraper.py
 - `src/utils/track_bias.py` → migration/to_keiba_ai/src/utils/track_bias.py
+- `src/ui/track_bias_tab.py` → migration/to_keiba_ai/src/ui/track_bias_tab.py
 - Pedigree ingestion and batch harvesting:
   - run_pedigree.py, run_pedigree_safe.py
   - pedigree_queue.json, pedigree_queue_small.json
