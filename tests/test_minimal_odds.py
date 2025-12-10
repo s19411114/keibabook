@@ -1,7 +1,7 @@
 import datetime
 import json
 from src.scrapers.odds_fetcher import OddsFetcher
-from scripts.cli_minimal_odds import compare_snapshots
+from src.utils.odds_utils import compare_snapshots
 
 
 def test_compare_snapshots_simple():

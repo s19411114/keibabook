@@ -8,7 +8,11 @@ import yaml
 from pathlib import Path
 sys.path.insert(0, 'src')
 
+import pytest
 from scrapers.keibabook import KeibaBookScraper
+
+# Interactive / long-running test: skip in automated test runs
+pytestmark = pytest.mark.skip(reason="Interactive network test; skip in CI")
 
 async def test_japan_cup():
     # 設定ファイル読み込み

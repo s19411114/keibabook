@@ -2,7 +2,7 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-def aggregate_individual_comments(horses, stable_comment_data, previous_race_comment_data, training_data, point_data, tag_sources: bool = False):
+def aggregate_individual_comments(horses, stable_comment_data, previous_race_comment_data, training_data, point_data=None, tag_sources: bool = False):
     """
     Combine comments from shutuba/training/stable/previous/point pages into individual_comment.
     Avoid duplicate comment fragments while preserving order. Optionally tag comment sources.

@@ -1,3 +1,6 @@
+Category: Issue
+Status: Active
+
 # KeibaBook Scraper パフォーマンス問題分析レポート
 
 **作成日**: 2025年11月25日  
@@ -26,17 +29,8 @@ wait_seconds = min(10 * (attempt + 1), 30)  # 最大30秒
 
 ---
 
-### 2. Docker環境でのPlaywright起動オーバーヘッド
-**ファイル**: `src/scrapers/keibabook.py` (行499-506), `Dockerfile`
-
-**問題点**:
-- Docker内でChromiumの初回起動に時間がかかる
-- WSL2経由のファイルI/Oが遅い（特にボリュームマウント時）
-- `mcr.microsoft.com/playwright/focal` イメージはPlaywrightがプリインストールされていないため、毎回`pip install`が走る
-
-**修正案**:
-- `Dockerfile`でPlaywright Chromiumをプリインストール済みのイメージを使用
-- または `--network=host` でDNS解決を高速化
+### 2. コンテナ（Docker）関連の注記
+Dockerによる再現は非推奨です。ホスト環境（`.venv`）での再現手順を推奨します。WSL固有の I/O 遅延や共有マウントの問題がある場合、WSL 設定（`.wslconfig`のメモリ増/スワップ増）やホスト実行での再現を推奨します。
 
 ---
 
@@ -149,26 +143,16 @@ await asyncio.sleep(wait_seconds)  # レース発走まで待機
 
 ---
 
-## 🛠 推奨Docker実行コマンド
+## 🛠 実行コマンド（推奨）
+Docker 実行例は削除されました（非推奨）。ホスト環境での再現手順を使用してください。
 
-現在の問題のあるコマンド:
 ```bash
-docker run --rm -it -v "$(pwd)":/app -w /app mcr.microsoft.com/playwright/focal \
-  /bin/bash -lc "python -m pip install -r requirements.txt && time python scripts/run_single_race.py ..."
-```
-
-改善後のコマンド（Dockerfileでビルドしたイメージを使用）:
-```bash
-docker-compose run --rm app python scripts/run_single_race.py --venue 浦和 --race 9 --skip-debug-files --rate 0.5
-```
-
-または、WSL2内で直接実行（Docker不要）:
-```bash
-cd /mnt/c/GeminiCLI/TEST/keibabook
+cd /path/to/keibabook
+python3 -m venv .venv
 source .venv/bin/activate
+pip install -r requirements.txt
 python scripts/run_single_race.py --venue 浦和 --race 9 --skip-debug-files
 ```
-
 ---
 
 ## 📊 期待される改善効果

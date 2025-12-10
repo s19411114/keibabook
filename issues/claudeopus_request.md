@@ -1,3 +1,6 @@
+Category: Issue
+Status: Active
+
 # ClaudeOpus Review Request — KeibaBook Scraper
 
 SHORT SUMMARY
@@ -6,17 +9,19 @@ SHORT SUMMARY
 ENVIRONMENT
 - Repo path: `C:\GeminiCLI\TEST\keibabook`
 - Python 3.12+ (workspace uses 3.14) and Playwright (Chromium)
-- Optionally runs inside Docker using `mcr.microsoft.com/playwright/focal` image
+- **Deprecated**: Containerized/Docker runs are not recommended; please use host `.venv`-based run instead.
 - Common test commands:
   - Host (PowerShell):
     ```powershell
     $env:PYTHONPATH='C:\GeminiCLI\TEST\keibabook';
     Measure-Command { C:/path/to/python.exe scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-dup --full --skip-debug-files }
     ```
-  - Docker (Linux):
+  - Host (Linux) example:
     ```sh
-    docker run --rm -it -v "$(pwd)":/app -w /app mcr.microsoft.com/playwright/focal \
-      /bin/bash -lc "python -m pip install -r requirements.txt && time python scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-dup --full --skip-debug-files"
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    time python scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-dup --full --skip-debug-files
     ```
 
 KEY FILES TO REVIEW
@@ -42,22 +47,22 @@ SUSPECTED PROBLEM AREAS (TO VERIFY)
 CHECKLIST & REPRO STEPS
 1. Confirm running process and which script caused long execution:
    - Host: `Get-Process python` (PowerShell)
-   - Docker: `docker ps`, `docker logs <id> --tail 200` and `docker stats <id>`
-2. Run single-run perf test (Host & Docker) using the commands above; measure start-to-finish and `PERF` logs.
+   - Host: Use `top`, `dmesg`, `journalctl` and `ps` for diagnostics; attach `debug_*` files.
+2. Run single-run perf test on Host (Host only) using the commands above; measure start-to-finish and `PERF` logs.
 3. Collect debug artifacts created by the run:
    - `debug_fetches_<race_key>.json` (per-fetch details)
    - `debug_page_<race_key>.html` (last fetched page HTML)
    - `data/` folder last-modified files list
 4. Examine `debug_fetches_<race_key>.json` for slow/failed fetches (status, goto_ms, content_ms, total_ms) and for 429 frequency
 5. Check whether multiple browser launches are happening per run or browser is reused across multiple fetches
-6. If Docker performance is suspected, run the same command on host and inside Docker to check the timing differences
+6. If containerized performance is suspected (deprecated), run the same command on the host to check timing differences; container runs are not recommended.
 7. For `run_pedigree.py` / `run_pedigree_safe.py`, compute the queue size in `pedigree_queue*.json` and estimate run time at current rate limiter settings
 
 LOGS & ARTIFACTS TO ATTACH
 - `debug_fetches_<race_key>.json` (if present) — per-fetch JSON with timing and HTTP status
 - `debug_page_<race_key>.html` — the last page fetched for the race, if exists
 - `data/` last 20 files (list and timestamps)
-- `docker logs` output and `docker stats` summary (if Container used)
+- Host logs output (`top`, `dmesg`) and `debug_*` summary (if Container used, attach logs separately — containerized runs are deprecated)
 - copy of `settings.yml` and the command used to run the script
 - optional: `pedigree_queue.json` (or small) if `run_pedigree*` was executed
 

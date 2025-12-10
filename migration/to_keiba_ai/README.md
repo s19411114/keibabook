@@ -13,5 +13,6 @@ What's here:
 Notes:
 - Files are copied here for review; the originals in the keibabook repo remain unchanged for now.
 - After review and approval, these files should be moved into the keiba-ai repo and removed from keibabook where appropriate.
+ - `UpsetDetector`: The UpsetDetector implementation has been copied here (see `src/utils/upset_detector.py`). The keibabook repository retains a shim that logs a deprecation message and returns an empty result set; full logic now lives in this migration folder for adoption in keiba-ai.
 
 Contact: s19411114 (repo owner)

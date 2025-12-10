@@ -1,3 +1,6 @@
+Category: Operational
+Status: Active
+
 # 競馬ブック スクレイパー プロジェクトログ
 
 ## 1. プロジェクト目標
@@ -137,5 +140,12 @@ AIによる競馬予測の精度を向上させるため、以下の情報重要
 - Archived /home/u/projects/TEST/keibabook/start_streamlit_powershell.ps1 as archived-20251207T144106Z-start_streamlit_powershell.ps1 at 20251207T144106ZZ
 
 - Archived /home/u/projects/TEST/keibabook/create_browser_shortcut.bat as archived-20251207T144106Z-create_browser_shortcut.bat at 20251207T144106ZZ
+ 
+ - Archived /home/u/projects/TEST/keibabook/issues/HANDOVER_CLAUDE_HAIKU.md as docs/archived/archived-HANDOVER_CLAUDE_HAIKU.md at 2025-12-10
+ - Archived /home/u/projects/TEST/keibabook/issues/OPUS_HAIKU_HANDOVER.md as docs/archived/archived-OPUS_HAIKU_HANDOVER.md at 2025-12-10
 
 - Archived /home/u/projects/TEST/keibabook/.wslconfig.example as archived-20251207T144107Z-.wslconfig.example at 20251207T144107ZZ
+
+- Archived issue 'IMPROVE/migration-bak-cleanup: migration/backups の .bak ファイル' -> completed_issues.md at 20251208T052700ZZ
+
+- Archived issue 'BUG/unused-base-url: `keibabook.py` の base_url 重複計算' -> completed_issues.md at 20251208T052700ZZ

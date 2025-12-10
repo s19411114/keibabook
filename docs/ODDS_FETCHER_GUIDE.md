@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # オッズ取得機能ガイド
 
 ## 概要
@@ -163,4 +166,3 @@ await rate_limiter.wait(randomize=True)  # ランダム要素あり
 - 南関東競馬公式サイトのURLは実際のURLに置き換えが必要です
 - HTML構造に応じてパーサーを調整してください
 - レート制御を適切に設定して、サイト負担を軽減してください
-

@@ -1,0 +1,12 @@
+[Unit]
+Description=KeibaBook Memory Watchdog (development)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/u/ドキュメント/GeminiCLI/TEST/keibabook/scripts/watchdog_mem.py --system-threshold 85 --max-kill 2 --interval 10
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -1,14 +1,14 @@
 """
-Keibabook UI placeholder for Track Bias Tab
-
-NOTE: This UI tab has been moved to keiba-ai migration. The full implementation
-was copied to `migration/to_keiba_ai/src/ui/track_bias_tab.py`. This module is a
-minimal shim to keep `import` compatibility and show a message in the UI.
+ARCHIVED: src/ui/track_bias_tab.py (Streamlit UI)
+This module was replaced by a keiba-ai implementation and the NiceGUI UI.
+It remains for historical/reference purposes only.
 """
-import streamlit as st
+from src.utils.logger import get_logger
 
+logger = get_logger(__name__)
 
-def render_track_bias_tab(db_manager, headless_mode=True):
+def render_track_bias_tab(*args, **kwargs):
+    logger.warning("src/ui/track_bias_tab.py is archived. Use keiba-ai or NiceGUI implementation.")
     """
     トラックバイアス分析タブを描画
     

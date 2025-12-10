@@ -1,23 +1,13 @@
 """
-調教早見表タブ
-調教データを評価して表示
+ARCHIVED: src/ui/training_evaluation_tab.py (Streamlit UI)
+This Streamlit-based module was archived after migration to NiceGUI and keiba-ai.
 """
-import streamlit as st
-import pandas as pd
-from pathlib import Path
-import json
-from datetime import datetime
 from src.utils.logger import get_logger
-from src.utils.training_evaluation import (
-    evaluate_all_horses_training,
-    get_oikiri_adjustment,
-    format_training_evaluation
-)
 
 logger = get_logger(__name__)
 
-
-def render_training_evaluation_tab():
+def render_training_evaluation_tab(*args, **kwargs):
+    logger.warning("src/ui/training_evaluation_tab.py is archived. Use NiceGUI/keiba-ai for training evaluation.")
     """調教早見表タブの描画"""
     st.header("🏇 調教早見表")
     

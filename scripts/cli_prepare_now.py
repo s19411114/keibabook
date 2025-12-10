@@ -10,7 +10,6 @@ from src.scrapers.jra_odds import JRAOddsFetcher
 from src.utils.db_manager import CSVDBManager
 from src.utils.recommender import HorseRecommender
 from src.utils.horse_ranker import HorseRanker
-from src.utils.upset_detector import UpsetDetector
 from src.utils.schedule_utils import get_next_race_number
 from src.scrapers.netkeiba_calendar import NetkeibaCalendarFetcher
 from src.scrapers.keiba_today import KeibaTodayFetcher
@@ -135,7 +134,6 @@ async def main(target_venue: str = None, fast: bool = False, headful: bool = Fal
     # quick analysis
     recommender = HorseRecommender(dbm)
     ranker = HorseRanker()
-    upset = UpsetDetector()
     ranked = ranker.rank_horses(scraped)
     print('Top ranked horses:')
     for r in ranked[:5]:

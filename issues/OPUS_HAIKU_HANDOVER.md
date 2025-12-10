@@ -1,3 +1,8 @@
+Category: Issue
+Status: Active
+
+> **ARCHIVED**: このファイルは docs/archived/archived-OPUS_HAIKU_HANDOVER.md に移動されました。今後はこちらを参照してください。
+
 # Opus & Haiku Handover — KeibaBook Scraper
 
 ## 目的
@@ -7,7 +12,7 @@ Opus と Haiku 向けの作業引継ぎファイルです。現状の問題、�
 
 ## 現状サマリ（短く）
 - 問題: 1レースのスクレイプが極端に遅く（数時間に達する）なるケースがあり、4+時間の報告あり
-- 修正済み: 429バックオフの上限短縮、RateLimiter のレンジ調整（1–2秒）、Docker イメージ改善、会場名の正規化、テスト修正。
+- 修正済み: 429バックオフの上限短縮、RateLimiter のレンジ調整（1–2秒）、会場名の正規化、テスト修正。
 - 検証済み: 主要ユニットテスト 24 件パス（`pytest` 非スローグループ）。
 - 未解決: 実行環境（Docker vs ホスト）ごとのパフォーマンス差、run_pedigree の長時間処理、429 頻度と並列制御の最適化。
 
@@ -15,10 +20,10 @@ Opus と Haiku 向けの作業引継ぎファイルです。現状の問題、�
 
 ## 重要アーティファクト（すぐ見るもの）
 - `issues/PERFORMANCE_ANALYSIS.md` — 詳細分析
-- `issues/HANDOVER_TASKS.md` — 大きな改善タスク
+- `docs/archived/archived-HANDOVER_TASKS.md` — 大きな改善タスク
 - `issues/claudeopus_bundle.md`、`issues/claudeopus_request.md` — もともとの review bundle
 - `issues/attachments/keibabook_sample_logs.zip` — サンプルログ
-- 新規: `issues/OPUS_HAIKU_HANDOVER.md`（このファイル）
+- 新規: `docs/archived/archived-OPUS_HAIKU_HANDOVER.md`（このファイルのアーカイブ版）
 
 ---
 
@@ -42,20 +47,9 @@ Measure-Command { C:/path/to/python.exe scripts/run_single_race.py --venue 浦�
 
 ---
 
-## 再現手順（Docker）
-1. Docker イメージのビルド（Playwright 公式イメージベースに修正済み）:
+> **注意**: Docker 実行手順は削除されました（非推奨）。ホスト上の `.venv` を用いて再現してください（`python -m venv .venv; source .venv/bin/activate; pip install -r requirements.txt` など）。
 
-```powershell
-docker-compose build --no-cache app
-```
 
-2. Docker での実行:
-
-```powershell
-docker-compose run --rm app python scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-dup --full --skip-debug-files
-```
-
-- 実行する際に `--skip-debug-files` を外すと `debug_page_<race_key>.html` や `debug_fetches_<race_key>.json` が出るため、これらを ZIP にして添付してください。
 
 ---
 
@@ -63,18 +57,18 @@ docker-compose run --rm app python scripts/run_single_race.py --venue 浦和 --r
 - `debug_fetches_<race_key>.json`  — すべてのフェッチのタイムスタンプ、HTTP ステータス、goto_ms, content_ms
 - `debug_page_<race_key>.html` — 最後に取得したページ HTML
 - `data/<race_id>/*` — 出力 JSON
-- Docker の `docker logs` および `docker stats`（もし Docker で実行した場合）
+- 実行時のホストログ（`top`/`dmesg` 等）と `debug_*` ファイルを添付してください。
 - `settings.yml` の実行時値
 
 ---
 
 ## 優先タスク（Opus と Haiku 向け）
-1. まず**再現**: ホスト / Docker 両方で 1 レースの実行を行い、それぞれの所要時間と `debug_fetches` を比較（優先）
+1. まず**再現**: ホスト（`.venv`）で 1 レースの実行を行い、所要時間と `debug_fetches` を比較してください（優先）
 2. 429 分析: `debug_fetches` で 429 の発生頻度と対象 URL（pedigree, point, horse detail 等）を特定。429 が多いなら、手短に次の方針のうちどれが良いか検討してください:
    - 同一ドメインの 1-2 秒待機を維持、並列数を下げる
    - リトライ回数を減らし、バックオフ最大を 10-30 秒に留める
 3. `run_pedigree.py` を `aiohttp` ベースで並列化（CONCURRENCY=3 推奨）
-4. Docker での I/O と mount の最適化（`:delegated`、`/app/data` を docker volume に）
+4. コンテナ化に関する古いメモ（削除/非推奨）。ホスト実行を推奨します。
 5. RateLimiter のテスト（`pytest` に `tests/test_rate_limiter.py` を追加する）
 
 ---

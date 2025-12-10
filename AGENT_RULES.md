@@ -1,3 +1,6 @@
+Category: Operational
+Status: Active
+
 # 🤖 AIエージェント向け作業ルール
 
 ## ⚠️ 絶対に守るべきルール
@@ -8,19 +11,19 @@
 
 | 項目 | 値 |
 |------|------|
-| 作業ディレクトリ | `C:\GeminiCLI\TEST\keibabook` |
+| 作業ディレクトリ | `~/keibabook` またはワークスペースルート |
 | Python環境 | `.venv` (Python 3.12) |
-| エディタ | VS Code (Windows) |
+| エディタ | VS Code (Remote WSL/WSL2 推奨) |
 
 > ❌ **禁止**: WSL・Docker の使用
 
 ### 2. 作業開始時の確認コマンド
 
-```powershell
+```bash
 # 必ず最初に実行
-pwd  # C:\GeminiCLI\TEST\keibabook であることを確認
-.\.venv\Scripts\Activate.ps1
-Get-Command python | Select-Object -ExpandProperty Source  # .venv内のPythonが表示されるべき
+pwd  # ワークスペースルートであることを確認
+source .venv/bin/activate
+which python  # .venvのpythonが表示されるべき
 ```
 
 ### 3. 禁止事項
@@ -39,7 +42,7 @@ Get-Command python | Select-Object -ExpandProperty Source  # .venv内のPython�
 - `docs/MULTI_SOURCE_STRATEGY.md` - データ取得戦略
 - `docs/*.md` - すべてのドキュメント
 - `README.md`, `WORKFLOW.md`, `HANDOVER.md`
-- `issues/HANDOVER_CLAUDE_HAIKU.md` - 過去の開発履歴と参考URL
+- `docs/archived/archived-HANDOVER_CLAUDE_HAIKU.md` - 過去の開発履歴と参考URL（アーカイブ）
 
 **設定・認証:**
 - `.vscode/settings.json` - VS Code設定
@@ -80,31 +83,31 @@ C:\GeminiCLI\TEST\keibabook\
 
 ### スクレイピング
 
-```powershell
-cd C:\GeminiCLI\TEST\keibabook
-.\.venv\Scripts\Activate.ps1
+```bash
+cd ~/keibabook
+source .venv/bin/activate
 python run_scraper.py
 ```
 
 ### Streamlit起動
 
-```powershell
-cd C:\GeminiCLI\TEST\keibabook
-.\.venv\Scripts\Activate.ps1
-streamlit run app.py
+```bash
+cd ~/keibabook
+source .venv/bin/activate
+python -m app_nicegui
 ```
 
 または起動スクリプト:
 ```powershell
-.\scripts\start_streamlit_win.ps1
+./scripts/run_nicegui.sh
 ```
 
 ### テスト実行
 
-```powershell
-cd C:\GeminiCLI\TEST\keibabook
-.\.venv\Scripts\Activate.ps1
-pytest tests\
+```bash
+cd ~/keibabook
+source .venv/bin/activate
+pytest tests/
 ```
 
 ### 依存関係の更新
@@ -132,7 +135,12 @@ playwright install chromium
 ## 📌 ドキュメント運用ルール（重要）
 1. すべてのバグ報告・タスク・設計変更・改善提案は `docs/ISSUES_MASTER.md` に記載してください。
 2. 新しい課題を追加する場合は `カテゴリ/短い見出し` を先頭にし、`reporter:` `status:` `priority:` を明記してください。
-3. 完了した課題は `scripts/archive_doc.py --move docs/ISSUES_MASTER.md` または `scripts/archive_doc.py --move <file>` を使って `docs/archived/` に移動してください。プロジェクトログは自動更新されます。
+3. 完了した課題は `scripts/extract_completed_from_issues_master.py` を使用して個別セクションとして抽出・アーカイブしてください。既定では完了タスクは `docs/archived/completed_issues.md` にまとめて追記されます。個別ファイル化する場合は `--separate` オプションを指定してください。手順:
+	 1. `python scripts/extract_completed_from_issues_master.py`（dry-run; 検出結果を表示します）
+	 2. `python scripts/extract_completed_from_issues_master.py --confirm`（検出された完了セクションを `docs/archived/issues_master` に移し、`PROJECT_LOG.md` に追記）
+	 3. 重要な決定や移行理由は `PROJECT_LOG.md` に書き残してください。
+  
+    - CI: `Weekly Archive Dry-Run` workflow runs weekly and opens an issue when it detects completed sections. Review the issue and run the `Manual Archive` workflow via the Actions page to perform `--confirm`.
 4. `implementation_plan.md.resolved` の内容は `docs/ISSUES_MASTER.md` にマージされ、過去の計画は `docs/archived/` に移してください。
 ```
 

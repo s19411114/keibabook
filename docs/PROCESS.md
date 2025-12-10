@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # ---
 # Title: Documentation Process
 # Category: process

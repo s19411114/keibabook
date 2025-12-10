@@ -239,7 +239,8 @@ class CSVDBManager:
         try:
             df = pd.read_csv(self.url_log_path, encoding='utf-8-sig')
             # 出馬表ページで成功したもののみを対象
-            rows = df[(df['race_id'] == race_id) & (df['page_type'] == 'shutuba') & (df['status'] == 'success')]
+            # race_id 列は数値で保存されることがあるため、比較は文字列に変換して行う
+            rows = df[(df['race_id'].astype(str) == str(race_id)) & (df['page_type'] == 'shutuba') & (df['status'] == 'success')]
             if len(rows) == 0:
                 return False
             if max_age_seconds is None or max_age_seconds == 0:

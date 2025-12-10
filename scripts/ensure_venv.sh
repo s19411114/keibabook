@@ -30,4 +30,4 @@ if [ -f requirements.txt ]; then
   python -m pip install -r requirements.txt
 fi
 
-echo "Created .venv and installed dependencies. Activate it with: source .venv/bin/activate"
+echo "Created .venv and installed dependencies. Activate it with: source .venv/bin/activate (or open a new VS Code integrated terminal — it auto-activates .venv)."

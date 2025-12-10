@@ -1,3 +1,6 @@
+Category: Issue
+Status: Active
+
 # ClaudeOpus Full Summary — KeibaBook Scraper
 
 This file consolidates the key information for external review (perf, behavior, tests, PR and reproduction instructions).
@@ -39,11 +42,7 @@ This file consolidates the key information for external review (perf, behavior, 
   $env:PYTHONPATH='C:\GeminiCLI\TEST\keibabook';
   Measure-Command { C:/path/to/python.exe scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-dup --full --skip-debug-files }
   ```
-- Docker (Linux):
-  ```sh
-  docker run --rm -it -v "$(pwd)":/app -w /app mcr.microsoft.com/playwright/focal \
-    /bin/bash -lc "python -m pip install -r requirements.txt && time python scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-dup --full --skip-debug-files"
-  ```
+- Docker: 削除（非推奨）。代わりにホスト上での再現手順を実行してください。 See: `cd /path/to/keibabook; python3 -m venv .venv; source .venv/bin/activate; pip install -r requirements.txt; python scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-debug-files`
 - Docker limited resources to test: add `--cpus` and `--memory` flags
 
 6) Logs to attach for review

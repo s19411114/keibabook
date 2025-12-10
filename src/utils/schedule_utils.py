@@ -30,7 +30,12 @@ def get_next_race_number(schedule: List[Dict], venue_name: str, now: datetime.da
                     continue
                 try:
                     hh, mm = map(int, t.split(':'))
+                    # Construct candidate datetime for race; handle potential next-day races
                     race_dt = datetime.datetime(now.year, now.month, now.day, hh, mm)
+                    # If race time appears to be for the next day (e.g., now 23:50 and race at 00:10),
+                    # treat times more than 12 hours in the past as next-day races.
+                    if race_dt < (now - datetime.timedelta(hours=12)):
+                        race_dt = race_dt + datetime.timedelta(days=1)
                     # If race time is after now - buffer, it's a candidate
                     if race_dt >= (now - datetime.timedelta(minutes=buffer_minutes)):
                         return r.get('race_num')

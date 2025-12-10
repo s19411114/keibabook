@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # 調教タイム差に関する参考情報
 
 ⚠️ **削除禁止** - 調教タイム換算の根拠資料

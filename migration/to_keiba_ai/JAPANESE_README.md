@@ -29,3 +29,15 @@
 バックアップ: 移管前に一時的なバックアップを作成してください（`scripts/backup_repo.sh` を作成済み）。
 
 問い合わせ先: リポジトリ管理者
+
+---
+## アーカイブ索引の生成と NiceGUI での閲覧
+このリポジトリにはアーカイブ索引生成スクリプト `scripts/generate_migration_index.py` を置いています。
+生成方法:
+```
+python scripts/generate_migration_index.py
+```
+生成される `migration/ARCHIVE_INDEX.md` は NiceGUI プロトタイプ（`app_nicegui.py`）にて「📚 アーカイブ表示」ボタンで読み込めます。NiceGUI を起動したら、左のサイドバーで「📚 アーカイブ表示」をクリックしてください。
+
+アーカイブ索引にはファイルパス、サイズ、更新日時、SHA1（内容チェック用）を含みます。
+

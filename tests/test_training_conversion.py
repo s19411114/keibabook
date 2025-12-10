@@ -4,12 +4,14 @@
 """
 import asyncio
 import json
+import pytest
 from src.utils.config import load_settings
 from src.scrapers.keibabook import KeibaBookScraper
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+@pytest.mark.skip(reason="Interactive browser test; skip in CI")
 async def test_training_data():
     """調教データを取得してタイム変換をテスト"""
     

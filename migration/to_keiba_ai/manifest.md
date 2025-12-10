@@ -9,6 +9,7 @@ This manifest lists files and folders selected for migration to the keiba-ai pro
 
 ## Analytics and batch processing
 - src/utils/track_bias.py — Track bias computation and helpers
+ - src/utils/upset_detector.py — UpsetDetector (migration: move to keiba-ai for upset/穴馬 detection)
 - run_pedigree.py — Batch pedigree downloader (long-running, heavy)
 - run_pedigree_safe.py — Safe variant for pedigree harvesting
 - pedigree_queue.json — Example queue for pedigree processing
@@ -25,8 +26,8 @@ This manifest lists files and folders selected for migration to the keiba-ai pro
 ## Documentation & Issues (hand-over related)
 - docs/DATA_SOURCES.md — update to indicate Netkeiba historical sources move
 - docs/DATA_STRATEGY.md — update to indicate Netkeiba DB migration
-- issues/OPUS_HAIKU_HANDOVER.md — long-running scripts & run_pedigree discussions
-- issues/HANDOVER_TASKS.md — run_pedigree async tasks
+- docs/archived/archived-OPUS_HAIKU_HANDOVER.md — long-running scripts & run_pedigree discussions
+- docs/archived/archived-HANDOVER_TASKS.md — run_pedigree async tasks
 - issues/claudeopus_full_summary.md — analysis referencing historical batch jobs
 
 ## Notes and rationale

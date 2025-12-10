@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # AIエージェント向けオンボーディング（AGENT_ONBOARDING.md）
 # ---
 # Title: Agent Onboarding

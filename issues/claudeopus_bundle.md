@@ -1,3 +1,6 @@
+Category: Issue
+Status: Active
+
 # ClaudeOpus Bundle: KeibaBook Scraper — Single Attachment
 
 This bundle consolidates the essential materials to hand off to an external reviewer (e.g., ClaudeOpus): summary, reproduction steps, and a sample log archive.
@@ -14,7 +17,7 @@ How to use this bundle
    - `unzip issues/attachments/keibabook_sample_logs.zip -d /tmp/keibabook_sample_logs`
 4. Run the reproduction command given in the summary and compare timing:
    - Host: `Measure-Command { ... scripts/run_single_race.py --venue 浦和 --race 9 --perf --skip-dup --full --skip-debug-files }`
-   - Docker: `docker run ... mcr.microsoft.com/playwright/focal ...`
+   - Docker: 削除（非推奨）。代わりにホスト上の `.venv` で実行してください。
 
 What else to provide to get the best advice
 - Attach in PR or provide links to: `debug_fetches_<race_key>.json` and `debug_page_<race_key>.html` for the actual slow run if available (these were not present in local repo snapshot).

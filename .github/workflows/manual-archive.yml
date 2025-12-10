@@ -1,0 +1,33 @@
+name: Manual Archive
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Confirm archive operation'
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
+
+jobs:
+  manual-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Run confirm archive (if confirmed)
+        if: ${{ github.event.inputs.confirm == 'yes' }}
+        run: |
+          python3 scripts/extract_completed_from_issues_master.py --confirm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Dry-run (no confirm)
+        if: ${{ github.event.inputs.confirm != 'yes' }}
+        run: |
+          python3 scripts/extract_completed_from_issues_master.py

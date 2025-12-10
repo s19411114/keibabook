@@ -14,13 +14,11 @@
 
 【中央競馬専用】
 - CPU予想: レーティング、スピード指数、調教印、血統印
-- ギリギリ情報（重賞）: 馬体重変動、パドック評価、直前コメント
-- 特集ページ（重賞）: 傾向分析、血統傾向、本命・対抗・穴馬
+- 特集ページ（重賞）: 見出し/自由ラベル/テキスト（傾向/血統/本命・対抗は専用データソース/AIで扱います）
 - AI指数
 
 【地方競馬専用】
-- ポイント: 大穴馬、激走馬、AI血統予想、パワー馬場向き馬
-- 特定の馬のコメント（穴馬のヒント）
+（※ 地方競馬のポイント情報（主に11/12R）は収集対象です。穴馬の独自判定は行わず、ポイントは提供されるローカル情報をそのまま出力します）
 
 【レース後】
 - レース結果: 着順、タイム、着差、通過順位、上がり3F
@@ -93,19 +91,7 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             lines.append(f"\n**サマリー**: {cpu_data['summary']['comment']}")
         lines.append("")
     
-    # ===== 中央競馬専用: ギリギリ情報（重賞） =====
-    girigiri_data = race_data.get('girigiri_info', {})
-    if girigiri_data:
-        lines.append("## ギリギリ情報（直前情報）")
-        if girigiri_data.get('overall_comment'):
-            lines.append(f"- 全体コメント: {girigiri_data['overall_comment']}")
-        if girigiri_data.get('paddock_comment'):
-            lines.append(f"- パドック: {girigiri_data['paddock_comment']}")
-        if girigiri_data.get('last_update'):
-            lines.append(f"- 最終更新: {girigiri_data['last_update']}")
-        for h in girigiri_data.get('horses', []):
-            lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}: 体重{h.get('weight_change', '')} パドック{h.get('paddock_eval', '')} {h.get('girigiri_comment', '')}")
-        lines.append("")
+    # ギリギリ情報は運用で取得対象外のためエクスポートしません。
     
     # ===== 中央競馬専用: 特集ページ（重賞） =====
     feature_data = race_data.get('special_feature', {})
@@ -119,21 +105,27 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             lines.append("### 傾向データ")
             for k, v in feature_data['trends'].items():
                 lines.append(f"- {k}: {v}")
-        picks = feature_data.get('picks', {})
-        if any(picks.values()):
-            lines.append("### 注目馬")
-            if picks.get('honmei'):
-                lines.append(f"- **本命**: {', '.join(picks['honmei'])}")
-            if picks.get('taikou'):
-                lines.append(f"- **対抗**: {', '.join(picks['taikou'])}")
-            if picks.get('anaba'):
-                lines.append(f"- **穴馬**: {', '.join(picks['anaba'])}")
-        if feature_data.get('pedigree_trends'):
-            lines.append("### 血統傾向")
-            for trend in feature_data['pedigree_trends']:
-                lines.append(f"- {trend}")
-        if feature_data.get('course_analysis'):
-            lines.append(f"### コース分析\n{feature_data['course_analysis']}")
+        # Note: 本命/対抗/穴馬の抽出はスクレイパーでは行いません。keiba-ai等の専用システムで処理してください。
+        # Pedigree trends are intentionally collected from pedigree-specific endpoints
+        # and are not parsed from special feature pages in keibabook. If present,
+        # they will be processed by keiba-ai's dedicated ingestion.
+        # course_analysis is no longer extracted from special features; instead,
+        # export course jockey statistics fetched from the dedicated course data page.
+        course_stats = race_data.get('course_jockey_stats', {})
+        if course_stats:
+            lines.append("### コース別 騎手統計")
+            for jockey, s in course_stats.items():
+                lines.append(f"- {jockey}: 勝率={s.get('win_rate', '')}% 連対率={s.get('top2_rate', '')}% 出走数={s.get('rides', '')}")
+        lines.append("")
+
+    # Note: jockey stats are collected from course data pages (race_data['course_jockey_stats']).
+
+    # ===== 特集ページ内のラベル（キーバリュー形式、血統は除外） =====
+    special_labels = race_data.get('special_labels', {})
+    if special_labels:
+        lines.append('## 特集ページ ラベル一覧')
+        for title, content in special_labels.items():
+            lines.append(f"- {title}: {content}")
         lines.append("")
     
     # ===== 中央競馬専用: 当日特集ページ（一覧等） =====
@@ -147,15 +139,7 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             data = df.get('data', {})
             title = data.get('title', '') if data else ''
             lines.append(f"- URL: {url} - {title}")
-            # 簡易的に注目馬(本命/対抗/穴馬)を出力
-            picks = data.get('picks', {}) if data else {}
-            if picks and any(picks.values()):
-                if picks.get('honmei'):
-                    lines.append(f"  - 本命: {', '.join(picks.get('honmei', []))}")
-                if picks.get('taikou'):
-                    lines.append(f"  - 対抗: {', '.join(picks.get('taikou', []))}")
-                if picks.get('anaba'):
-                    lines.append(f"  - 穴馬: {', '.join(picks.get('anaba', []))}")
+            # 注: 当日特集に含まれる本命/対抗/穴馬などの独自予想は取得対象外です
         lines.append("")
 
     # ===== 地方競馬専用: ポイント情報 =====
@@ -178,8 +162,11 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
             lines.append("### パワー馬場向きの馬")
             for h in point_data['power_track_horses']:
                 lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}: {h.get('reason', '')} (オッズ{h.get('odds', '')})")
+        if point_data.get('board_horses'):
+            lines.append("### 掲示板の馬")
+            for h in point_data['board_horses']:
+                lines.append(f"- {h.get('horse_num', '')}番 {h.get('horse_name', '')}")
         lines.append("")
-    
     # 出馬表（詳細）
     lines.append("## 出馬表")
     lines.append("")
@@ -190,7 +177,7 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
         num = h.get('horse_num', '')
         name = h.get('horse_name', '')
         mark = h.get('prediction_mark', '')
-        
+
         lines.append(f"### {num}番 {name} ({waku}枠) {mark}")
         lines.append("")
         
@@ -208,13 +195,13 @@ def export_for_ai(race_data: dict, format: str = "markdown") -> str:
         if odds is not None:
             lines.append(f"- オッズ: {odds}倍 ({pop}人気)" if pop else f"- オッズ: {odds}倍")
         
-        # 個別予想家印（広瀬、吉田、安中、CPU穴など）
+        # 競馬ブック等のサイトが提供する予想印・予想家印は取得して出力します（アプリ独自の予想は行いません）
         individual_marks = h.get('individual_marks', {})
         if individual_marks:
-            mark_strs = [f"{name}:{m}" for name, m in individual_marks.items() if m]
+            mark_strs = [f"{n}:{m}" for n, m in individual_marks.items() if m]
             if mark_strs:
                 lines.append(f"- **予想家印**: {', '.join(mark_strs)}")
-        
+
         # 短評/見解
         comment = h.get('comment', '')
         if comment:

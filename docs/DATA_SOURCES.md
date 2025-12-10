@@ -1,3 +1,6 @@
+Category: Reference
+Status: Active
+
 # データソース一覧
 
 ⚠️ **重要: このファイルの内容を削除しないこと**

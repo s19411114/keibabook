@@ -59,19 +59,7 @@ def save_snapshot(out_dir: Path, race_id: str, data: Dict):
     return fpath
 
 
-def compare_snapshots(prev: Dict, current: Dict) -> Dict:
-    # Simple percent change per horse_num for win odds only (if present)
-    changes = {}
-    prev_h = {str(h.get('horse_num')): float(h.get('win_odds')) if h.get('win_odds') else None for h in prev.get('horses', [])}
-    cur_h = {str(h.get('horse_num')): float(h.get('win_odds')) if h.get('win_odds') else None for h in current.get('horses', [])}
-    for k, v in cur_h.items():
-        if k in prev_h and prev_h[k] and v:
-            try:
-                pct = (v - prev_h[k]) / prev_h[k] * 100.0
-                changes[k] = round(pct, 2)
-            except Exception:
-                changes[k] = None
-    return changes
+from src.utils.odds_utils import compare_snapshots
 
 
 async def do_fetch(browser, page, race_id: str, race_type: str, settings: Dict):
@@ -181,12 +169,10 @@ async def main(tracks: List[str], offsets: List[int], headful: bool = False, dry
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Minimal odds fetcher (10 and 4 min updates)')
-    parser.add_argument('--tracks', default='浦和', help='Comma-separated venue names to monitor (default: 浦和)')
-    parser.add_argument('--offsets', default='10,4', help='Comma-separated minute offsets before race to fetch (default: 10,4)')
-    parser.add_argument('--headful', action='store_true', help='Launch browser headful instead of headless')
-    parser.add_argument('--dry-run', action='store_true', help='Do not perform HTTP requests; just show schedule')
-    args = parser.parse_args()
-    tracks = [t.strip() for t in args.tracks.split(',') if t.strip()]
-    offsets = [int(x.strip()) for x in args.offsets.split(',') if x.strip()]
-    asyncio.run(main(tracks, offsets, headful=args.headful, dry_run=args.dry_run))
+    # Minimal odds fetch script has been migrated to the keiba-ai project.
+    # Please use the migration copy:
+    # migration/to_keiba_ai/scripts/cli_minimal_odds.py
+    import sys
+    print('この CLI は migration に移動しました: migration/to_keiba_ai/scripts/cli_minimal_odds.py')
+    print('機能を保守するため、そちらを利用してください。')
+    sys.exit(0)

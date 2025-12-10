@@ -40,7 +40,6 @@ shutuba_normalized/
 logs/
 
 # IDE
-# Track workspace settings for WSL/Docker workflow; allow `.vscode/settings.json`
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
@@ -64,6 +63,7 @@ cookies.json
 
 # Temporary files
 tmp/
+
 temp/
 # Shell /tmp files created by scripts
 /tmp/bench_*
@@ -103,9 +103,4 @@ tall -e .
 scripts/cleanup_temp.sh
 bench_playwright.py
 
-# Docker
-.dockerignore
-.venv/
-*.bak
-競馬予想/
-.venv_test_repro/
+\n# Ignore generated training reports\ntraining_report_*.html\ndata/reports/

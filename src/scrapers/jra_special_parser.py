@@ -26,59 +26,48 @@ class JRASpecialParser:
         
         Args:
             html_content: CPU予想ページのHTML
-            
-        Returns:
-            CPU予想データ
+        
         """
         soup = BeautifulSoup(html_content, 'html.parser')
         cpu_data = {
             'horses': [],
             'summary': {}
         }
-        
+
         # CPU予想テーブルを探す
-        # 様々なセレクタパターンを試す
         cpu_table = soup.select_one("table.cpu, table.CPU, table[class*='cpu'], .cpu_table tbody, .CPUTable tbody")
-        
         if not cpu_table:
-            # 別のパターン: 出馬表ページ内のCPU予想セクション
             cpu_section = soup.select_one(".cpu_section, .CPUSection, [class*='cpu']")
             if cpu_section:
                 cpu_table = cpu_section.find('table')
-        
         if not cpu_table:
-            # syutuba_sp テーブルからCPU関連データを探す
             cpu_table = soup.select_one(".syutuba_sp tbody")
-        
+
         if cpu_table:
             for row in cpu_table.find_all('tr'):
                 horse_data = self._parse_cpu_row(row)
                 if horse_data and horse_data.get('horse_num'):
                     cpu_data['horses'].append(horse_data)
-        
-        # サマリー情報（ページ全体のコメント等）
+
+        # summary
         summary_section = soup.select_one(".cpu_summary, .CPUSummary, .summary")
         if summary_section:
             cpu_data['summary']['comment'] = summary_section.get_text(strip=True)
-        
+
         logger.info(f"CPU予想取得: {len(cpu_data['horses'])}頭")
         return cpu_data
-    
+
     def _parse_cpu_row(self, row) -> Optional[Dict[str, Any]]:
         """CPU予想の1行をパース"""
         horse_data = {}
-        
-        # 馬番
         horse_num_elem = row.select_one(".umaban")
         if horse_num_elem:
             horse_data['horse_num'] = horse_num_elem.get_text(strip=True)
-        
-        # 馬名
+
         horse_name_elem = row.select_one(".kbamei a, .horse_name a")
         if horse_name_elem:
             horse_data['horse_name'] = horse_name_elem.get_text(strip=True)
-        
-        # レーティング
+
         rating_elem = row.select_one(".rating, .Rating, [class*='rating'], td[class*='rating']")
         if rating_elem:
             rating_text = rating_elem.get_text(strip=True)
@@ -86,32 +75,27 @@ class JRASpecialParser:
                 horse_data['rating'] = float(rating_text) if rating_text else None
             except ValueError:
                 horse_data['rating'] = rating_text
-        
-        # スピード指数
+
         speed_elem = row.select_one(".speed, .Speed, .speed_index, [class*='speed']")
         if speed_elem:
             speed_text = speed_elem.get_text(strip=True)
             try:
                 horse_data['speed_index'] = float(speed_text) if speed_text else None
-            except ValueError:
+            except Exception:
                 horse_data['speed_index'] = speed_text
-        
-        # 調教印
+
         training_mark_elem = row.select_one(".training_mark, .cyokyo_mark, [class*='cyokyo']")
         if training_mark_elem:
             horse_data['training_mark'] = training_mark_elem.get_text(strip=True)
-        
-        # 血統印
+
         pedigree_mark_elem = row.select_one(".pedigree_mark, .kettou_mark, [class*='kettou']")
         if pedigree_mark_elem:
             horse_data['pedigree_mark'] = pedigree_mark_elem.get_text(strip=True)
-        
-        # 総合印（ファクター印）
+
         factor_mark_elem = row.select_one(".factor_mark, .total_mark, [class*='mark']")
         if factor_mark_elem:
             horse_data['factor_mark'] = factor_mark_elem.get_text(strip=True)
-        
-        # CPU指数
+
         cpu_index_elem = row.select_one(".cpu_index, .CPUIndex, [class*='index']")
         if cpu_index_elem:
             cpu_text = cpu_index_elem.get_text(strip=True)
@@ -119,121 +103,40 @@ class JRASpecialParser:
                 horse_data['cpu_index'] = float(cpu_text) if cpu_text else None
             except ValueError:
                 horse_data['cpu_index'] = cpu_text
-        
+
         return horse_data if horse_data else None
     
-    def parse_girigiri_info(self, html_content: str) -> Dict[str, Any]:
-        """
-        ギリギリ情報（重賞）を解析
-        
-        レース直前の最新情報
-        - 馬体重変動
-        - パドック情報
-        - 直前の仕上がり
-        - 騎手コメント
-        
-        Args:
-            html_content: ギリギリ情報ページのHTML
-            
-        Returns:
-            ギリギリ情報データ
-        """
-        soup = BeautifulSoup(html_content, 'html.parser')
-        girigiri_data = {
-            'horses': [],
-            'overall_comment': '',
-            'paddock_comment': '',
-            'last_update': ''
-        }
-        
-        # ギリギリ情報セクション
-        girigiri_section = soup.select_one(".girigiri, .Girigiri, .tyokuzen, [class*='girigiri']")
-        
-        if girigiri_section:
-            # 馬ごとの情報
-            for item in girigiri_section.select(".horse_info, .HorseInfo, tr, .item"):
-                horse_info = self._parse_girigiri_horse(item)
-                if horse_info and horse_info.get('horse_num'):
-                    girigiri_data['horses'].append(horse_info)
-            
-            # 全体コメント
-            overall_elem = girigiri_section.select_one(".overall_comment, .OverallComment, .comment")
-            if overall_elem:
-                girigiri_data['overall_comment'] = overall_elem.get_text(strip=True)
-        
-        # パドック情報
-        paddock_section = soup.select_one(".paddock, .Paddock, [class*='paddock']")
-        if paddock_section:
-            girigiri_data['paddock_comment'] = paddock_section.get_text(strip=True)
-        
-        # 最終更新時刻
-        update_elem = soup.select_one(".update_time, .UpdateTime, .last_update")
-        if update_elem:
-            girigiri_data['last_update'] = update_elem.get_text(strip=True)
-        
-        logger.info(f"ギリギリ情報取得: {len(girigiri_data['horses'])}頭")
-        return girigiri_data
+    # NOTE: ギリギリ（直前）情報のパースは運用方針により廃止しました（2025-12-10）。
+    # 以前は馬体重変動・パドック・直前コメント等を取得していましたが、
+    # これらの情報は運用上収集しないため削除しています。
     
-    def _parse_girigiri_horse(self, item) -> Optional[Dict[str, Any]]:
-        """ギリギリ情報の馬データをパース"""
-        horse_data = {}
-        
-        # 馬番
-        horse_num_elem = item.select_one(".umaban, .horse_num")
-        if horse_num_elem:
-            horse_data['horse_num'] = horse_num_elem.get_text(strip=True)
-        
-        # 馬名
-        horse_name_elem = item.select_one(".kbamei a, .horse_name")
-        if horse_name_elem:
-            horse_data['horse_name'] = horse_name_elem.get_text(strip=True)
-        
-        # 馬体重変動
-        weight_elem = item.select_one(".weight_change, .WeightChange, [class*='weight']")
-        if weight_elem:
-            horse_data['weight_change'] = weight_elem.get_text(strip=True)
-        
-        # パドック評価
-        paddock_elem = item.select_one(".paddock_eval, .PaddockEval")
-        if paddock_elem:
-            horse_data['paddock_eval'] = paddock_elem.get_text(strip=True)
-        
-        # 直前コメント
-        comment_elem = item.select_one(".comment, .Comment, .tyokuzen_comment")
-        if comment_elem:
-            horse_data['girigiri_comment'] = comment_elem.get_text(strip=True)
-        
-        return horse_data if horse_data else None
+    # (girigiri per-horse parser removed)
     
     def parse_special_feature(self, html_content: str) -> Dict[str, Any]:
         """
         特集ページ（重賞）を解析
         
-        重賞レースの詳細分析:
-        - 過去の傾向分析
-        - 血統傾向
-        - コース適性
-        - 本命・対抗・穴馬分析
+        特集ページから取得するのは主にタイトルと自由形式の解析セクション（テキストラベル）です。
+        特集ページからの「血統傾向」「コース適性」「本命・対抗・穴馬」の抽出は行わず、
+        それぞれ専用のデータソース（血統ページ、コースデータ、AI推論）で扱います。
         
         Args:
             html_content: 特集ページのHTML
             
         Returns:
-            特集ページデータ
+            特集ページデータ（新版）
+            - labels: dict mapping arbitrary label titles to their textual content
+            - '血統' と表記されるラベルは自動的に除外されます
         """
         soup = BeautifulSoup(html_content, 'html.parser')
         feature_data = {
             'title': '',
             'analysis': [],
-            'trends': {},
-            'picks': {
-                'honmei': [],  # 本命
-                'taikou': [],  # 対抗
-                'anaba': []    # 穴馬
-            },
-            'pedigree_trends': [],
-            'course_analysis': ''
+            # Free-form label dictionary (label -> content). Only generic labels are preserved.
+            'labels': {}
         }
+        # A general-purpose label dictionary (label name -> content string)
+        feature_data['labels'] = {}
         
         # 特集タイトル
         title_elem = soup.select_one(".feature_title, .FeatureTitle, h1, h2")
@@ -250,38 +153,47 @@ class JRASpecialParser:
                     'title': section_title.get_text(strip=True),
                     'content': section_content.get_text(strip=True)
                 })
+
+        # Generic label extraction: find heading-like nodes and capture following sibling
+        # content blocks. This catches arbitrary labels we want to preserve.
+        for heading in soup.select('h1, h2, h3, h4, .label, .label-title, .section-title'):
+            title = heading.get_text(strip=True)
+            if not title:
+                continue
+            lower_title = title.lower()
+            # Skip any '血統' labeled sections and course analysis labels
+            if ('血統' in title or '血統' in lower_title or 'kettou' in lower_title or 'コース' in title or 'コース' in lower_title or 'course' in lower_title):
+                # Do not extract bloodline-labeled section into generic labels
+                continue
+            # Aggregate textual content until the next heading
+            parts = []
+            node = heading.find_next_sibling()
+            while node and node.name not in ['h1', 'h2', 'h3', 'h4']:
+                # Avoid capturing navigation or unrelated lists such as new registration pages
+                try:
+                    text = node.get_text(separator=' ', strip=True)
+                except Exception:
+                    node = node.find_next_sibling()
+                    continue
+                if text:
+                    parts.append(text)
+                node = node.find_next_sibling()
+            # Save label content if present
+            if parts:
+                feature_data['labels'][title] = ' '.join(parts)
         
-        # 傾向データ
-        trends_section = soup.select_one(".trends, .Trends, .trend_data")
-        if trends_section:
-            for item in trends_section.select(".trend_item, .TrendItem, li"):
-                key_elem = item.select_one(".key, .label")
-                value_elem = item.select_one(".value, .data")
-                if key_elem and value_elem:
-                    feature_data['trends'][key_elem.get_text(strip=True)] = value_elem.get_text(strip=True)
+        # Note: 特集ページからの傾向分析（trends）や本命/対抗/穴馬の抽出は実施しません.
+        # これらは専用のコースデータ/血統データ/AI推論で扱います.
         
-        # 本命・対抗・穴馬
-        picks_section = soup.select_one(".picks, .Picks, .yosou")
-        if picks_section:
-            for category in ['honmei', 'taikou', 'anaba']:
-                cat_elem = picks_section.select_one(f".{category}, .{category.capitalize()}")
-                if cat_elem:
-                    for horse in cat_elem.select(".horse, .Horse, li"):
-                        feature_data['picks'][category].append(horse.get_text(strip=True))
+        # 血統傾向 - do not populate from special pages. Pedigree is obtained separately
+        # via dedicated pedigree endpoints; leaving pedigree_trends empty by design.
         
-        # 血統傾向
-        pedigree_section = soup.select_one(".pedigree_trend, .PedigreeTrend, [class*='kettou']")
-        if pedigree_section:
-            for item in pedigree_section.select("li, .item"):
-                feature_data['pedigree_trends'].append(item.get_text(strip=True))
-        
-        # コース分析
-        course_section = soup.select_one(".course_analysis, .CourseAnalysis, [class*='course']")
-        if course_section:
-            feature_data['course_analysis'] = course_section.get_text(strip=True)
+        # コース分析 - do not populate from special pages (may create biased insights)
         
         logger.info(f"特集ページ取得: {feature_data['title']}")
+
         return feature_data
+        
     
     def parse_ai_index(self, html_content: str) -> Dict[str, Any]:
         """
@@ -324,6 +236,94 @@ class JRASpecialParser:
         
         logger.info(f"AI指数取得: {len(ai_data['horses'])}頭")
         return ai_data
+
+    def parse_course_jockey_stats(self, html_content: str) -> Dict[str, Any]:
+        """
+        Parse course data page to extract jockey statistics for that course.
+
+        Returns a dict mapping jockey name to a dict containing 'win_rate', 'top2_rate', 'rides' where available.
+        """
+        soup = BeautifulSoup(html_content, 'html.parser')
+        jockey_stats = {}
+
+        # Try to find tables that include '騎手' as a header
+        tables = soup.find_all('table')
+        candidate_tables = []
+        for tbl in tables:
+            ths = tbl.select('th')
+            headers = [th.get_text(strip=True) for th in ths]
+            if any('騎手' in h or 'Jockey' in h or '騎手名' in h for h in headers):
+                candidate_tables.append(tbl)
+
+        # If no table candidates, try to find sections with '騎手' in title
+        if not candidate_tables:
+            for section in soup.select('[class*="jockey"], [id*="jockey"], .jockey_stats, .course_jockey'):
+                table = section.find('table')
+                if table:
+                    candidate_tables.append(table)
+
+        for tbl in candidate_tables:
+            # Determine header column indexes
+            headers = [th.get_text(strip=True) for th in tbl.select('th')]
+            hidx = {h: i for i, h in enumerate(headers)}
+            # Match common column names
+            jockey_idx = None
+            win_idx = None
+            top2_idx = None
+            rides_idx = None
+            for i, h in enumerate(headers):
+                if '騎手' in h or 'Jockey' in h or '騎手名' in h:
+                    jockey_idx = i
+                if '勝率' in h or '勝率(%)' in h:
+                    win_idx = i
+                if '連対' in h or '連対率' in h or '連対率(%)' in h:
+                    top2_idx = i
+                if '騎乗数' in h or '回数' in h or '出走数' in h:
+                    rides_idx = i
+
+            rows = tbl.select('tbody tr') or tbl.select('tr')
+            for row in rows:
+                cols = row.find_all(['td', 'th'])
+                if not cols:
+                    continue
+                jockey_name = ''
+                if jockey_idx is not None and jockey_idx < len(cols):
+                    jockey_name = cols[jockey_idx].get_text(strip=True)
+                else:
+                    # fall back to first column
+                    jockey_name = cols[0].get_text(strip=True)
+                if not jockey_name:
+                    continue
+                # Parse numbers
+                def parse_pct(text):
+                    if not text:
+                        return None
+                    text = text.replace('%', '').replace('％', '').strip()
+                    try:
+                        return float(text)
+                    except Exception:
+                        return None
+
+                win_pct = None
+                top2_pct = None
+                rides_n = None
+                if win_idx is not None and win_idx < len(cols):
+                    win_pct = parse_pct(cols[win_idx].get_text(strip=True))
+                if top2_idx is not None and top2_idx < len(cols):
+                    top2_pct = parse_pct(cols[top2_idx].get_text(strip=True))
+                if rides_idx is not None and rides_idx < len(cols):
+                    try:
+                        rides_n = int(cols[rides_idx].get_text(strip=True))
+                    except Exception:
+                        rides_n = None
+
+                jockey_stats[jockey_name] = {
+                    'win_rate': win_pct,
+                    'top2_rate': top2_pct,
+                    'rides': rides_n
+                }
+
+        return jockey_stats
     
     def _parse_ai_row(self, row) -> Optional[Dict[str, Any]]:
         """AI指数の1行をパース"""

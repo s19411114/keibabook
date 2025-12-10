@@ -1,30 +1,12 @@
 """
-Streamlit GUI アプリケーション
-競馬ブックスクレイパーの操作インターフェース
+ARCHIVED: app.py.complete_tab3 (Streamlit app snapshot)
+This file is archived and kept for reference; the live UI has moved to NiceGUI (app_nicegui.py).
 """
-import streamlit as st
-import asyncio
-import os
-import json
-import datetime
-import importlib
-from pathlib import Path
-from src.utils.config import load_settings
-from src.scrapers.keibabook import KeibaBookScraper
-# モジュールのリロードを強制 (AttributeError対策)
-import src.scrapers.jra_schedule
-importlib.reload(src.scrapers.jra_schedule)
-from src.scrapers.jra_schedule import JRAScheduleFetcher
 
-from src.scrapers.jra_odds import JRAOddsFetcher
-from src.utils.db_manager import CSVDBManager
-from src.utils.recommender import HorseRecommender
-from src.utils.horse_ranker import HorseRanker
-from src.utils.upset_detector import UpsetDetector
 from src.utils.logger import get_logger
-from src.utils.venue_manager import VenueManager
 
 logger = get_logger(__name__)
+logger.warning("app.py.complete_tab3 is archived. Use app_nicegui.py (NiceGUI) instead.")
 
 # ページ設定
 st.set_page_config(
@@ -430,8 +412,8 @@ with tab1:
                     if st.session_state.abort_scraping:
                         raise Exception("ユーザーによる中断")
                     
-                    # JRAオッズ取得 (JRAの場合のみ)
-                    if race_type == 'jra':
+                    # JRAオッズ取得 (JRAの場合のみ & 設定で有効な場合)
+                    if race_type == 'jra' and not settings.get('skip_realtime_odds', True):
                         status_text.text("リアルタイムオッズ取得中 (JRA)...")
                         progress_bar.progress(60)
                         

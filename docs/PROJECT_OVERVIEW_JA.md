@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # ---
 # Title: Project Overview (JA)
 # Category: overview

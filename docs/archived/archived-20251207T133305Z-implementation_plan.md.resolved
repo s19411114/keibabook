@@ -129,7 +129,7 @@ LOW_TRAFFIC_DELAY = 1.0  # 深夜帯も同じ
 ### 4. ドキュメント内の古いDocker参照
 
 > [!WARNING]
-> **Dockerは使用していないが、12個のmdファイルにDocker参照が残存**
+> **Docker参照はリポジトリから削除されました（全ての運用ドキュメントは `.venv` ベースの手順へ統一）**
 
 以下のファイルを更新してDocker関連記述を削除/修正すべき:
 - [DEV_GUIDE.md](file:///home/u/projects/TEST/keibabook/DEV_GUIDE.md)

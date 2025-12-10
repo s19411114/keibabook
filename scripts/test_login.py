@@ -75,8 +75,26 @@ async def test_login_with_cookies():
         else:
             print("   ✅ ログインページにリダイレクトされていません")
         
-        # テスト2: 出馬表ページにアクセスして馬の数を確認
-        print("\n📍 テスト2: 出馬表ページで馬の数を確認...")
+        # テスト2: ログアウトリンク/文言でログイン状態を確認（最優先）
+        print("\n📍 テスト2: ログアウトリンクでログイン状態を確認...")
+        content = await page.content()
+        
+        # ログアウトリンクまたは「ログアウト」文言をチェック
+        if 'ログアウト' in content:
+            print("   ✅ 「ログアウト」検出: ログイン済み！")
+            await browser.close()
+            return True
+        
+        logout_links = await page.query_selector_all('a[href*="logout"]')
+        if logout_links and len(logout_links) > 0:
+            print("   ✅ ログアウトリンク検出: ログイン済み！")
+            await browser.close()
+            return True
+        
+        print("   ⚠️ ログアウトリンクが見つかりません")
+        
+        # テスト3: 出馬表ページにアクセスして馬の数を確認（フォールバック）
+        print("\n📍 テスト3: 出馬表ページで馬の数を確認（フォールバック）...")
         
         # 今日のレースで確認（中山・阪神）
         from datetime import datetime

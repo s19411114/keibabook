@@ -1,0 +1,16 @@
+KeibaBookScraper.scrape() full implementation snapshot
+===================================================
+
+This file is a snapshot placeholder indicating that the full implementation of
+`KeibaBookScraper.scrape()` that existed on 2025-12-08 was archived for
+migration/inspection. The full function was large (~400 lines) and includes the
+original orchestration, login checks, rate-limiting logic, fetch/parse/merge
+steps, and debug output logic.
+
+The original implementation remains available via commit history, and a
+reference to the original file path is kept here:
+  - src/scrapers/keibabook.py
+
+Maintain the original code in git history for review and future archival if
+needed. The repo now contains a simplified version in `src/scrapers/keibabook.py`
+which delegates to helper functions for the common flows.

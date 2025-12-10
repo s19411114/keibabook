@@ -255,11 +255,7 @@ async def test_keibabook_scraper_scrape_method():
     scraper._parse_previous_race_comment_data = MagicMock(return_value={
         '1': 'スタートで後手を踏んだのが全て。力負けではない。'
     })
-    scraper._parse_horse_past_results_data = MagicMock(return_value=[
-        {'date': '2025/10/20', 'venue': '東京', 'race_num': '1', 'finish_position': '1着', 'time': '1:35.0', 'jockey': 'ルメール', 'weight': '55'}
-    ])
-    # Bypass direct HTML parsing for horse_table in this unit test (mock the result)
-    scraper._parse_horse_table_data = MagicMock(return_value={'1': {'past_results': [{'date': '2025/10/20', 'venue': '東京', 'race_num': '1', 'finish_position': '1着', 'time': '1:35.0', 'jockey': 'ルメール', 'weight': '55'}]}})
+    # Past results / 馬柱は運用方針で取得しないため、モックは不要
 
     with patch('src.scrapers.keibabook.async_playwright') as mock_async_playwright, \
          patch('src.utils.login.KeibaBookLogin.ensure_logged_in', new_callable=AsyncMock) as mock_login:
@@ -346,9 +342,7 @@ async def test_keibabook_scraper_scrape_method():
         }
         assert scraped_data['horses'][0]['stable_comment'] == 'まだ素質だけで走っている感じ。使いつつ良くなってくれば。'
         assert scraped_data['horses'][0]['previous_race_comment'] == 'スタートで後手を踏んだのが全て。力負けではない。'
-        assert scraped_data['horses'][0]['past_results'] == [
-            {'date': '2025/10/20', 'venue': '東京', 'race_num': '1', 'finish_position': '1着', 'time': '1:35.0', 'jockey': 'ルメール', 'weight': '55'}
-        ]
+        assert scraped_data['horses'][0]['past_results'] == []
         scraper._fetch_page_content = original_fetch
 
 
@@ -390,69 +384,12 @@ async def test_keibabook_scraper_nar_training_fetch():
     assert expected_training_url in called_urls
 
 @pytest.mark.asyncio
-async def test_keibabook_scraper_parse_horse_past_results_data():
+async def test_keibabook_scraper_past_results_parser_removed():
     settings = load_settings()
     scraper = KeibaBookScraper(settings)
-
-    mock_horse_past_results_html = """
-    <html>
-    <body>
-        <div class="HorsePastResultsTable">
-            <table>
-                <thead>
-                    <tr>
-                        <th>日付</th>
-                        <th>開催</th>
-                        <th>R</th>
-                        <th>着順</th>
-                        <th>タイム</th>
-                        <th>騎手</th>
-                        <th>斤量</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2025/10/20</td>
-                        <td>東京</td>
-                        <td>1</td>
-                        <td>1着</td>
-                        <td>1:35.0</td>
-                        <td>ルメール</td>
-                        <td>55</td>
-                    </tr>
-                    <tr>
-                        <td>2025/09/15</td>
-                        <td>中山</td>
-                        <td>5</td>
-                        <td>3着</td>
-                        <td>1:22.5</td>
-                        <td>武豊</td>
-                        <td>54</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </body>
-    </html>
-    """
-
-    horse_past_results_data = scraper._parse_horse_past_results_data(mock_horse_past_results_html)
-
-    assert len(horse_past_results_data) == 2
-    assert horse_past_results_data[0]['date'] == "2025/10/20"
-    assert horse_past_results_data[0]['venue'] == "東京"
-    assert horse_past_results_data[0]['race_num'] == "1"
-    assert horse_past_results_data[0]['finish_position'] == "1着"
-    assert horse_past_results_data[0]['time'] == "1:35.0"
-    assert horse_past_results_data[0]['jockey'] == "ルメール"
-    assert horse_past_results_data[0]['weight'] == "55"
-    assert horse_past_results_data[1]['date'] == "2025/09/15"
-    assert horse_past_results_data[1]['venue'] == "中山"
-    assert horse_past_results_data[1]['race_num'] == "5"
-    assert horse_past_results_data[1]['finish_position'] == "3着"
-    assert horse_past_results_data[1]['time'] == "1:22.5"
-    assert horse_past_results_data[1]['jockey'] == "武豊"
-    assert horse_past_results_data[1]['weight'] == "54"
+    # Past results parsing is removed; ensure no attribute exists
+    assert not hasattr(scraper, '_parse_horse_past_results_data')
+    assert not hasattr(scraper, '_parse_horse_table_data')
 
 
 @pytest.mark.asyncio

@@ -79,6 +79,40 @@ class KeibaBookScraper:
                 self.base_url = ''
         else:
             self.base_url = ''
+        # Course jockey stats fetching (course data page) - default True for JRA
+        self.fetch_course_jockey_stats = bool(self.settings.get('fetch_course_jockey_stats', True))
+        # Fetch girigiri/paddock/直前 info (default: False) — do not fetch unless explicitly enabled
+        self.fetch_girigiri = bool(self.settings.get('fetch_girigiri', False))
+        # TM (トラックマン直前情報) is not fetched by default and currently unimplemented.
+        # The previous setting `fetch_tm` has been removed to avoid confusion.
+        # Special pages: optionally limit heavy fetches by grade (e.g., 'GI,G1')
+        self.special_fetch_grades = self.settings.get('special_fetch_grades', '')
+
+    def _get_race_number(self):
+        """Return race number if available in settings (race_num, race_key, race_id)."""
+        try:
+            rn = self.settings.get('race_num')
+            if rn:
+                return int(rn)
+        except Exception:
+            pass
+        rid = self.settings.get('race_id', '')
+        # coercively convert to string to avoid TypeError when an int is stored in settings
+        rid_str = str(rid) if rid is not None else ''
+        if rid_str and len(rid_str) >= 2 and rid_str[-2:].isdigit():
+            try:
+                return int(rid_str[-2:])
+            except Exception:
+                pass
+        rk = self.settings.get('race_key', '') or ''
+        import re
+        m = re.search(r'(\d{1,2})R$', rk or '')
+        if m:
+            try:
+                return int(m.group(1))
+            except Exception:
+                pass
+        return None
 
     async def _fetch_page_content(self, page, url, retry_count=3, retry_delay=2, wait_until=None):
         """
@@ -525,6 +559,109 @@ class KeibaBookScraper:
         
         return training_data
 
+    async def _ensure_authenticated(self, context, page):
+        """
+        Ensure Playwright page is authenticated using KeibaBookAuth.
+        Returns (login_ok, page) and leaves page pointing at target.
+        """
+        from src.utils.keibabook_auth import KeibaBookAuth
+        cookie_file = self.settings.get('cookie_file', 'cookies.json')
+        login_id = self.settings.get('login_id')
+        password = self.settings.get('login_password')
+        url = self.shutuba_url
+        try:
+            login_ok, page = await KeibaBookAuth.ensure_authenticated(
+                context=context,
+                page=page,
+                login_id=login_id,
+                password=password,
+                cookie_file=cookie_file,
+                target_url=url
+            )
+            return login_ok, page
+        except Exception as e:
+            logger.debug(f"_ensure_authenticated エラー: {e}")
+            return False, page
+
+    async def _fetch_and_parse_training(self, page, race_key):
+        """
+        Fetch training page and parse; returns parsed_training_data or {}.
+        """
+        base_url = self.base_url
+        training_url = f"{base_url}/cyokyo/0/{self.settings['race_id']}"
+        if not training_url or self.settings.get('skip_training', False):
+            return {}
+        await self.rate_limiter.wait()
+        if not self._should_skip_due_to_dup(training_url):
+            training_html_content = await self._fetch_page_content(page, training_url)
+            self._log_url(training_url, 'training', 'success')
+            if not self.settings.get('skip_debug_files', False):
+                with open(self.debug_dir / f"debug_training_{race_key}.html", "w", encoding='utf-8') as f:
+                    f.write(training_html_content)
+        else:
+            logger.info(f"スキップ（既取得）: {training_url}")
+            training_html_content = ""
+        parsed_training_data = self._parse_training_data(training_html_content) if training_html_content else {}
+        if parsed_training_data:
+            from src.utils.training_converter import convert_training_data
+            parsed_training_data = convert_training_data(parsed_training_data)
+            logger.info(f"調教タイム換算完了: {len(parsed_training_data)}頭分")
+        else:
+            parsed_training_data = {}
+            logger.info("調教データをスキップまたは未検出")
+        return parsed_training_data
+
+    async def _fetch_generic_page_and_parse(self, page, page_url, debug_name, parser_func=None, tag_name=None, skip_flag=False):
+        """
+        Generic fetch-and-parse helper for pages like pedigree, stable_comment, previous_race_comment.
+        `parser_func` should be a function that takes HTML and returns parsed data.
+        """
+        if not page_url or skip_flag:
+            return {} if parser_func else []
+        await self.rate_limiter.wait()
+        if not self._should_skip_due_to_dup(page_url):
+            content = await self._fetch_page_content(page, page_url)
+            if tag_name:
+                self._log_url(page_url, tag_name, 'success')
+            if not self.settings.get('skip_debug_files', False):
+                with open(self.debug_dir / f"debug_{debug_name}_{self.settings.get('race_key','unknown')}.html", 'w', encoding='utf-8') as f:
+                    f.write(content)
+        else:
+            logger.info(f"スキップ（既取得）: {page_url}")
+            content = ""
+        if content and parser_func:
+            try:
+                return parser_func(content)
+            except Exception as e:
+                logger.debug(f"parser_func 例外: {e}")
+                return {} if isinstance({}, type({})) else []
+        return {} if parser_func else []
+
+    async def _fetch_cpu_prediction(self, page, race_key):
+        """
+        Fetch CPU prediction and parse with JRA parser; returns cpu_data or {}.
+        """
+        if self.settings.get('skip_cpu_prediction', False):
+            return {}
+        base_url = self.base_url
+        cpu_url = f"{base_url}/cpu/{self.settings['race_id']}"
+        await self.rate_limiter.wait()
+        if not self._should_skip_due_to_dup(cpu_url):
+            try:
+                cpu_html = await self._fetch_page_content(page, cpu_url)
+                self._log_url(cpu_url, 'cpu_prediction', 'success')
+                if not self.settings.get('skip_debug_files', False):
+                    with open(self.debug_dir / f"debug_cpu_{race_key}.html", "w", encoding='utf-8') as f:
+                        f.write(cpu_html)
+                cpu_data = self.jra_parser.parse_cpu_prediction(cpu_html)
+                return cpu_data
+            except Exception as e:
+                logger.debug(f"CPU予想取得エラー: {e}")
+                return {}
+        else:
+            logger.info(f"スキップ（既取得）: {cpu_url}")
+            return {}
+
     def _parse_pedigree_data(self, html_content):
         """
         血統データをパース（三代血統完全版）
@@ -687,112 +824,12 @@ class KeibaBookScraper:
                 previous_race_comment_data[horse_num] = comment_elem.get_text(strip=True)
         return previous_race_comment_data
 
-    def _parse_horse_past_results_data(self, html_content):
-        soup = BeautifulSoup(html_content, 'html.parser')
-        past_results = []
-
-        results_table = soup.select_one(".HorsePastResultsTable tbody")
-        if results_table:
-            for row in results_table.find_all('tr'):
-                columns = row.find_all('td')
-                if len(columns) >= 7: # 日付, 開催, R, 着順, タイム, 騎手, 斤量
-                    past_results.append({
-                        'date': columns[0].get_text(strip=True),
-                        'venue': columns[1].get_text(strip=True),
-                        'race_num': columns[2].get_text(strip=True),
-                        'finish_position': columns[3].get_text(strip=True),
-                        'time': columns[4].get_text(strip=True),
-                        'jockey': columns[5].get_text(strip=True),
-                        'weight': columns[6].get_text(strip=True)
-                    })
-        return past_results
+    # NOTE: 馬の過去走データ（馬柱/成績表）取得機能は運用方針により削除されました。
+    # 以前は _parse_horse_past_results_data()/ _parse_horse_table_data() が出馬表HTML
+    # や個別馬ページの能力表から過去成績を抽出していましたが、現在は不要であるため
+    # 削除済みです（2025-12-10）。
     
-    def _parse_horse_table_data(self, html_content):
-        """
-        馬柱（能力表）HTMLから過去走情報を取得
-        出馬表ページに含まれる馬柱情報をパース
-        過去3走分を取得（予想に必要）
-        
-        注意: 個別馬ページを開くのは大変なため、馬柱から取得する方針
-        実際のHTML構造に応じてセレクタを調整が必要
-        
-        Args:
-            html_content: 出馬表ページのHTML
-            
-        Returns:
-            馬番をキーとした過去成績データの辞書（過去3走分）
-        """
-        soup = BeautifulSoup(html_content, 'html.parser')
-        horse_table_data = {}
-        
-        # 出馬表テーブルから各馬の情報を取得
-        shutuba_table = soup.select_one(".syutuba_sp tbody")
-        if not shutuba_table:
-            logger.warning("出馬表テーブルが見つかりません")
-            return horse_table_data
-        
-        for row in shutuba_table.find_all('tr'):
-            horse_num_elem = row.select_one(".umaban")
-            if not horse_num_elem:
-                continue
-            
-            horse_num = horse_num_elem.get_text(strip=True)
-            
-            # 馬柱の過去成績を探す
-            # 複数のセレクタパターンを試す（実際のHTML構造に応じて調整）
-            past_results = []
-            
-            # パターン1: 同じ行内の過去成績テーブル
-            past_results_table = row.select_one(".HorsePastResultsTable, .past_results, table.past_results")
-            
-            # パターン2: 次の行（展開された詳細行）を探す
-            if not past_results_table:
-                next_row = row.find_next_sibling('tr')
-                if next_row:
-                    past_results_table = next_row.select_one(".HorsePastResultsTable, .past_results, table.past_results")
-            
-            # パターン3: 親要素内を探す
-            if not past_results_table:
-                parent = row.parent
-                if parent:
-                    past_results_table = parent.select_one(".HorsePastResultsTable, .past_results")
-            
-            if past_results_table:
-                # テーブル行を取得
-                result_rows = past_results_table.find_all('tr')
-                if not result_rows:
-                    # tbody内を探す
-                    tbody = past_results_table.find('tbody')
-                    if tbody:
-                        result_rows = tbody.find_all('tr')
-                
-                for result_row in result_rows:
-                    cols = result_row.find_all('td')
-                    if len(cols) >= 7:  # 日付, 開催, R, 着順, タイム, 騎手, 斤量
-                        past_results.append({
-                            'date': cols[0].get_text(strip=True),
-                            'venue': cols[1].get_text(strip=True),
-                            'race_num': cols[2].get_text(strip=True),
-                            'finish_position': cols[3].get_text(strip=True),
-                            'time': cols[4].get_text(strip=True),
-                            'jockey': cols[5].get_text(strip=True),
-                            'weight': cols[6].get_text(strip=True)
-                        })
-                
-                # 過去3走分に制限（予想に必要な分）
-                past_results = past_results[:3]
-                horse_table_data[horse_num] = {
-                    'past_results': past_results
-                }
-                logger.debug(f"馬{horse_num}: {len(past_results)}走分の過去成績を取得")
-            else:
-                # 馬柱情報が見つからない場合は空のリスト
-                horse_table_data[horse_num] = {
-                    'past_results': []
-                }
-                logger.debug(f"馬{horse_num}: 過去成績が見つかりませんでした")
-        
-        return horse_table_data
+    # (functionality removed)
     
     async def _scrape_result_page(self, page, base_url):
         """
@@ -847,6 +884,11 @@ class KeibaBookScraper:
         """
         if self.race_type != 'nar':
             return None
+        # Only fetch local point pages for late-card races (11,12) where they exist
+        race_num = self._get_race_number()
+        if race_num not in (11, 12):
+            logger.info(f"スキップ（ポイントページ対象外のレース番号: {race_num}）")
+            return None
         
         try:
             # ポイントページのURL（実際のURL構造に応じて調整が必要）
@@ -880,44 +922,58 @@ class KeibaBookScraper:
             logger.error(f"ポイントページ取得エラー: {e}")
             return None
 
-    async def _fetch_special_pages(self, page, base_url, race_key):
+    async def _fetch_special_pages(self, page, base_url, race_key, race_grade=None):
         """
         重賞用のギリギリ・特集ページを取得してパースするヘルパ。
         この処理は非常に重くなり得るため、独立した関数で明示的に呼び出す。
+        Args:
+            race_grade: optional grade string (e.g. 'GI' or 'GIII') to control fetching by grade
+
         Return: dict with possible keys 'girigiri_info', 'special_feature' and 'daily_feature'
         """
         special_data = {}
+        # Collect all extracted labels to allow top-level processing
+        special_data['labels'] = {}
+        # Respect settings to limit special page fetches by grade (comma-separated or list)
+        special_grades_setting = self.settings.get('special_fetch_grades', '')
+        if isinstance(special_grades_setting, str):
+            allowed_grades = [g.strip() for g in special_grades_setting.split(',') if g.strip()]
+        elif isinstance(special_grades_setting, (list, tuple)):
+            allowed_grades = [g.strip() for g in special_grades_setting]
+        else:
+            allowed_grades = []
+
+        if allowed_grades and race_grade:
+            # Normalise common grade tokens (G1/GI etc.) for comparison
+            rg = race_grade.upper().replace(' ', '')
+            allowed = any((rg == g.upper().replace(' ', '')) or (g.upper().replace(' ', '') in rg) for g in allowed_grades)
+            if not allowed:
+                logger.info(f"特集ページ取得をスキップ（グレード除外）: {race_grade}")
+                return special_data
         try:
-            # ギリギリ情報（直前情報）
-            girigiri_url = f"{base_url}/girigiri/{self.settings['race_id']}"
-            await self.rate_limiter.wait()
-            if not self._should_skip_due_to_dup(girigiri_url):
-                try:
-                    girigiri_html = await self._fetch_page_content(page, girigiri_url)
-                    self._log_url(girigiri_url, 'girigiri', 'success')
-                    if not self.settings.get('skip_debug_files', False):
-                        with open(self.debug_dir / f"debug_girigiri_{race_key}.html", "w", encoding="utf-8") as f:
-                            f.write(girigiri_html)
-                    girigiri_data = self.jra_parser.parse_girigiri_info(girigiri_html)
-                    special_data['girigiri_info'] = girigiri_data
-                    logger.info("ギリギリ情報取得成功")
-                except Exception as e:
-                    logger.warning(f"ギリギリ情報取得エラー（重賞以外は正常）: {e}")
-            else:
-                logger.info(f"スキップ（既取得）: {girigiri_url}")
+            # ギリギリ情報（直前情報）は運用方針により現在取得対象外です。
+            # (fetch_girigiri 設定は存在しますが、デフォルトでは False です)
 
             # 特集ページ（レース個別: 現行の取り方）
             feature_url = f"{base_url}/tokusyu/{self.settings['race_id']}"
             await self.rate_limiter.wait()
             if not self._should_skip_due_to_dup(feature_url):
                 try:
-                    feature_html = await self._fetch_page_content(page, feature_url)
+                    # Skip fetching pages that are clearly registry pages (新規登録/特別登録)
+                    if 'tourokuba' in feature_url or 'touroku' in feature_url or 'tourok' in feature_url or '登録' in feature_url:
+                        logger.info(f"スキップ（登録ページ）: {feature_url}")
+                        feature_html = ''
+                    else:
+                        feature_html = await self._fetch_page_content(page, feature_url)
                     self._log_url(feature_url, 'feature', 'success')
                     if not self.settings.get('skip_debug_files', False):
                         with open(self.debug_dir / f"debug_feature_{race_key}.html", "w", encoding="utf-8") as f:
                             f.write(feature_html)
                     feature_data = self.jra_parser.parse_special_feature(feature_html)
                     special_data['special_feature'] = feature_data
+                    # Merge any labels from feature into the cumulative label map
+                    if feature_data.get('labels'):
+                        special_data['labels'].update(feature_data.get('labels', {}))
                     logger.info(f"特集ページ取得成功: {feature_data.get('title', '')}")
                 except Exception as e:
                     logger.warning(f"特集ページ取得エラー（重賞以外は正常）: {e}")
@@ -953,6 +1009,10 @@ class KeibaBookScraper:
                                 with open(self.debug_dir / f"debug_daily_feature_{race_key}_{idx}.html", "w", encoding="utf-8") as f:
                                     f.write(day_html)
                             # Try parsing using existing special feature parser
+                            # Skip registration pages and similar non-feature pages by URL
+                            if 'tourokuba' in day_url or 'touroku' in day_url or '登録' in day_url:
+                                logger.info(f"スキップ（登録ページ）: {day_url}")
+                                continue
                             day_feature_data = self.jra_parser.parse_special_feature(day_html)
                             # merge or append to special_data.daily_feature list
                             if 'daily_feature' not in special_data:
@@ -961,6 +1021,9 @@ class KeibaBookScraper:
                                 'url': day_url,
                                 'data': day_feature_data
                             })
+                            # Merge labels
+                            if isinstance(day_feature_data, dict) and day_feature_data.get('labels'):
+                                special_data['labels'].update(day_feature_data.get('labels', {}))
                             logger.info(f"日別特集ページ取得成功: {day_url}")
                         except Exception as e:
                             logger.warning(f"日別特集ページ取得エラー: {day_url}: {e}")
@@ -971,7 +1034,31 @@ class KeibaBookScraper:
             logger.warning(f"特集ページ全体の取得処理でエラーが発生しました: {e}")
         return special_data
 
-    def _aggregate_individual_comments(self, horses, stable_comment_data, previous_race_comment_data, training_data, point_data):
+    async def _fetch_course_data_and_parse_jockey_stats(self, page, base_url, race_key):
+        """
+        Fetch course data page and parse jockey stats. Returns dict mapping jockey -> stats.
+        """
+        if not base_url or not self.fetch_course_jockey_stats:
+            return {}
+        course_url = f"{base_url}/data/{self.settings.get('race_id')}"
+        if self._should_skip_due_to_dup(course_url):
+            logger.info(f"スキップ（既取得）: {course_url}")
+            return {}
+        try:
+            await self.rate_limiter.wait()
+            course_html = await self._fetch_page_content(page, course_url)
+            self._log_url(course_url, 'course', 'success')
+            if not self.settings.get('skip_debug_files', False):
+                with open(self.debug_dir / f"debug_course_{race_key}.html", "w", encoding="utf-8") as f:
+                    f.write(course_html)
+            # Parse using jra parser
+            course_stats = self.jra_parser.parse_course_jockey_stats(course_html)
+            return course_stats
+        except Exception as e:
+            logger.warning(f"コースデータ取得エラー: {e}")
+            return {}
+
+    def _aggregate_individual_comments(self, horses, stable_comment_data, previous_race_comment_data, training_data, point_data=None):
         """
         出馬表/調教/厩舎/前走/ポイントページから取得したコメントやヒントを
         結合して `individual_comment` に格納する。個別馬ページを開いて取得する方法は使わない。
@@ -1055,24 +1142,9 @@ class KeibaBookScraper:
             # ================================================================================
             # ⚠️ 重要: ログイン処理 - このセクションを削除しないでください
             # ================================================================================
-            # 新しい認証モジュールを使用（馬の数で認証状態を確認）
-            from src.utils.keibabook_auth import KeibaBookAuth
-            cookie_file = self.settings.get('cookie_file', 'cookies.json')
-            login_id = self.settings.get('login_id')
-            password = self.settings.get('login_password')
+            # Delegate to helper
+            login_ok, page = await self._ensure_authenticated(context, page)
             url = self.shutuba_url
-            
-            # 認証を確保（Cookieまたはログインで）
-            # target_urlを渡すことで、認証確認後に出馬表ページに遷移
-            login_ok, page = await KeibaBookAuth.ensure_authenticated(
-                context=context,
-                page=page,
-                login_id=login_id,
-                password=password,
-                cookie_file=cookie_file,
-                target_url=url  # 出馬表URLをターゲットに
-            )
-            
             if not login_ok:
                 logger.warning("⚠️ ログインに失敗しました。無料範囲（3頭まで）のデータのみ取得されます。")
             else:
@@ -1094,20 +1166,11 @@ class KeibaBookScraper:
             # レート制御: サイト負担を軽減
             await self.rate_limiter.wait()
             
-            # 現在のページURLを確認し、必要なら出馬表URLに遷移
+            # 現在のページURLを確認し、必要なら出馬表URLに遷移（ミニマル実装）
             current_url = page.url
             if url in current_url or current_url in url:
-                # 既に対象ページにいる場合は、コンテンツのみ取得
                 logger.debug(f"既に対象ページにいます: {current_url}")
                 html_content = await page.content()
-                self._last_fetches.append({
-                    'requested_url': url,
-                    'actual_url': current_url,
-                    'status': 'cached',
-                    'goto_ms': 0,
-                    'content_ms': 0,
-                    'total_ms': 0
-                })
             else:
                 html_content = await self._fetch_page_content(page, url)
             
@@ -1138,36 +1201,8 @@ class KeibaBookScraper:
             # 地方競馬の場合は最小限のデータのみ取得（馬柱、出馬表、血統）
             # 中央競馬の場合は全データを取得
             
-            # 調教データを取得してマージ（中央/地方の両方で取得）
-            base_url = self.base_url
-            training_url = f"{base_url}/cyokyo/0/{self.settings['race_id']}"
-            
-            # 調教データ取得（中央/地方の両方で取得）
-            if training_url and not self.settings.get('skip_training', False):
-                # レート制御
-                await self.rate_limiter.wait()
-                
-                # 重複チェック
-                if not self._should_skip_due_to_dup(training_url):
-                    training_html_content = await self._fetch_page_content(page, training_url)
-                    self._log_url(training_url, 'training', 'success')
-                    if not self.settings.get('skip_debug_files', False):
-                        with open(self.debug_dir / f"debug_training_{race_key}.html", "w", encoding="utf-8") as f:
-                            f.write(training_html_content)
-                else:
-                    logger.info(f"スキップ（既取得）: {training_url}")
-                    training_html_content = ""
-                
-                parsed_training_data = self._parse_training_data(training_html_content) if training_html_content else {}
-                
-                # 調教タイムを栗東・美浦間で換算
-                if parsed_training_data:
-                    from src.utils.training_converter import convert_training_data
-                    parsed_training_data = convert_training_data(parsed_training_data)
-                    logger.info(f"調教タイム換算完了: {len(parsed_training_data)}頭分")
-                else:
-                    parsed_training_data = {}
-                    logger.info("調教データをスキップまたは未検出")
+            # 調教データの取得/マージ
+            parsed_training_data = await self._fetch_and_parse_training(page, race_key)
 
             for horse in race_data.get('horses', []):
                 horse_num = horse.get('horse_num')
@@ -1176,25 +1211,12 @@ class KeibaBookScraper:
                 else:
                     horse['training_data'] = {}
 
-            # 血統データを取得してマージ（馬柱、出馬表、血統は必須）
+            # 血統データの取得/マージ
             base_url = self.base_url
             pedigree_url = f"{base_url}/kettou/{self.settings['race_id']}"
-            
-            # レート制御
-            await self.rate_limiter.wait()
-            
-            # 重複チェック
-            if not self._should_skip_due_to_dup(pedigree_url) and not self.settings.get('skip_pedigree', False):
-                pedigree_html_content = await self._fetch_page_content(page, pedigree_url)
-                self._log_url(pedigree_url, 'pedigree', 'success')
-                if not self.settings.get('skip_debug_files', False):
-                    with open(self.debug_dir / f"debug_pedigree_{race_key}.html", "w", encoding="utf-8") as f:
-                        f.write(pedigree_html_content)
-            else:
-                logger.info(f"スキップ（既取得）: {pedigree_url}")
-                pedigree_html_content = ""
-            
-            parsed_pedigree_data = self._parse_pedigree_data(pedigree_html_content) if pedigree_html_content else []
+            parsed_pedigree_data = await self._fetch_generic_page_and_parse(
+                page, pedigree_url, 'pedigree', parser_func=self._parse_pedigree_data, tag_name='pedigree', skip_flag=self.settings.get('skip_pedigree', False)
+            )
 
             # 血統データをインデックスでマッチング（血統ページには馬番がないため）
             horses = race_data.get('horses', [])
@@ -1204,25 +1226,12 @@ class KeibaBookScraper:
                 else:
                     horse['pedigree_data'] = {}
 
-            # 厩舎の話データを取得してマージ（地方競馬ではスキップ）
+            # 厩舎の話データの取得/マージ（地方競馬はスキップ）
             if self.race_type != 'nar' and not self.settings.get('skip_stable_comment', False):
                 stable_comment_url = f"{base_url}/danwa/0/{self.settings['race_id']}"
-                
-                # レート制御
-                await self.rate_limiter.wait()
-                
-                # 重複チェック
-                if not self._should_skip_due_to_dup(stable_comment_url):
-                    stable_comment_html_content = await self._fetch_page_content(page, stable_comment_url)
-                    self._log_url(stable_comment_url, 'stable_comment', 'success')
-                    if not self.settings.get('skip_debug_files', False):
-                        with open(self.debug_dir / f"debug_stable_comment_{race_key}.html", "w", encoding="utf-8") as f:
-                            f.write(stable_comment_html_content)
-                else:
-                    logger.info(f"スキップ（既取得）: {stable_comment_url}")
-                    stable_comment_html_content = ""
-                
-                parsed_stable_comment_data = self._parse_stable_comment_data(stable_comment_html_content) if stable_comment_html_content else {}
+                parsed_stable_comment_data = await self._fetch_generic_page_and_parse(
+                    page, stable_comment_url, 'stable_comment', parser_func=self._parse_stable_comment_data, tag_name='stable_comment', skip_flag=self.settings.get('skip_stable_comment', False)
+                )
             else:
                 parsed_stable_comment_data = {}
                 logger.info("地方競馬のため厩舎コメントをスキップ")
@@ -1234,25 +1243,12 @@ class KeibaBookScraper:
                 else:
                     horse['stable_comment'] = ""
 
-            # 前走コメントデータを取得してマージ（地方競馬ではスキップ）
+            # 前走コメントデータの取得/マージ（地方競馬はスキップ）
             if self.race_type != 'nar' and not self.settings.get('skip_previous_race_comment', False):
                 previous_race_comment_url = f"{base_url}/syoin/{self.settings['race_id']}"
-                
-                # レート制御
-                await self.rate_limiter.wait()
-                
-                # 重複チェック
-                if not self._should_skip_due_to_dup(previous_race_comment_url):
-                    previous_race_comment_url_content = await self._fetch_page_content(page, previous_race_comment_url)
-                    self._log_url(previous_race_comment_url, 'previous_race_comment', 'success')
-                    if not self.settings.get('skip_debug_files', False):
-                        with open(self.debug_dir / f"debug_previous_race_comment_{race_key}.html", "w", encoding="utf-8") as f:
-                            f.write(previous_race_comment_url_content)
-                else:
-                    logger.info(f"スキップ（既取得）: {previous_race_comment_url}")
-                    previous_race_comment_url_content = ""
-                
-                parsed_previous_race_comment_data = self._parse_previous_race_comment_data(previous_race_comment_url_content) if previous_race_comment_url_content else {}
+                parsed_previous_race_comment_data = await self._fetch_generic_page_and_parse(
+                    page, previous_race_comment_url, 'previous_race_comment', parser_func=self._parse_previous_race_comment_data, tag_name='previous_race_comment', skip_flag=self.settings.get('skip_previous_race_comment', False)
+                )
             else:
                 parsed_previous_race_comment_data = {}
                 logger.info("地方競馬のため前走コメントをスキップ")
@@ -1264,72 +1260,38 @@ class KeibaBookScraper:
                 else:
                     horse['previous_race_comment'] = ""
 
-            # 馬柱（能力表）データを取得（出馬表ページから）- 簡易情報として
-            if self.settings.get('skip_past_results', False):
-                horse_table_data = {}
-            else:
-                # 個別馬ページへの遷移は行わない（被りが多いため）
-                horse_table_data = self._parse_horse_table_data(html_content)
+            # 馬柱データ（出馬表ページから）は運用方針により取得しません
+            # (skip_past_results デフォルト true)。過去走データはJSON/DBに含めない設計です。
+            horse_table_data = {}
             for horse in race_data.get('horses', []):
-                horse_num = horse.get('horse_num')
-                if horse_num in horse_table_data:
-                    horse['past_results'] = horse_table_data[horse_num].get('past_results', [])
-                else:
-                    horse['past_results'] = []
+                # Past results are intentionally omitted per operational policy
+                horse['past_results'] = []
             
-            # ===== 中央競馬専用ページの取得 =====
+            # ===== 中央競馬専用ページの取得: CPU予想など =====
             if self.race_type == 'jra':
-                # CPU予想ページを取得（最重要ページ：レーティング、スピード指数、印）
-                if not self.settings.get('skip_cpu_prediction', False):
-                    cpu_url = f"{base_url}/cpu/{self.settings['race_id']}"
-                    
-                    await self.rate_limiter.wait()
-                    
-                    if not self._should_skip_due_to_dup(cpu_url):
-                        try:
-                            cpu_html = await self._fetch_page_content(page, cpu_url)
-                            self._log_url(cpu_url, 'cpu_prediction', 'success')
-                            if not self.settings.get('skip_debug_files', False):
-                                with open(self.debug_dir / f"debug_cpu_{race_key}.html", "w", encoding="utf-8") as f:
-                                    f.write(cpu_html)
-                            
-                            cpu_data = self.jra_parser.parse_cpu_prediction(cpu_html)
-                            race_data['cpu_prediction'] = cpu_data
-                            
-                            # CPU予想データを各馬にマージ
-                            cpu_horses_dict = {h.get('horse_num'): h for h in cpu_data.get('horses', [])}
-                            for horse in race_data.get('horses', []):
-                                horse_num = horse.get('horse_num')
-                                if horse_num in cpu_horses_dict:
-                                    cpu_horse = cpu_horses_dict[horse_num]
-                                    horse['rating'] = cpu_horse.get('rating')
-                                    horse['speed_index'] = cpu_horse.get('speed_index')
-                                    horse['cpu_training_mark'] = cpu_horse.get('training_mark')
-                                    horse['cpu_pedigree_mark'] = cpu_horse.get('pedigree_mark')
-                                    horse['cpu_index'] = cpu_horse.get('cpu_index')
-                            
-                            logger.info(f"CPU予想取得成功: {len(cpu_data.get('horses', []))}頭")
-                        except Exception as e:
-                            logger.warning(f"CPU予想取得エラー: {e}")
-                    else:
-                        logger.info(f"スキップ（既取得）: {cpu_url}")
+                # Course data: jockey stats (optional)
+                if self.fetch_course_jockey_stats and self.settings.get('race_id'):
+                    course_stats = await self._fetch_course_data_and_parse_jockey_stats(page, base_url, race_key)
+                    if course_stats:
+                        race_data['course_jockey_stats'] = course_stats
+                cpu_data = await self._fetch_cpu_prediction(page, race_key)
+                if cpu_data:
+                    race_data['cpu_prediction'] = cpu_data
                 
                 # 重賞の場合、ギリギリ情報と特集ページを取得
                 is_graded = any(g in race_data.get('race_grade', '') for g in ['GI', 'GII', 'GIII', 'G1', 'G2', 'G3', '重賞'])
                 
-                # Only fetch special pages (girigiri, feature) when race is graded and
-                # special pages are not explicitly disabled. Also allow fetching the day's
-                # feature pages for any race when enabled via settings (fetch_daily_special_pages).
                 fetch_daily = bool(self.settings.get('fetch_daily_special_pages', False))
                 if (is_graded or fetch_daily) and not self.settings.get('skip_special_pages', False):
-                    # 重賞のギリギリ/特集は別関数で取得（重いので分離）
-                    special = await self._fetch_special_pages(page, base_url, race_key)
-                    if 'girigiri_info' in special:
-                        race_data['girigiri_info'] = special['girigiri_info']
+                    special = await self._fetch_special_pages(page, base_url, race_key, race_data.get('race_grade'))
+                    # ギリギリ情報は取得しない設計のため race_data へはマージしません
                     if 'special_feature' in special:
                         race_data['special_feature'] = special['special_feature']
                     if 'daily_feature' in special:
                         race_data['daily_feature'] = special['daily_feature']
+                    # aggregate labels collected across special/daily features (excluding '血統')
+                    if special.get('labels'):
+                        race_data['special_labels'] = special.get('labels')
                 
                 # AI指数は出馬表ページから既に取得済み（parse_race_dataで処理）
             
@@ -1339,7 +1301,7 @@ class KeibaBookScraper:
                     self._aggregate_individual_comments(race_data.get('horses', []), parsed_stable_comment_data, parsed_previous_race_comment_data, parsed_training_data, None)
             # ===== 地方競馬専用ページの取得 =====
             if self.race_type == 'nar':
-                # ポイントページを取得
+                # ポイントページを取得（地方競馬の11R/12Rのみ）
                 point_data = await self._scrape_point_page(page, base_url)
                 if point_data:
                     race_data['point_info'] = point_data

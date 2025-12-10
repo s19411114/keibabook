@@ -7,7 +7,7 @@
 - docs/DATA_SOURCES.md
 - docs/DATA_STRATEGY.md
 - docs/MULTI_SOURCE_STRATEGY.md
-- issues/HANDOVER_CLAUDE_HAIKU.md
+- docs/archived/archived-HANDOVER_CLAUDE_HAIKU.md
 - migration/list_migration_candidates.py
 - migration/to_keiba_ai/CONSOLIDATION_SUGGESTIONS.md
 - migration/to_keiba_ai/README.md
@@ -32,8 +32,8 @@
 - app.py
 - check_data.py
 - check_json.py
-- issues/HANDOVER_TASKS.md
-- issues/OPUS_HAIKU_HANDOVER.md
+- docs/archived/archived-HANDOVER_TASKS.md
+- docs/archived/archived-OPUS_HAIKU_HANDOVER.md
 - issues/PERFORMANCE_ANALYSIS.md
 - issues/claudeopus_full_summary.md
 - issues/claudeopus_request.md

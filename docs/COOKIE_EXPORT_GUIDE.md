@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # Cookie手動エクスポート手順
 
 ## 1. Chrome拡張機能のインストール

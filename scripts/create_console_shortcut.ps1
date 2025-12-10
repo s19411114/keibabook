@@ -1,6 +1,6 @@
 param(
     [string]$Name = "KeibaBook Console",
-    [string]$TargetScript = "$PSScriptRoot\start_streamlit_win.ps1",
+    [string]$TargetScript = "$PSScriptRoot\run_nicegui.ps1",
     [string]$IconPath = ""
 )
 

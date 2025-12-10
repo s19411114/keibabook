@@ -1,3 +1,6 @@
+Category: Index
+Status: Active
+
 # Documentation Index
 
 This file is generated. Run `python scripts/generate_docs_index.py --confirm` to update.

@@ -46,9 +46,9 @@ async def main():
         print("Error: debug_files/debug_nouryoku.html not found.")
         return
 
-    # Parse data
-    print("Parsing data...")
-    horse_table_data = scraper._parse_horse_table_data(html_content)
+    # Parse data (past performance / 馬柱 parsing has been removed)
+    print("Parsing data... (past performance parsing removed)")
+    horse_table_data = {}
     
     # Create mock race data
     race_data = {

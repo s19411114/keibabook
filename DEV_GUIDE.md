@@ -1,3 +1,6 @@
+Category: Development
+Status: Active
+
 # Developer Guide (Canonical)
 
 この `DEV_GUIDE.md` はこのリポジトリの**公式な開発手順書**です。
@@ -31,9 +34,11 @@
 cd ~/keibabook
 
 # venvが存在しない場合は作成
-python3 -m venv venv
+python3 -m venv .venv
 
-# venvをアクティベート
+# VS Code の統合ターミナルは開くと自動的に .venv を有効化します。
+# 手動で別ターミナルを使う場合は次のコマンドで有効化してください:
+## (手動)
 source .venv/bin/activate
 
 # 依存関係をインストール
@@ -47,8 +52,10 @@ playwright install chromium
 
 ```bash
 cd ~/keibabook
+# VS Code の統合ターミナルでは自動的に venv が有効化されます。
+# 手動で有効化する場合:
 source .venv/bin/activate
-# プロンプトに (.venv) が表示されることを確認
+## プロンプトに (.venv) が表示されることを確認
 ```
 
 ## 4. 主要コマンド
@@ -58,10 +65,18 @@ source .venv/bin/activate
 python run_scraper.py
 
 # Streamlit GUI を起動
-streamlit run app.py
+python -m app_nicegui
 
 # テストを実行
 pytest tests/
+
+## 10. 運用ポリシー（重要）
+
+ - 馬柱（過去走情報）はポリシーによりコードから削除され、収集しません（`skip_past_results` 設定は廃止/無効化）。
+ - リアルタイムオッズの取得はデフォルトで無効です（設定: `skip_realtime_odds: true`）。
+ - ギリギリ情報（直前情報）はポリシーにより収集しません（`fetch_girigiri` パーサを削除済み）。
+- これらの設定は `config/settings.yml` で上書きできますが、運用ではデフォルトを守ってください。
+
 ```
 
 ## 5. 依存関係の変更

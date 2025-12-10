@@ -1,3 +1,8 @@
+Category: Issue
+Status: Active
+
+> **ARCHIVED**: このファイルは docs/archived/archived-HANDOVER_CLAUDE_HAIKU.md に移動されました。今後はこちらを参照してください。
+
 # 引継ぎ資料 - Claude Haiku / 次のエージェント向け
 
 ## 📋 現在の状況

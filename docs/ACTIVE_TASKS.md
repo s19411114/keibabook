@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # ---
 # Title: Active Tasks
 # Category: operations

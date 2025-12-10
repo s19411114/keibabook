@@ -31,6 +31,10 @@ skip_race_if_fetched_within_seconds: 604800
 force_recheck_on_scrape: false
 # コメント集約時にソースをタグ付け（例: [stable] コメント）。デフォルト False
 tag_comment_sources: false
+# スキップ: 馬柱（過去走データ）を取得しない（運用方針: True = スキップ）
+skip_past_results: true
+# スキップ: リアルタイムオッズの取得を行わない（True = スキップ）
+skip_realtime_odds: true
 # ログイン情報（自動ログイン用）
 # ⚠️ 以下にあなたのログイン情報を入力してください
 login_id: ""

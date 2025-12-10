@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # データ取得戦略
 
 ⚠️ **削除禁止** - 両サイトの役割分担を明確化

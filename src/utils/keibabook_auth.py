@@ -119,6 +119,11 @@ class KeibaBookAuth:
                 logger.warning(f"Cookieファイルが存在しません: {path}")
                 return False
             
+            # Validate cookie file before loading to avoid injecting expired/invalid cookies
+            valid, msg = KeibaBookAuth.is_cookie_valid(cookie_file)
+            if not valid:
+                logger.warning(f"Cookieファイル無効: {msg}")
+                return False
             with open(path, 'r', encoding='utf-8') as f:
                 cookies = json.load(f)
             
@@ -155,27 +160,82 @@ class KeibaBookAuth:
     @staticmethod
     async def verify_login_by_horse_count(page: Page, test_url: str = None) -> Tuple[bool, int]:
         """
-        馬の数でログイン状態を確認
+        ログイン状態を確認（優先順位: ログアウトリンク > Cookie > 馬の数）
         
-        【重要】
-        - 3頭以下 = 未ログイン（無料ユーザー制限）
-        - 6頭以上 = ログイン済み
+        【確認方法】
+        1. まずログアウトリンク/文言をチェック（最も信頼性が高い）
+        2. tkクッキーの存在と有効期限をチェック
+        3. 馬の数でフォールバック確認
+           - 3頭以下 = 未ログイン（無料ユーザー制限）
+           - 6頭以上 = ログイン済み
         
         Returns:
             (is_logged_in, horse_count)
         """
         if not test_url:
-            # 今日のレースで確認（日付は動的に生成）
-            from datetime import datetime
-            today = datetime.now().strftime('%Y%m%d')
-            # 中山12R を試す (06=中山)
-            test_url = f"https://s.keibabook.co.jp/cyuou/syutuba/{today}0612"
+            # トップページを使用（レース非開催日でも動作）
+            test_url = "https://s.keibabook.co.jp/"
         
         try:
-            logger.debug(f"馬の数でログイン確認: {test_url}")
-            await page.goto(test_url, wait_until='domcontentloaded', timeout=60000)
+            urls_to_try = []
+            if test_url:
+                urls_to_try.append(test_url)
+            # Try some canonical pages as fallback
+            urls_to_try.extend(KeibaBookAuth.TEST_URLS)
+            urls_to_try = list(dict.fromkeys(urls_to_try))  # dedupe while preserving order
+
+            logger.debug(f"ログイン確認; 試行URL: {urls_to_try}")
+            # We'll try multiple URLs because some pages have different layouts/subdomains
+            page_html = ''
+            for u in urls_to_try:
+                try:
+                    await page.goto(u, wait_until='domcontentloaded', timeout=60000)
+                    page_html = await page.content()
+                    break
+                except Exception as e:
+                    logger.debug(f"ログイン確認用URLにアクセスできません: {u} ({e})")
             
-            # 複数のパターンで馬の行を検出
+            # ========================================
+            # 優先チェック1: ログアウトリンク/文言（最も信頼性が高い）
+            # ========================================
+            logout_found = False
+            try:
+                logout_nodes = await page.query_selector_all('a[href*="logout"], a[class*="logout"], a[href*="/logout"]')
+                if logout_nodes and len(logout_nodes) > 0:
+                    logout_found = True
+                    logger.info("✅ ログアウトリンク検出: ログイン済み")
+                else:
+                    # ページ内のテキストに「ログアウト」があるかをチェック
+                    if not page_html:
+                        page_html = await page.content()
+                    if 'ログアウト' in page_html:
+                        logout_found = True
+                        logger.info("✅ 「ログアウト」文言検出: ログイン済み")
+            except Exception as e:
+                logger.debug(f"ログアウト検出中にエラー: {e}")
+            
+            # ログアウトリンクが見つかれば即座にログイン済みと判断
+            if logout_found:
+                return True, 0  # 馬の数は確認不要
+            
+            # ========================================
+            # 優先チェック2: tkクッキーの存在確認
+            # ========================================
+            try:
+                ck = await page.context.cookies()
+                for c in ck:
+                    if c.get('name') == 'tk':
+                        exp = c.get('expires') or c.get('expiry') or 0
+                        import time
+                        if not exp or int(exp) > int(time.time()):
+                            logger.info("✅ tk cookie検出（有効期限内）: ログイン済み")
+                            return True, 0
+            except Exception as e:
+                logger.debug(f"Cookie確認中にエラー: {e}")
+            
+            # ========================================
+            # フォールバック: 馬の数でログイン確認
+            # ========================================
             horse_count = 0
             
             # パターン1: HorseListテーブル
@@ -199,7 +259,6 @@ class KeibaBookAuth:
             if horse_count == 0:
                 links = await page.query_selector_all('a[href*="/uma/"]')
                 if links:
-                    # 重複を除去（馬名リンクが複数ある場合）
                     horse_count = len(links)
             
             # パターン4: 馬番セル
@@ -210,22 +269,11 @@ class KeibaBookAuth:
             
             logger.info(f"検出された馬の数: {horse_count}")
             
-            # 補助チェック: ログアウトリンクや「ログアウト」文言があるかどうか
-            logout_found = False
-            try:
-                logout_nodes = await page.query_selector_all('a[href*="logout"], a[class*="logout"], a[href*="/logout"]')
-                if logout_nodes and len(logout_nodes) > 0:
-                    logout_found = True
-                else:
-                    # ページ内のテキストに「ログアウト」があるかをチェック
-                    page_html = await page.content()
-                    if 'ログアウト' in page_html:
-                        logout_found = True
-            except Exception as e:
-                logger.debug(f"ログアウト検出中にエラー: {e}")
-
-            # 3頭以下は未ログイン。ただしログアウトリンクがあればログイン済みと判断
-            is_logged_in = (horse_count >= 6) or logout_found
+            # 馬の数からログイン状態を判定
+            is_logged_in = horse_count >= 6
+            
+            if not is_logged_in and horse_count == 0:
+                logger.warning("⚠️ レースデータなし（非開催日の可能性）。ログイン状態を確定できません。")
             
             return is_logged_in, horse_count
             
@@ -362,8 +410,13 @@ class KeibaBookAuth:
             created_page = True
         
         try:
-            # Step 1: Cookieを読み込み
-            cookie_loaded = await KeibaBookAuth.load_cookies(context, cookie_file)
+            # Step 1: Cookieを読み込み（まず有効性を確認してからロード）
+            cookie_valid, cookie_msg = KeibaBookAuth.is_cookie_valid(cookie_file)
+            if cookie_valid:
+                cookie_loaded = await KeibaBookAuth.load_cookies(context, cookie_file)
+            else:
+                cookie_loaded = False
+                logger.info(f"Cookie検証: {cookie_msg} (ロードをスキップ)")
             
             if cookie_loaded:
                 logger.info("Cookieを読み込みました。認証状態を確認...")
@@ -398,6 +451,8 @@ class KeibaBookAuth:
                         logger.info(f"✅ ログイン認証成功（{horse_count}頭確認）")
                         return True, page
             
+            else:
+                logger.info('ログイン認証情報が設定されていません（環境変数LOGIN_ID/LOGIN_PASSWORDを確認ください）')
             # Step 4: 認証失敗
             logger.error("❌ 認証失敗。無料範囲のデータのみ取得されます。")
             

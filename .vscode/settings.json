@@ -50,11 +50,7 @@
   "python.experiments.enabled": false,
   "terminal.integrated.profiles.linux": {
     "bash-venv": {
-      "path": "/bin/bash",
-      "args": [
-        "-lc",
-        "source ${workspaceFolder}/.venv/bin/activate; exec bash -l"
-      ]
+      "path": "/bin/bash"
     }
   },
   "terminal.integrated.defaultProfile.linux": "bash-venv",

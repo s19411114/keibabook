@@ -1,3 +1,6 @@
+Category: Guide
+Status: Active
+
 # ---
 # Title: Local Racing (NAR) Guide
 # Category: local-racing
@@ -122,4 +125,3 @@ else:
 
 - 中央競馬: JRA（日本中央競馬会）
 - 地方競馬: NAR（地方競馬全国協会）
-

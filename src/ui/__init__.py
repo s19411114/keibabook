@@ -1,4 +1,7 @@
-"""UI components module"""
-from src.ui.track_bias_tab import render_track_bias_tab
+"""UI components module (archived: Streamlit UIs are moved to NiceGUI.)"""
+from src.utils.logger import get_logger
 
-__all__ = ['render_track_bias_tab']
+logger = get_logger(__name__)
+logger.warning("src.ui package contains archived Streamlit UI components. Use app_nicegui.py for the UI.")
+
+__all__ = []

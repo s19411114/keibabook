@@ -1,3 +1,6 @@
+Category: Process
+Status: Active
+
 # 🔄 開発ワークフロー（統合版）
 
 ## 📋 目次
@@ -118,16 +121,16 @@ git push -f origin feat/agent-run
 
 ## 🕷️ スクレイピング実行
 
-### Streamlit GUI（推奨）
+### NiceGUI (UI)（推奨）
 ```powershell
 cd C:\GeminiCLI\TEST\keibabook
 .\.venv\Scripts\Activate.ps1
-streamlit run app.py
+python -m app_nicegui
 ```
 
 または起動スクリプト:
 ```powershell
-.\scripts\start_streamlit_win.ps1
+./scripts/run_nicegui.sh
 ```
 
 ### CLI版

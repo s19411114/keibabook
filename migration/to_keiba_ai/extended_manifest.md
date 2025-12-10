@@ -36,8 +36,8 @@ This manifest expands the earlier manifest by listing additional files that are 
 ## Category: Docs/Issues referencing migration
 - docs/DATA_SOURCES.md - (updated) shows Netkeiba migration policy
 - docs/DATA_STRATEGY.md - (updated) shows policy and rationale
-- issues/HANDOVER_TASKS.md - (review) includes run_pedigree async migration tasks
-- issues/OPUS_HAIKU_HANDOVER.md - (review) discusses 429 and related performance
+- docs/archived/archived-HANDOVER_TASKS.md - (review) includes run_pedigree async migration tasks
+- docs/archived/archived-OPUS_HAIKU_HANDOVER.md - (review) discusses 429 and related performance
 
 ## Category: Misc / Helpers
 - src/scrapers/httpx_scraper.py - (review) general fetcher pattern used across scrapers
