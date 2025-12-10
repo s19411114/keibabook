@@ -104,3 +104,6 @@ scripts/cleanup_temp.sh
 bench_playwright.py
 
 \n# Ignore generated training reports\ntraining_report_*.html\ndata/reports/
+
+# Virtual environment (local)
+.venv/
