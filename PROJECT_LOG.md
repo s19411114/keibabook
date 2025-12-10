@@ -149,3 +149,7 @@ AIによる競馬予測の精度を向上させるため、以下の情報重要
 - Archived issue 'IMPROVE/migration-bak-cleanup: migration/backups の .bak ファイル' -> completed_issues.md at 20251208T052700ZZ
 
 - Archived issue 'BUG/unused-base-url: `keibabook.py` の base_url 重複計算' -> completed_issues.md at 20251208T052700ZZ
+
+## 2025-12-11
+- Branch: feat/nicegui-theme-training
+- Changes: Add NiceGUI dark/light toggle; training report generator and serving endpoint; schedule parsing and scraper robustness fixes; `.venv` removed from repository; `.gitignore` updated.
