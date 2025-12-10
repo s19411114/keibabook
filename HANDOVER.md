@@ -148,6 +148,14 @@ pytest tests\
 	- 概要: README / DEV_GUIDE / exporter の docstrings は特集・馬柱収集方針に更新済みだが、すべてのドキュメント（例: ARCHITECTURE, migration docs, sample_output) を順次アップデートする必要がある。
 	- 推奨作業: `DOC_MANIFEST.json` に「ドキュメント整合性チェック」を追加して、収集ポリシーに一致するかを確認するCIチェックを導入。
 
+	---
+	## 2025-12-11 追記: NiceGUIテーマ + 調教レポート
+	- Branch: feat/nicegui-theme-training
+	- 内容: NiceGUI のダーク/ライト切替（アプリ内テーマ、ブラウザ拡張に依存しない表示）、トレーニング（調教）レポート生成ボタンとレポート表示エンドポイント（`/training_report/<name>`）を追加しました。`src/utils/schedule_utils.py` の夜間レース時刻ロールオーバー対応と、`_get_race_number` の race_id 型耐性修正も含まれます。
+	- 影響: 生成レポートは `data/reports/` に保存され、`.gitignore` に追加されました。
+	- 次の推奨作業: 調教データ検出ロジック（`_parse_training_data`）の追加パターン対応、NiceGUIの配色微調整、CIにレポート生成のテスト追加。
+
+
 ---
 
 この一覧は現状の主要課題です。どれを優先して引き継ぎますか？（例: ログインの更なる堅牢化、イベントループ警告対策、ドキュメント整合性チェックの実装など）
